@@ -97,8 +97,27 @@ $myData = fetchDataFromMySQLTable($tableName);
 $originalArray = $myData;
 $separatedArray = separateJSONFields($originalArray);
 
-// Print the separated array for testing
-print_r($separatedArray[183]$id);
+// Initialize an empty array to store systemIds
+$systemIds = [];
+
+// Iterate through the main array
+foreach ($separatedArray as $item) {
+    // Check if 'referenceIds' key exists in the current item
+    if (isset($item['referenceIds']) && is_array($item['referenceIds'])) {
+        // Iterate through the 'referenceIds' array
+        foreach ($item['referenceIds'] as $reference) {
+            // Check if 'systemId' key exists in the current reference
+            if (isset($reference['systemId'])) {
+                // Add the 'systemId' value to the $systemIds array
+                $systemIds[] = $reference['systemId'];
+            }
+        }
+    }
+}
+
+// $systemIds now contains all the 'systemId' values from the original array
+print_r($systemIds);
+?>
 //$result = in_array('ECARPENTER', $separatedArray);
 //
 //var_dump($result); // bool(true)
