@@ -493,16 +493,7 @@ function createReservationLibRoom($data)
     return $result;
 }
 
-function extractGuestSurnames($guestData) {
-    $surnames = [];
 
-    foreach ($guestData as $guest) {
-        $surname = $guest['guest']['names'][0]['surname'];
-        $surnames[] = $surname;
-    }
-
-    return $surnames;
-}
 
 function createLoyaltyProgramArray() {
     $loyaltyProgramArray = [
@@ -662,59 +653,50 @@ function mapCustomerContactData($array) {
     $uniqueCheck = []; // Array to keep track of existing contacts to prevent duplicates
 
     foreach ($array as $item) {
-        // Ensure 'guests' field is not null before decoding
-        if (isset($item['guests']) && !is_null($item['guests'])) {
+        if (isset($item['guests']) && $item['guests'] !== null) {
             $guests = json_decode($item['guests'], true);
 
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                // Log an error or handle it accordingly if JSON is not valid
+                error_log("JSON decode error in guests: " . json_last_error_msg());
+                continue;
+            }
+
             foreach ($guests as $guest) {
+                if (!isset($guest['guest'])) {
+                    // Handle the case where 'guest' key is not set or is not an array
+                    continue;
+                }
                 $guestData = $guest['guest'];
 
-                // Initialize the contact array with default values
+                // Set the title to an empty string if it is 'N/A'
+                $title = isset($guestData['names'][0]['title']) && $guestData['names'][0]['title'] !== 'N/A' ? $guestData['names'][0]['title'] : '';
+
                 $contact = [
-                    'firstName' => '',
-                    'LastName' => '',
-                    'title' => '',
+                    'firstName' => $guestData['names'][0]['givenName'] ?? '',
+                    'LastName' => $guestData['names'][0]['surname'] ?? '',
+                    'title' => $title,
                     'email' => '',
-                    'birthDate' => '',
-                    'languageCode' => '',
-                    'languageFormat' => '',
-                    'isPrimary' => $guestData['isPrimary'] ?? '',
+                    'birthDate' => '', // Assuming this will be filled in later, as it's not provided in the sample
+                    'languageCode' => $guestData['names'][0]['language']['code'] ?? '',
+                    'languageFormat' => $guestData['names'][0]['language']['format'] ?? '',
                     'dataSource' => 'HAPI'
                 ];
 
-                // Check if names exist and assign them, including language details
-                if (!empty($guestData['names'])) {
-                    foreach ($guestData['names'] as $name) {
-                        $contact['firstName'] = $name['givenName'] ?? '';
-                        $contact['LastName'] = $name['surname'] ?? '';
-                        // Assuming the language is part of the first name's structure
-                        if (isset($name['language'])) {
-                            $contact['languageCode'] = $name['language']['code'] ?? '';
-                            $contact['languageFormat'] = $name['language']['format'] ?? '';
-                            // Assuming we only have one name entry with a language, break out of the loop
-                            break;
-                        }
-                    }
-                }
-
-                // Check if contact details exist and find the email
+                // Extract the first available email address
                 if (!empty($guestData['contactDetails'])) {
                     foreach ($guestData['contactDetails'] as $contactDetail) {
-                        if ($contactDetail['type'] === 'EMAIL') {
-                            $contact['email'] = $contactDetail['value'] ?? '';
-                            break;
+                        if ($contactDetail['type'] === 'EMAIL' && !empty($contactDetail['value'])) {
+                            $contact['email'] = $contactDetail['value'];
+                            break; // We only take the first email
                         }
                     }
                 }
 
-                // Create a unique identifier for each contact
+                // Generate a unique key for the contact to avoid duplicates
                 $uniqueId = $contact['firstName'] . '|' . $contact['LastName'] . '|' . $contact['email'];
-
-                // Check if this uniqueId has already been added to prevent duplicates
                 if (!isset($uniqueCheck[$uniqueId])) {
-                    // Add the contact to the customerContacts array
                     $customerContacts[] = $contact;
-                    // Mark this uniqueId as added
                     $uniqueCheck[$uniqueId] = true;
                 }
             }
@@ -722,6 +704,51 @@ function mapCustomerContactData($array) {
     }
 
     return $customerContacts;
+}
+
+
+
+
+
+function mapServiceItems($data) {
+    $mappedItems = [];
+    $uniqueItems = [];
+
+    // Add a default record with "UNKNOWN" values at the beginning
+    $mappedItems[] = [
+        'itemName' => 'UNKNOWN',
+        'itemCode' => 'UNKNOWN',
+        'ratePlanCode' => 'UNKNOWN',
+        'dataSource' => 'HAPI'
+    ];
+
+    foreach ($data as $entry) {
+        if (isset($entry['services']) && isset($entry['prices'])) {
+            $services = json_decode($entry['services'], true);
+            $prices = json_decode($entry['prices'], true);
+
+            foreach ($services as $index => $service) {
+                // Construct a unique key for each item to detect duplicates
+                $uniqueKey = $service['code'] . '|' . $prices[$index]['ratePlanCode'];
+
+                // Skip if this uniqueKey has already been added
+                if (!isset($uniqueItems[$uniqueKey])) {
+                    $mappedItems[] = [
+                        'itemName' => '',
+                        'itemCode' => $service['code'] ?? 'UNKNOWN',
+                        'ratePlanCode' => $prices[$index]['ratePlanCode'] ?? 'UNKNOWN',
+                        'dataSource' => 'HAPI'
+                    ];
+
+                    // Mark this uniqueKey as added
+                    $uniqueItems[$uniqueKey] = true;
+                }
+            }
+
+        }
+    }
+
+    return $mappedItems;
 }
 
 
@@ -747,9 +774,7 @@ $myData = fetchDataFromMySQLTable($tableName, $host, $username, $password, $data
 
 
 
-// Declare Variables:
-$tableName = 'hapi_raw_reservations';
-$myData = fetchDataFromMySQLTable($tableName);
+
 
 
 
@@ -759,9 +784,8 @@ $myData = fetchDataFromMySQLTable($tableName);
 $myDataSemiParsed = $myData;  // Use $inputArray instead of $myData
 
 //// Output the result
-var_dump(mapCustomerContactData($myDataSemiParsed));
-
-
+//print_r($myDataSemiParsed);
+var_dump(mapCustomerContactData($myData));
 
 
 
