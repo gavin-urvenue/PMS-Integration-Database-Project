@@ -785,7 +785,7 @@ $myDataSemiParsed = $myData;  // Use $inputArray instead of $myData
 
 //// Output the result
 //print_r($myDataSemiParsed);
-var_dump(mapCustomerContactData($myData));
+var_dump(mapServiceItems($myData));
 
 
 
