@@ -87,14 +87,11 @@ function fetchDataFromMySQLTable($tableName, $originDBConnection, $destinationDB
         while ($row = $result->fetch_assoc()) {
             $data[] = $row;
 
-            // Debugging: Log timestamps
-            error_log("Row createtstamp: " . $row['createtstamp'] . ", modtstamp: " . $row['modtstamp'] . ", lastEtlStartTStamp: $lastEtlStartTStamp", 3, 'error_log.txt');
-
             // Calculate insert and update counts
             if ($row['createtstamp'] > $lastEtlStartTStamp) {
                 $insertCount++;
             }
-            if ($row['modtstamp'] > $lastEtlStartTStamp) {
+            if ($row['modtstamp'] > $lastEtlStartTStamp AND $row['createtstamp'] <= $lastEtlStartTStamp) {
                 $updateCount++;
             }
         }
@@ -1691,53 +1688,225 @@ function upsertReservationLibRoomClass($data, $dbConnection) {
     }
 }
 
-function upsertReservationStay($arrRESERVATIONstay, $dbConnection) {
+function upsertReservationStay($data, $dbConnection) {
     $tableName = 'RESERVATIONstay';
 
-    foreach ($arrRESERVATIONstay as $element) {
-        // Extract the required fields
-        $createDateTime = $element['createDateTime'];
-        $modifyDateTime = $element['modifyDateTime'];
-        $startDate = $element['startDate'];
-        $endDate = $element['endDate'];
-        $extPMSConfNum = $element['extPMSConfNum'];
-        // Other fields can be extracted similarly
+    foreach ($data as $element) {
+        // Convert ISO 8601 datetime to Unix timestamp
+        $createDateTime = strtotime($element['createDateTime']) ?: null;
+        $modifyDateTime = strtotime($element['modifyDateTime']) ?: null;
+        $startDate = $element['startDate'] ?? null;
+        $endDate = $element['endDate'] ?? null;
+        $extPMSConfNum = $element['extPMSConfNum'] ?? null;
+        $dataSource = $element['dataSource'] ?? null;
+        $libSourceId = $element['libSourceId'] ?? null;
+        $libPropertyId = $element['libPropertyId'] ?? null;
+
+        $dbConnection->begin_transaction();
+
+        try {
+            // Check if a record with this combination already exists
+            $checkQuery = "SELECT `id` FROM `$tableName` WHERE `createDateTime` = FROM_UNIXTIME(?) AND `modifyDateTime` = FROM_UNIXTIME(?) AND `startDate` = ? AND `endDate` = ? AND `extPMSConfNum` = ?";
+            $stmt = $dbConnection->prepare($checkQuery);
+            if (!$stmt) {
+                throw new Exception("Prepare failed: " . $dbConnection->error);
+            }
+
+            $stmt->bind_param("iisss", $createDateTime, $modifyDateTime, $startDate, $endDate, $extPMSConfNum);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $exists = $result->fetch_assoc();
+
+            if ($exists) {
+                // Update
+                $updateQuery = "UPDATE `$tableName` SET `extPMSConfNum` = ?, `dataSource` = ?, `libSourceId` = ?, `libPropertyId` = ? WHERE `createDateTime` = FROM_UNIXTIME(?) AND `modifyDateTime` = FROM_UNIXTIME(?) AND `startDate` = ? AND `endDate` = ? AND `extPMSConfNum` = ?";
+                $updateStmt = $dbConnection->prepare($updateQuery);
+                if (!$updateStmt) {
+                    throw new Exception("Prepare failed: " . $dbConnection->error);
+                }
+
+                $updateStmt->bind_param("ssiiissss", $extPMSConfNum, $dataSource, $libSourceId, $libPropertyId, $createDateTime, $modifyDateTime, $startDate, $endDate, $extPMSConfNum);
+                $updateStmt->execute();
+                if ($updateStmt->error) {
+                    throw new Exception("Error in update operation: " . $updateStmt->error);
+                }
+            } else {
+                // Insert
+                $insertQuery = "INSERT INTO `$tableName` (`createDateTime`, `modifyDateTime`, `startDate`, `endDate`, `extPMSConfNum`, `dataSource`, `libSourceId`, `libPropertyId`) VALUES (FROM_UNIXTIME(?), FROM_UNIXTIME(?), ?, ?, ?, ?, ?, ?)";
+                $insertStmt = $dbConnection->prepare($insertQuery);
+                if (!$insertStmt) {
+                    throw new Exception("Prepare failed: " . $dbConnection->error);
+                }
+
+                $insertStmt->bind_param("iissssii", $createDateTime, $modifyDateTime, $startDate, $endDate, $extPMSConfNum, $dataSource, $libSourceId, $libPropertyId);
+                $insertStmt->execute();
+                if ($insertStmt->error) {
+                    throw new Exception("Error in insert operation: " . $insertStmt->error);
+                }
+            }
+
+            // Commit the transaction
+            $dbConnection->commit();
+
+        } catch (Exception $e) {
+            // Rollback the transaction on error
+            $dbConnection->rollback();
+            error_log("Upsert failed: " . $e->getMessage(), 3, 'error_log.txt');
+            throw $e;
+        }
+    }
+}
+
+function upsertCustomerRelationship($data, $dbConnection) {
+    $tableName = 'CUSTOMERrelationship';
+
+    foreach ($data as $element) {
+        $isPrimaryGuest = isset($element['isPrimaryGuest']) ? (int)$element['isPrimaryGuest'] : null;
+        $dataSource = $element['dataSource'] ?? null;
+        $contactTypeId = $element['contactTypeId'] ?? null;
+        $contactId = $element['contactId'] ?? null;
 
         // Start a transaction
         $dbConnection->begin_transaction();
 
         try {
             // Check if a record with this combination already exists
-            $checkQuery = "SELECT `id` FROM `$tableName` WHERE `createDateTime` = ? AND `modifyDateTime` = ? AND `startDate` = ? AND `endDate` = ? AND `extPMSConfNum` = ?";
+            $checkQuery = "SELECT `id` FROM `$tableName` WHERE `isPrimaryGuest` = ? AND `dataSource` = ? AND `contactTypeId` = ? AND `contactId` = ?";
             $stmt = $dbConnection->prepare($checkQuery);
-            $stmt->bind_param("sssss", $createDateTime, $modifyDateTime, $startDate, $endDate, $extPMSConfNum);
+            $stmt->bind_param("issi", $isPrimaryGuest, $dataSource, $contactTypeId, $contactId);
             $stmt->execute();
             $result = $stmt->get_result();
             $exists = $result->fetch_assoc();
 
-            // Prepare the upsert query
+            // Upsert query
             if ($exists) {
                 // Update
-                $updateQuery = "UPDATE `$tableName` SET ... WHERE `createDateTime` = ? AND `modifyDateTime` = ? AND `startDate` = ? AND `endDate` = ? AND `extPMSConfNum` = ?";
+                $updateQuery = "UPDATE `$tableName` SET `isPrimaryGuest` = ?, `dataSource` = ?, `contactTypeId` = ?, `contactId` = ? WHERE `id` = ?";
                 $updateStmt = $dbConnection->prepare($updateQuery);
-                // Bind parameters for the update query
+                $updateStmt->bind_param("issii", $isPrimaryGuest, $dataSource, $contactTypeId, $contactId, $exists['id']);
             } else {
                 // Insert
-                $insertQuery = "INSERT INTO `$tableName` (...) VALUES (...)";
+                $insertQuery = "INSERT INTO `$tableName` (`isPrimaryGuest`, `dataSource`, `contactTypeId`, `contactId`) VALUES (?, ?, ?, ?)";
                 $insertStmt = $dbConnection->prepare($insertQuery);
-                // Bind parameters for the insert query
+                $insertStmt->bind_param("issi", $isPrimaryGuest, $dataSource, $contactTypeId, $contactId);
             }
 
             // Execute the query
             if ($exists) {
-                // Execute update
                 $updateStmt->execute();
                 if ($updateStmt->error) {
                     throw new Exception("Error in update operation: " . $updateStmt->error);
                 }
             } else {
-                // Execute insert
                 $insertStmt->execute();
+                if ($insertStmt->error) {
+                    throw new Exception("Error in insert operation: " . $insertStmt->error);
+                }
+            }
+
+            // Commit the transaction
+            $dbConnection->commit();
+
+        } catch (Exception $e) {
+            // Rollback the transaction on error
+            $dbConnection->rollback();
+            throw $e;
+        }
+    }
+}
+
+function upsertCustomerMembership($data, $dbConnection) {
+    $tableName = 'CUSTOMERmembership';
+
+    foreach ($data as $element) {
+        $level = $element['level'] ?? null;
+        $membershipCode = $element['membershipCode'] ?? null;
+        $dataSource = $element['dataSource'] ?? null;
+        $libLoyaltyProgramId = $element['libLoyaltyProgramId'] ?? null;
+        $contactId = $element['contactId'] ?? null;
+
+        // Start a transaction
+        $dbConnection->begin_transaction();
+
+        try {
+            // Check if a record with this combination already exists
+            $checkQuery = "SELECT `id` FROM `$tableName` WHERE `contactId` = ? AND `libLoyaltyProgramId` = ? AND `level` = ? AND `membershipCode` = ?";
+            $stmt = $dbConnection->prepare($checkQuery);
+            $stmt->bind_param("iiss", $contactId, $libLoyaltyProgramId, $level, $membershipCode);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $exists = $result->fetch_assoc();
+
+            // Upsert query
+            if ($exists) {
+                // Update
+                $updateQuery = "UPDATE `$tableName` SET `level` = ?, `membershipCode` = ?, `dataSource` = ? WHERE `id` = ?";
+                $updateStmt = $dbConnection->prepare($updateQuery);
+                $updateStmt->bind_param("sssi", $level, $membershipCode, $dataSource, $exists['id']);
+            } else {
+                // Insert
+                $insertQuery = "INSERT INTO `$tableName` (`level`, `membershipCode`, `dataSource`, `libLoyaltyProgramId`, `contactId`) VALUES (?, ?, ?, ?, ?)";
+                $insertStmt = $dbConnection->prepare($insertQuery);
+                $insertStmt->bind_param("sssii", $level, $membershipCode, $dataSource, $libLoyaltyProgramId, $contactId);
+            }
+
+            // Execute the query
+            if ($exists) {
+                $updateStmt->execute();
+                if ($updateStmt->error) {
+                    throw new Exception("Error in update operation: " . $updateStmt->error);
+                }
+            } else {
+                $insertStmt->execute();
+                if ($insertStmt->error) {
+                    throw new Exception("Error in insert operation: " . $insertStmt->error);
+                }
+            }
+
+            // Commit the transaction
+            $dbConnection->commit();
+
+        } catch (Exception $e) {
+            // Rollback the transaction on error
+            $dbConnection->rollback();
+            throw $e;
+        }
+    }
+}
+
+function upsertServicesPayment($data, $dbConnection) {
+    $tableName = 'SERVICESpayment';
+
+    foreach ($data as $element) {
+        $paymentAmount = $element['paymentAmount'] ?? null;
+        $currencyCode = $element['currencyCode'] ?? null;
+        $dataSource = $element['dataSource'] ?? null;
+        $libTenderId = $element['libTenderId'] ?? null;
+
+        // Start a transaction
+        $dbConnection->begin_transaction();
+
+        try {
+            // Construct the check query with consideration for NULL values
+            $checkQuery = "SELECT COUNT(*) as count FROM `$tableName` WHERE 
+                (`paymentAmount` = ? OR (? IS NULL AND `paymentAmount` IS NULL)) AND 
+                (`currencyCode` = ? OR (? IS NULL AND `currencyCode` IS NULL)) AND 
+                `dataSource` = ? AND 
+                `libTenderId` = ?";
+
+            $checkStmt = $dbConnection->prepare($checkQuery);
+            $checkStmt->bind_param("dssdsi", $paymentAmount, $paymentAmount, $currencyCode, $currencyCode, $dataSource, $libTenderId);
+            $checkStmt->execute();
+            $result = $checkStmt->get_result();
+            $row = $result->fetch_assoc();
+
+            // Insert only if the record does not exist
+            if ($row['count'] == 0) {
+                $insertQuery = "INSERT INTO `$tableName` (`paymentAmount`, `currencyCode`, `dataSource`, `libTenderId`) VALUES (?, ?, ?, ?)";
+                $insertStmt = $dbConnection->prepare($insertQuery);
+                $insertStmt->bind_param("dssi", $paymentAmount, $currencyCode, $dataSource, $libTenderId);
+                $insertStmt->execute();
+
                 if ($insertStmt->error) {
                     throw new Exception("Error in insert operation: " . $insertStmt->error);
                 }
@@ -1756,75 +1925,6 @@ function upsertReservationStay($arrRESERVATIONstay, $dbConnection) {
 
 
 
-function findIdInDatabase($mysqli, $tableName, $searchCriteria) {
-    $query = "SELECT id FROM $tableName WHERE ";
-    $conditions = [];
-    $params = [];
-    $types = '';
-
-    foreach ($searchCriteria as $key => $value) {
-        $conditions[] = "$key = ?";
-        $params[] = &$searchCriteria[$key];
-        $types .= 's';
-    }
-
-    $query .= implode(' AND ', $conditions);
-
-    $stmt = $mysqli->prepare($query);
-
-    if (!$stmt) {
-        die("Error preparing query: " . $mysqli->error);
-    }
-
-    $stmt->bind_param($types, ...$params);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $row = $result->fetch_assoc();
-
-
-    $stmt->close();
-
-    return $row ? $row['id'] : null;
-}
-
-function updateArrayWithIdsForSpecificField($mysqli, $arr, $tableName, $matchingField) {
-    foreach ($arr as $key => $value) {
-        // Adjusted to access the nested 'CUSTOMERlibContactType' key
-        if (isset($value['CUSTOMERlibContactType'][$matchingField])) {
-            $searchCriteria = [$matchingField => $value['CUSTOMERlibContactType'][$matchingField]];
-            $id = findIdInDatabase($mysqli, $tableName, $searchCriteria);
-            $arr[$key]['id'] = $id; // Add the id to the top level of each element
-        } else {
-            // Handle the case where the matching field is not set
-            $arr[$key]['id'] = null;
-            echo "Warning: '$matchingField' key not found for element at index $key.\n";
-        }
-    }
-    return $arr;
-}
-
-function updateArrayWithIdsForMultipleFields($mysqli, $arr, $tableName, $matchingFields, $isNested = false) {
-    foreach ($arr as $key => $value) {
-        $searchCriteria = [];
-
-        // Adjust data access based on whether the data is nested
-        $data = $isNested ? $value[$tableName] : $value;
-
-        foreach ($matchingFields as $field) {
-            if (isset($data[$field])) {
-                $searchCriteria[$field] = $data[$field];
-            } else {
-                // Handle the case where a matching field is not set
-                echo "Warning: '$field' key not found for element at index $key.\n";
-                $searchCriteria[$field] = null; // or handle differently as needed
-            }
-        }
-
-        $id = findIdInDatabase($mysqli, $tableName, $searchCriteria);
-        $arr[$key]['id'] = $id; // Add the id to the top level of each element
-    }
-    return $arr;
-}
 
 function getTableAsAssociativeArray($connection, $tableName) {
     // Ensure the table name is safe to use in a query
@@ -2253,7 +2353,7 @@ try {
 }
 
 
-
+// Get Parent table associative arrays to prepare for upsert of child tables
 // Update $arrCustomerlibContactType
 // $arrCustomerlibContactType = updateArrayWithIdsForSpecificField($destinationDBConnection, $arrCustomerlibContactType, 'CUSTOMERlibContactType', 'type');
 $arrCustomerlibContactType = getTableAsAssociativeArray($destinationDBConnection,'CUSTOMERlibContactType');
@@ -2316,13 +2416,28 @@ $arrSERVICESpayment = createArrSERVICESpayment($myDataSemiParsed, $arrServicesli
 // 1) RESERVATIONgroupStay
 //Upsert into RESERVATIONstay table
 try {
-    upsertReservationStay($arrRESERVATIONstay, $destinationDBConnection);
+    upsertRESERVATIONstay($arrRESERVATIONstay, $destinationDBConnection);
 } catch (Exception $e) {
     echo 'Error: ' . $e->getMessage();
 }
 // 2) CUSTOMERrelationship
+//try {
+//    upsertCUSTOMERrelationship($arrCUSTOMERrelationship, $destinationDBConnection);
+//} catch (Exception $e) {
+//    echo 'Error: ' . $e->getMessage();
+//}
 // 3) CUSTOMERmembership
+try {
+    upsertCUSTOMERmembership($arrCUSTOMERmembership, $destinationDBConnection);
+} catch (Exception $e) {
+    echo 'Error: ' . $e->getMessage();
+}
 // 4) SERVICESpayment
+try {
+    upsertSERVICESpayment($arrSERVICESpayment, $destinationDBConnection);
+} catch (Exception $e) {
+    echo 'Error: ' . $e->getMessage();
+}
 // Grandchild tables
 // 1) RESERVATIONroomDetails
 // 2) RESERVATIONstayStatusStay
@@ -2336,11 +2451,11 @@ try {
 // 2) SERVICESfolioOrders
 
 //Populate grandchild tables
-var_dump(array_slice($arrRESERVATIONstay, 0, 20, true));
+//var_dump(array_slice($arrCUSTOMERrelationship, 0, 20, true));
 //var_dump(array_slice($arrReservationGroup, 0, 10, true));
-// print_r($arrCUSTOMERrelationship);
+// print_r($arrCUSTOMERmembership);
 //var_dump(array_slice($arrCustomerlibLoyaltyProgram, 0, 10, true));
-//var_dump(array_slice($arrSERVICESpayment, 0, 5, true));
+//var_dump(array_slice($arrSERVICESpayment, 0, 10, true));
 //print($etlStartTStamp);
 //echo "\n";
 //print($importCode);
@@ -2356,6 +2471,49 @@ var_dump(array_slice($arrRESERVATIONstay, 0, 20, true));
 // var_dump($arrReservationlibProperty);
 // var_dump($arrReservationlibProperty);
 
-//updateEtlDuration($destinationDBConnection)
+//// Check for null foreign keys
+//// Assuming $arr is your associative array
+//$arr = $arrCUSTOMERrelationship; // replace this with your actual array
+//
+//$contactTypeIdCounts = [];
+//$contactIdCounts = [];
+//
+//foreach ($arr as $item) {
+//    // Count for contactTypeId
+//    if (isset($item['contactTypeId'])) {
+//        $contactTypeId = $item['contactTypeId'];
+//        if (!isset($contactTypeIdCounts[$contactTypeId])) {
+//            $contactTypeIdCounts[$contactTypeId] = 0;
+//        }
+//        $contactTypeIdCounts[$contactTypeId]++;
+//    }
+//
+//    // Count for contactId
+//    if (isset($item['contactId'])) {
+//        $contactId = $item['contactId'];
+//        if (!isset($contactIdCounts[$contactId])) {
+//            $contactIdCounts[$contactId] = 0;
+//        }
+//        $contactIdCounts[$contactId]++;
+//    }
+//}
+//
+//// Output the results
+//echo "Counts for each contactTypeId:\n";
+//foreach ($contactTypeIdCounts as $contactTypeId => $count) {
+//    echo "contactTypeId: " . $contactTypeId . " - Count: " . $count . "\n";
+//}
+//
+//echo "\nCounts for each contactId:\n";
+//foreach ($contactIdCounts as $contactId => $count) {
+//    echo "contactId: " . $contactId . " - Count: " . $count . "\n";
+//}
 
+
+
+try {
+    updateEtlDuration($destinationDBConnection);
+} catch (Exception $e) {
+    echo 'Error: ' . $e->getMessage();
+}
 ?>
