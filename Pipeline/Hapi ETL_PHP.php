@@ -1,6 +1,7 @@
 <?php
 
-
+//variables
+$schemaVersion = 1.38;
 // Database Connections:
 $originTableName = 'hapi_raw_reservations';
 $originHost = 'localhost:3306';
@@ -40,8 +41,26 @@ function removeDuplicateRows2D($data, $key1, $key2)
     });
 }
 // Function to fetch data from a MySQL table and store it in a PHP associative  array
-function fetchDataFromMySQLTable($tableName, $originDBConnection)
+function getLatestEtlTimestamp($destinationDBConnection)
 {
+    $etlStartTStamp = 0;
+
+    try {
+        $query = "SELECT etlStartTStamp FROM PMSDATABASEmisc ORDER BY id DESC LIMIT 1";
+        $result = $destinationDBConnection->query($query);
+        if ($result && $row = $result->fetch_assoc()) {
+            $etlStartTStamp = $row['etlStartTStamp'];
+        }
+    } catch (Exception $e) {
+        error_log("Error fetching ETL timestamp: " . $e->getMessage(), 3, 'error_log.txt');
+    }
+
+    return $etlStartTStamp;
+}
+
+function fetchDataFromMySQLTable($tableName, $originDBConnection, $destinationDBConnection, &$insertCount, &$updateCount) {
+
+
     try {
         // Check connection
         if ($originDBConnection->connect_error) {
@@ -51,8 +70,11 @@ function fetchDataFromMySQLTable($tableName, $originDBConnection)
         // Start transaction
         $originDBConnection->begin_transaction();
 
+        // Fetch the last etlStartTStamp from PMSDATABASEmisc
+        $lastEtlStartTStamp = getLatestEtlTimestamp($destinationDBConnection);
+
         // Prepare and execute query
-        $query = "SELECT * FROM $tableName";
+        $query = "SELECT * FROM $tableName WHERE createTStamp > $lastEtlStartTStamp OR modTStamp > $lastEtlStartTStamp";
         $result = $originDBConnection->query($query);
 
         // Check for query success
@@ -64,6 +86,17 @@ function fetchDataFromMySQLTable($tableName, $originDBConnection)
         $data = [];
         while ($row = $result->fetch_assoc()) {
             $data[] = $row;
+
+            // Debugging: Log timestamps
+            error_log("Row createtstamp: " . $row['createtstamp'] . ", modtstamp: " . $row['modtstamp'] . ", lastEtlStartTStamp: $lastEtlStartTStamp", 3, 'error_log.txt');
+
+            // Calculate insert and update counts
+            if ($row['createtstamp'] > $lastEtlStartTStamp) {
+                $insertCount++;
+            }
+            if ($row['modtstamp'] > $lastEtlStartTStamp) {
+                $updateCount++;
+            }
         }
 
         // Commit the transaction
@@ -86,6 +119,100 @@ function fetchDataFromMySQLTable($tableName, $originDBConnection)
         // Optionally rethrow the exception if you want to handle it further up the call stack
         throw $e;
     }
+}
+
+
+function insertEtlTrackingInfo($destinationDBConnection, $insertCount, $updateCount, $etlSource, &$schemaVersion) {
+    try {
+        // Check connection
+        if ($destinationDBConnection->connect_error) {
+            throw new Exception('Connection failed: ' . $destinationDBConnection->connect_error);
+        }
+
+        // Prepare the file path and etlSource for SQL insertion
+        // Define the error log file path
+        $etlLogFile = dirname(__FILE__) . '/error_log.txt'; // Path to error_log.txt in the same directory as this script
+
+        $etlSource = $destinationDBConnection->real_escape_string($etlSource); // Escaping the etlSource
+
+        // Prepare and execute insert query with additional fields for insertCount and updateCount
+        $etlStartTStamp = time(); // Current Unix timestamp
+        $query = "INSERT INTO PMSDATABASEmisc (schemaVersion, etlStartTStamp, etlInsertsCount, etlUpdatesCount, etlLogFile, etlSource) VALUES ($schemaVersion, $etlStartTStamp, $insertCount, $updateCount, '$etlLogFile', '$etlSource')";
+        $result = $destinationDBConnection->query($query);
+
+        // Check for query success
+        if (!$result) {
+            throw new Exception('Query failed: ' . $destinationDBConnection->error);
+        }
+
+        // Log the success message
+        $successMessage = "Successfully inserted tracking info into PMSDATABASEmisc";
+        error_log($successMessage, 3, 'error_log.txt');
+
+    } catch (Exception $e) {
+        // Log the error
+        error_log($e->getMessage(), 3, 'error_log.txt');
+
+        // Optionally rethrow the exception if you want to handle it further up the call stack
+        throw $e;
+    }
+}
+
+
+
+
+
+function updateEtlDuration($destDBConnection)
+{
+    try {
+        // Check destination connection
+        if ($destDBConnection->connect_error) {
+            throw new Exception('Connection failed to destination DB: ' . $destDBConnection->connect_error);
+        }
+
+        // Get the current Unix timestamp
+        $currentTimestamp = time();
+
+        // Get the most recent ETL start timestamp
+        $queryStartTStamp = "SELECT etlStartTStamp FROM PMSDATABASEmisc ORDER BY id DESC LIMIT 1";
+        $resultStartTStamp = $destDBConnection->query($queryStartTStamp);
+        $etlStartTStamp = $resultStartTStamp->fetch_assoc()['etlStartTStamp'] ?? 0;
+
+        // Calculate the duration
+        $etlDuration = $currentTimestamp - $etlStartTStamp;
+
+        // Update the latest ETL record with the end timestamp and duration
+        $updateQuery = "UPDATE PMSDATABASEmisc SET etlEndTStamp = $currentTimestamp, etlDuration = $etlDuration ORDER BY id DESC LIMIT 1";
+        $destDBConnection->query($updateQuery);
+
+    } catch (Exception $e) {
+        // Handle exceptions, such as logging and re-throwing
+        error_log($e->getMessage(), 3, 'error_log.txt');
+        throw $e;
+    }
+}
+
+function getFirstNonNullImportCode($originDBConnection, $tableName)
+{
+    $importCode = '';
+
+    try {
+        $importCodeQuery = "SELECT import_code FROM $tableName WHERE import_code IS NOT NULL LIMIT 1";
+        $importCodeResult = $originDBConnection->query($importCodeQuery);
+
+        if (!$importCodeResult) {
+            throw new Exception('Query failed: ' . $originDBConnection->error);
+        }
+
+        if ($row = $importCodeResult->fetch_assoc()) {
+            $importCode = $row['import_code'];
+        }
+
+    } catch (Exception $e) {
+        error_log("Error fetching import_code: " . $e->getMessage(), 3, 'error_log.txt');
+    }
+
+    return $importCode;
 }
 
 
@@ -516,7 +643,7 @@ function createSERVICESlibserviceitems($array) {
 
 ////Function to create and populate the SERVICESlibFolioOrderType Table Associative Array
 function createSERVICESlibFolioOrderType() {
-    $contactTypeArray = [
+    $FolioOrderTypeArray = [
         [
             'SERVICESlibFolioOrdersType' => [
                 'orderType' => 'UNKNOWN',
@@ -543,7 +670,7 @@ function createSERVICESlibFolioOrderType() {
         ],
     ];
 
-    return $contactTypeArray;
+    return $FolioOrderTypeArray;
 }
 
 ////Function to create and populate the CUSTOMERcontact Table Associative Array
@@ -557,7 +684,7 @@ function createCUSTOMERcontact($array) {
             // 'birthDate' => 'UNKNOWN',
             'languageCode' => 'UNKNOWN',
             'languageFormat' => 'UNKNOWN',
-            'extGuestID' => 'UNKNOWN',
+            'extGuestId' => 'UNKNOWN',
             // 'isPrimary' => 'UNKNOWN',
             'dataSource' => 'HAPI'
         ]
@@ -589,7 +716,7 @@ function createCUSTOMERcontact($array) {
                     'birthDate' => $guestData['dateOfBirth'] ?? null, // Assign birthDate from dateOfBirth
                     'languageCode' => $guestData['primaryLanguage']['code'] ?? '',
                     'languageFormat' => $guestData['primaryLanguage']['format'] ?? '',
-                    'extGuestID' => $item['extracted_guest_id'] ?? '',
+                    'extGuestId' => $item['extracted_guest_id'] ?? '',
                     'isPrimary' => $guest['isPrimary'] ?? '',
                     'dataSource' => 'HAPI'
                 ];
@@ -629,7 +756,7 @@ function ParentTableValidation($tableName, $arrayOfAssocArrays, $dbConnection) {
             'birthDate' => ['type' => 'date'],
             'languageCode' => ['type' => 'varchar', 'length' => 16],
             'languageFormat' => ['type' => 'varchar', 'length' => 32],
-            'extGuestID' => ['type' => 'varchar', 'length' => 45],
+            'extGuestId' => ['type' => 'varchar', 'length' => 45],
             'metaData' => ['type' => 'json'],
             'dataSource' => ['type' => 'varchar', 'length' => 24],
         ],
@@ -809,7 +936,7 @@ function upsertCustomerContact($data, $dbConnection) {
         // Extract the required fields
         $firstName = $record['firstName'] ?? null;
         $lastName = $record['lastName'] ?? null;
-        $extGuestID = $record['extGuestID'] ?? null;
+        $extGuestId = $record['extGuestId'] ?? null;
 
         // Other fields
         $title = $record['title'] ?? '';
@@ -825,9 +952,9 @@ function upsertCustomerContact($data, $dbConnection) {
 
         try {
             // Check if a record with this combination already exists
-            $checkQuery = "SELECT COUNT(*) FROM `$tableName` WHERE `firstName` = ? AND `lastName` = ? AND `extGuestID` = ?";
+            $checkQuery = "SELECT COUNT(*) FROM `$tableName` WHERE `firstName` = ? AND `lastName` = ? AND `extGuestId` = ?";
             $stmt = $dbConnection->prepare($checkQuery);
-            $stmt->bind_param("sss", $firstName, $lastName, $extGuestID);
+            $stmt->bind_param("sss", $firstName, $lastName, $extGuestId);
             $stmt->execute();
             $result = $stmt->get_result();
             $exists = $result->fetch_row()[0] > 0;
@@ -835,14 +962,14 @@ function upsertCustomerContact($data, $dbConnection) {
             // Upsert query
             if ($exists) {
                 // Update
-                $updateQuery = "UPDATE `$tableName` SET `title` = ?, `email` = ?, `birthDate` = ?, `languageCode` = ?, `languageFormat` = ?, `metaData` = ?, `dataSource` = ? WHERE `firstName` = ? AND `lastName` = ? AND `extGuestID` = ?";
+                $updateQuery = "UPDATE `$tableName` SET `title` = ?, `email` = ?, `birthDate` = ?, `languageCode` = ?, `languageFormat` = ?, `metaData` = ?, `dataSource` = ? WHERE `firstName` = ? AND `lastName` = ? AND `extGuestId` = ?";
                 $updateStmt = $dbConnection->prepare($updateQuery);
-                $updateStmt->bind_param("ssssssssss", $title, $email, $birthDate, $languageCode, $languageFormat, $metaData, $dataSource, $firstName, $lastName, $extGuestID);
+                $updateStmt->bind_param("ssssssssss", $title, $email, $birthDate, $languageCode, $languageFormat, $metaData, $dataSource, $firstName, $lastName, $extGuestId);
             } else {
                 // Insert
-                $insertQuery = "INSERT INTO `$tableName` (`firstName`, `lastName`, `title`, `email`, `birthDate`, `languageCode`, `languageFormat`, `metaData`, `dataSource`, `extGuestID`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                $insertQuery = "INSERT INTO `$tableName` (`firstName`, `lastName`, `title`, `email`, `birthDate`, `languageCode`, `languageFormat`, `metaData`, `dataSource`, `extGuestId`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                 $insertStmt = $dbConnection->prepare($insertQuery);
-                $insertStmt->bind_param("ssssssssss", $firstName, $lastName, $title, $email, $birthDate, $languageCode, $languageFormat, $metaData, $dataSource, $extGuestID);
+                $insertStmt->bind_param("ssssssssss", $firstName, $lastName, $title, $email, $birthDate, $languageCode, $languageFormat, $metaData, $dataSource, $extGuestId);
             }
 
             // Execute the query
@@ -1237,11 +1364,11 @@ function upsertServicesLibFolioOrdersType($data, $dbConnection) {
     $tableName = 'SERVICESlibFolioOrdersType';
 
     foreach ($data as $element) {
-        if (isset($element['SERVICESlibFolioOrdersType'])) {
-            $record = $element['SERVICESlibFolioOrdersType'];
+        if (isset($element[$tableName])) {
+            $record = $element[$tableName];
 
             // Extract the required fields
-            $orderType = $record['type'] ?? null;
+            $orderType = $record['orderType'] ?? null;
             if ($orderType === null || $orderType === '') {
                 error_log("Skipped a record due to missing orderType", 3, 'error_log.txt');
                 continue; // Skip this record if orderType is not set or is an empty string
@@ -1564,6 +1691,71 @@ function upsertReservationLibRoomClass($data, $dbConnection) {
     }
 }
 
+function upsertReservationStay($arrRESERVATIONstay, $dbConnection) {
+    $tableName = 'RESERVATIONstay';
+
+    foreach ($arrRESERVATIONstay as $element) {
+        // Extract the required fields
+        $createDateTime = $element['createDateTime'];
+        $modifyDateTime = $element['modifyDateTime'];
+        $startDate = $element['startDate'];
+        $endDate = $element['endDate'];
+        $extPMSConfNum = $element['extPMSConfNum'];
+        // Other fields can be extracted similarly
+
+        // Start a transaction
+        $dbConnection->begin_transaction();
+
+        try {
+            // Check if a record with this combination already exists
+            $checkQuery = "SELECT `id` FROM `$tableName` WHERE `createDateTime` = ? AND `modifyDateTime` = ? AND `startDate` = ? AND `endDate` = ? AND `extPMSConfNum` = ?";
+            $stmt = $dbConnection->prepare($checkQuery);
+            $stmt->bind_param("sssss", $createDateTime, $modifyDateTime, $startDate, $endDate, $extPMSConfNum);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $exists = $result->fetch_assoc();
+
+            // Prepare the upsert query
+            if ($exists) {
+                // Update
+                $updateQuery = "UPDATE `$tableName` SET ... WHERE `createDateTime` = ? AND `modifyDateTime` = ? AND `startDate` = ? AND `endDate` = ? AND `extPMSConfNum` = ?";
+                $updateStmt = $dbConnection->prepare($updateQuery);
+                // Bind parameters for the update query
+            } else {
+                // Insert
+                $insertQuery = "INSERT INTO `$tableName` (...) VALUES (...)";
+                $insertStmt = $dbConnection->prepare($insertQuery);
+                // Bind parameters for the insert query
+            }
+
+            // Execute the query
+            if ($exists) {
+                // Execute update
+                $updateStmt->execute();
+                if ($updateStmt->error) {
+                    throw new Exception("Error in update operation: " . $updateStmt->error);
+                }
+            } else {
+                // Execute insert
+                $insertStmt->execute();
+                if ($insertStmt->error) {
+                    throw new Exception("Error in insert operation: " . $insertStmt->error);
+                }
+            }
+
+            // Commit the transaction
+            $dbConnection->commit();
+
+        } catch (Exception $e) {
+            // Rollback the transaction on error
+            $dbConnection->rollback();
+            throw $e;
+        }
+    }
+}
+
+
+
 function findIdInDatabase($mysqli, $tableName, $searchCriteria) {
     $query = "SELECT id FROM $tableName WHERE ";
     $conditions = [];
@@ -1664,13 +1856,13 @@ function getTableAsAssociativeArray($connection, $tableName) {
 
 function createArrReservationStay(
     $connection,
-    $myDataSemiParsed, 
-    $arrRESERVATIONlibSource, 
+    $myDataSemiParsed,
+    $arrRESERVATIONlibSource,
     $arrRESERVATIONlibProperty
 ) {
     $arrRESERVATIONStay = [];
 
-    // Create lookup arrays for source and property IDs
+    // Create lookup arrays for source and property Ids
     $sourceLookup = createLookup($connection, 'RESERVATIONlibSource', 'sourceName', 'sourceType');
     $propertyLookup = createLookup($connection, 'RESERVATIONlibProperty','propertyCode', 'chainCode');
 
@@ -1683,10 +1875,10 @@ function createArrReservationStay(
         $chainCode = $entry['extracted_chain_code'] ?? 'UNKNOWN';
         $propertyCode = $entry['extracted_property_code'] ?? 'UNKNOWN';
         $chainCode = $entry['extracted_chain_code'] ?? 'UNKNOWN';
-    
-        // Populate libSourceID and libPropertyID based on lookup
-        $libSourceID = $sourceLookup[$sourceName][$sourceType] ?? null;
-        $libPropertyID = $propertyLookup[$propertyCode][$chainCode] ?? null;
+
+        // Populate libSourceId and libPropertyId based on lookup
+        $libSourceId = $sourceLookup[$sourceName][$sourceType] ?? null;
+        $libPropertyId = $propertyLookup[$propertyCode][$chainCode] ?? null;
         $arrRESERVATIONStay[] = [
             'createDateTime' => $entry['createdDateTime'] ?? null,
             'modifyDateTime' => $entry['lastModifiedDateTime'] ?? null,
@@ -1694,11 +1886,11 @@ function createArrReservationStay(
             'endDate' => $entry['departure'] ?? null,
             'createdBy' => $entry['createdBy'] ?? null,
             'metaData' => null,
-            'extPMSConfNum' => $entry['confirmation_number'] ?? null, 
-            'extGuestID' => 'populated via trigger',
+            'extPMSConfNum' => $entry['confirmation_number'] ?? null,
+            'extGuestId' => 'populated via trigger',
             'dataSource' => 'HAPI', // Assuming 'HAPI' is constant
-            'libSourceID' => $libSourceID,
-            'libPropertyID' => $libPropertyID,
+            'libSourceId' => $libSourceId,
+            'libPropertyId' => $libPropertyId,
             'propertyCode' => $propertyCode,
             'chainCode' => $chainCode,
             'sourceName' => $sourceName,
@@ -1708,64 +1900,7 @@ function createArrReservationStay(
     // return $propertyLookup;
     return $arrRESERVATIONStay;
 }
-// function createArrReservationStay(
-//     $myDataSemiParsed, 
-//     $arrRESERVATIONlibSource, 
-//     $arrRESERVATIONlibProperty
-// ) {
-//     $arrRESERVATIONStay = [];
-//     $existingCombos = [];
 
-//     // Prepare a lookup array for source and property IDs
-//     $sourceLookup = createLookup($arrRESERVATIONlibSource, 'sourceName', 'sourceType');
-//     $propertyLookup = createLookup($arrRESERVATIONlibProperty, 'propertyCode', 'chainCode');
-
-//     foreach ($myDataSemiParsed as $entry) {
-//         $profiles = json_decode($entry['profiles'], true) ?? [];
-//         $profileData = $profiles[0] ?? []; // Assuming the first profile is what we want
-//         $sourceName = $profileData['names'][0]['name'] ?? 'UNKNOWN';
-//         $sourceType = $profileData['type'] ?? 'UNKNOWN';
-//         $propertyCode = $entry['extracted_property_code'] ?? 'UNKNOWN';
-//         $chainCode = $entry['extracted_chain_code'] ?? 'UNKNOWN';
-
-//         // Unique combination check to avoid duplicates
-//         $combo = $sourceName . $sourceType . $propertyCode . $chainCode;
-//         if (!in_array($combo, $existingCombos)) {
-//             $existingCombos[] = $combo;
-
-//             $arrRESERVATIONStay[] = [
-//                 'createDateTime' => $entry['createdDateTime'] ?? null,
-//                 'modifyDateTime' => $entry['lastModifiedDateTime'] ?? null,
-//                 'startDate' => $entry['arrival'] ?? null,
-//                 'endDate' => $entry['departure'] ?? null,
-//                 'createdBy' => $entry['createdBy'] ?? null,
-//                 'extGuestID' => null, // Assuming this is still null
-//                 'dataSource' => 'HAPI', // Assuming 'HAPI' is constant
-//                 'libSourceID' => $sourceLookup[$sourceName][$sourceType] ?? null,
-//                 'libPropertyID' => $propertyLookup[$propertyCode][$chainCode] ?? null,
-//                 'propertyCode' => $propertyCode,
-//                 'chainCode' => $chainCode,
-//                 'sourceName' => $sourceName,
-//                 'sourceType' => $sourceType,
-//             ];
-//         }
-//     }
-
-//     return $propertyLookup;
-// }
-
-
-// function createLookup($array, $keyField1, $keyField2) {
-//     $lookup = [];
-//     foreach ($array as $item) {
-//         $key1 = findInNestedArray($item, $keyField1);
-//         $key2 = findInNestedArray($item, $keyField2);
-//         if ($key1 !== null && $key2 !== null) {
-//             $lookup[$key1][$key2] = $item['id'];
-//         }
-//     }
-//     return $lookup;
-// }
 
 function createLookup($mysqli, $tableName, $keyField1, $keyField2) {
     $lookup = [];
@@ -1785,61 +1920,58 @@ function createLookup($mysqli, $tableName, $keyField1, $keyField2) {
 
 
 
-function createArrCUSTOMERrelationship($myDataSemiParsed) {
-    $arrCUSTOMERrelationship = [];
 
-    foreach ($myDataSemiParsed as $entry) {
-        $guestsData = json_decode($entry['guests'], true) ?? [];
-        foreach ($guestsData as $guestData) {
-            $guestInfo = $guestData['guest'] ?? null;
-            if ($guestInfo) {
-                $isPrimary = isset($guestData['isPrimary']) ? (int)$guestData['isPrimary'] : 0; // Convert true/false to 1/0
-                $relationship = [
-                    'isPrimaryGuest' => $isPrimary,
-                    'contactTypeID' => null, // Foreign key to be linked later
-                    'type' => 'GUEST',
-                    'contactID' => null, // Foreign key to be linked later
-                    'firstName' => $guestInfo['names'][0]['givenName'] ?? null,
-                    'LastName' => $guestInfo['names'][0]['surname'] ?? null,
-                    'dataSource' => 'HAPI'
-                ];
-                $arrCUSTOMERrelationship[] = $relationship;
-            }
+
+function createArrCUSTOMERmembership($myDataSemiParsed, $arrCUSTOMERlibLoyaltyProgram, $arrCUSTOMERcontact) {
+    $arrCUSTOMERmembership = [];
+    $defaultContactId = array_column($arrCUSTOMERcontact, 'id', 'extGuestID')['UNKNOWN'];
+    $loyaltyProgramIdForFairmont = null;
+
+    // Find the ID for 'Fairmont Banff Springs' from arrCUSTOMERlibLoyaltyProgram
+    foreach ($arrCUSTOMERlibLoyaltyProgram as $program) {
+        if ($program['name'] === 'Fairmont' && $program['source'] === 'Fairmont Banff Springs') {
+            $loyaltyProgramIdForFairmont = $program['id'];
+            break;
         }
     }
 
-    return $arrCUSTOMERrelationship;
-}
-
-function createArrCUSTOMERmembership($myDataSemiParsed) {
-    $arrCUSTOMERmembership = [];
-
     foreach ($myDataSemiParsed as $entry) {
-        // Decode the memberships JSON string into an associative array
         $memberships = json_decode($entry['memberships'], true) ?? [];
-        // Decode the guests JSON string to get the first guest's data
         $guestData = json_decode($entry['guests'], true)[0]['guest'] ?? null;
 
-        // If there are memberships and guest data, process them
         if (!empty($memberships) && $guestData) {
-            // Extract first and last name from the guest data
             $firstName = $guestData['names'][0]['givenName'] ?? null;
             $lastName = $guestData['names'][0]['surname'] ?? null;
+            $extGuestId = $entry['extracted_guest_id'] ?? null;
 
-            // Process each membership entry
             foreach ($memberships as $membership) {
-                // Create the customer membership array
+                // Only update if membershipCode is not null or empty
+                if (!empty($membership['membershipCode'])) {
+                    $libLoyaltyProgramId = $loyaltyProgramIdForFairmont;
+                } else {
+                    $libLoyaltyProgramId = null; // or some default value you deem appropriate
+                }
+
+                // Set the contactId based on the guest data
+                $contactId = $defaultContactId;
+                foreach ($arrCUSTOMERcontact as $contact) {
+                    if ($contact['extGuestID'] === $extGuestId && $contact['firstName'] === $firstName && $contact['lastName'] === $lastName) {
+                        $contactId = $contact['id'];
+                        break;
+                    }
+                }
+
                 $arrCUSTOMERmembership[] = [
                     'level' => $membership['level'] ?? null,
                     'membershipCode' => $membership['membershipCode'] ?? null,
                     'dataSource' => 'HAPI',
-                    'libLoyaltyProgramID' => null, // To be connected with foreign key
-                    'Name' => 'Fairmont Banff Springs',
-                    'Source' => 'Fairmont Banff Springs',
-                    'contactID' => null, // To be connected with foreign key
+                    'libLoyaltyProgramId' => $libLoyaltyProgramId,
+                    'Name' => $membership['Name'] ?? null,
+                    'Source' => $membership['Source'] ?? null,
+                    'contactId' => $contactId,
                     'firstName' => $firstName,
                     'LastName' => $lastName,
-                    'extGuestID' => $entry['extracted_guest_id'] ?? null,
+                    'extGuestId' => $extGuestId,
                 ];
             }
         }
@@ -1848,23 +1980,37 @@ function createArrCUSTOMERmembership($myDataSemiParsed) {
     return $arrCUSTOMERmembership;
 }
 
-function createArrSERVICESpayment($myDataSemiParsed) {
+
+
+
+function createArrSERVICESpayment($myDataSemiParsed, $arrSERVICESlibTender) {
     $arrSERVICESpayment = [];
+
+    // Create a lookup array for libTender based on paymentMethod
+    $libTenderLookup = [];
+    foreach ($arrSERVICESlibTender as $tender) {
+        $libTenderLookup[$tender['paymentMethod']] = $tender['id'];
+    }
+
+    // Get the default id for UNKNOWN paymentMethod
+    $defaultLibTenderId = $libTenderLookup['UNKNOWN'] ?? null;
 
     foreach ($myDataSemiParsed as $entry) {
         // Initialize default values
         $paymentAmount = null; // As specified, always null
         $currencyCode = isset($entry['currency']) ? json_decode($entry['currency'], true)['code'] : null;
         $dataSource = 'HAPI'; // Constant value 'HAPI'
-        $libTenderID = null; // Foreign key, left null for now
         $paymentMethod = isset($entry['paymentMethod']) ? json_decode($entry['paymentMethod'], true)['code'] : null;
+
+        // Match libTenderId using the lookup array, default to UNKNOWN if not found
+        $libTenderId = $libTenderLookup[$paymentMethod] ?? $defaultLibTenderId;
 
         // Construct the associative array
         $paymentData = [
             'paymentAmount' => $paymentAmount,
             'currencyCode' => $currencyCode,
             'dataSource' => $dataSource,
-            'libTenderID' => $libTenderID,
+            'libTenderId' => $libTenderId,
             'paymentMethod' => $paymentMethod
         ];
 
@@ -1874,22 +2020,48 @@ function createArrSERVICESpayment($myDataSemiParsed) {
     return $arrSERVICESpayment;
 }
 
-// Usage:
-// $myDataSemiParsed = /* Your data array */;
-// $arrSERVICESpayment = createArrSERVICESpayment($myDataSemiParsed);
+
+//-------------------------------------------------------------------------------------------------------------------------
+
+//Actual use of functions, or script logic:
 
 
 
 
 
-//create an array with all data from original data source
+//Pulling import code
+$importCode = getFirstNonNullImportCode($originDBConnection, 'hapi_raw_reservations');
+
+
+//Pull latest EtlTimestamp if exists from PMSDATABASEmisc
 try {
-    $myDataSemiParsed = fetchDataFromMySQLTable($originTableName, $originDBConnection);
-    // Work with $data...
-} catch (Exception $e) {
-    // Handle exception if needed
+    $etlStartTStamp = getLatestEtlTimestamp($destinationDBConnection);
+}
+catch (Exception $e)
+{
+echo 'Error: ' . $e->getMessage();
+}
+
+//fetch data from HAPI_RAW_RESERVATIONS and populate associative array
+$insertCount = 0;
+$updateCount = 0;
+try {
+    $myDataSemiParsed = fetchDataFromMySQLTable('hapi_raw_reservations', $originDBConnection, $destinationDBConnection, $insertCount, $updateCount);
+}
+catch (Exception $e)
+{
     echo 'Error: ' . $e->getMessage();
 }
+
+
+try {
+    insertEtlTrackingInfo($destinationDBConnection,$insertCount,$updateCount, $importCode, $schemaVersion);
+}
+catch (Exception $e)
+{
+    echo 'Error: ' . $e->getMessage();
+}
+
 
 //Parse out data from original data source array, $myDataSemiParsed, into arrays based on the final output tables
 //// CUSTOMER
@@ -1905,7 +2077,7 @@ $arrCustomerlibLoyaltyProgram = createCUSTOMERloyaltyProgram();
 ///
 //// SERVICES
 ///PARENT
-$arrServiceslibFolioOrderType = createSERVICESlibFolioOrderType();
+$arrServiceslibFolioOrdersType = createSERVICESlibFolioOrderType();
 $arrServiceslibTender = createSERVICESlibTender($myDataSemiParsed);
 $arrServiceslibServiceItems = createSERVICESlibServiceItems($myDataSemiParsed);
 /// CHILD
@@ -1956,7 +2128,7 @@ $arrParentTableArrays =
         $arrCustomerlibContactType,
         $arrCustomerContact,
         $arrCustomerlibLoyaltyProgram,
-        $arrServiceslibFolioOrderType,
+        $arrServiceslibFolioOrdersType,
         $arrServiceslibTender,
         $arrServiceslibServiceItems,
         $arrReservationlibProperty,
@@ -1983,7 +2155,7 @@ $grandChildTables =
 // Loop through each table and its corresponding data array
 
 
-// //Upsert Parent table associative arrays into their appropriate tables
+ //Upsert Parent table associative arrays into their appropriate tables
 
 //Upsert into CUSTOMERlibContactType table
 try {
@@ -2046,13 +2218,13 @@ try {
 
 //Upsert into SERVICESlibFolioOrdersType table
 try {
-   upsertServicesLibFolioOrdersType($arrServiceslibFolioOrderType, $destinationDBConnection);
+   upsertServicesLibFolioOrdersType($arrServiceslibFolioOrdersType, $destinationDBConnection);
 } catch (Exception $e) {
    echo 'Error: ' . $e->getMessage();
 }
 
 
-//Upsert into RESERVATIONgroupFolioOrdersType table
+//Upsert into RESERVATIONlibGroup table
 try {
    upsertReservationGroup($arrReservationGroup, $destinationDBConnection);
 } catch (Exception $e) {
@@ -2086,7 +2258,7 @@ try {
 // $arrCustomerlibContactType = updateArrayWithIdsForSpecificField($destinationDBConnection, $arrCustomerlibContactType, 'CUSTOMERlibContactType', 'type');
 $arrCustomerlibContactType = getTableAsAssociativeArray($destinationDBConnection,'CUSTOMERlibContactType');
 // Update $arrCustomerContact
-// $arrCustomerContact = updateArrayWithIdsForMultipleFields($destinationDBConnection, $arrCustomerContact, 'CUSTOMERcontact', ['firstName', 'lastName', 'extGuestID'],false);
+// $arrCustomerContact = updateArrayWithIdsForMultipleFields($destinationDBConnection, $arrCustomerContact, 'CUSTOMERcontact', ['firstName', 'lastName', 'extGuestId'],false);
 $arrCustomerContact = getTableAsAssociativeArray($destinationDBConnection,'CUSTOMERcontact');
 // Update $arrCustomerlibLoyaltyProgram
 // $arrCustomerlibLoyaltyProgram = updateArrayWithIdsForMultipleFields($destinationDBConnection, $arrCustomerlibLoyaltyProgram, 'CUSTOMERlibLoyaltyProgram', ['Name', 'Source'],true);
@@ -2115,9 +2287,9 @@ $arrReservationlibStayStatus = getTableAsAssociativeArray($destinationDBConnecti
 // Update $arrSERVICESlibtender
 // $arrServiceslibTender = updateArrayWithIdsForMultipleFields($destinationDBConnection, $arrServiceslibTender, 'SERVICESlibTender',['paymentMethod'], false);
 $arrServiceslibTender = getTableAsAssociativeArray($destinationDBConnection,'SERVICESlibTender');
-// Update $arrServiceslibFolioOrderType
-// $arrServiceslibFolioOrderType = updateArrayWithIdsForMultipleFields($destinationDBConnection, $arrServiceslibFolioOrderType, 'SERVICESlibFolioOrdersType',['orderType'], true);
-$arrServiceslibFolioOrderType = getTableAsAssociativeArray($destinationDBConnection,'SERVICESlibFolioOrdersType');
+// Update $arrServiceslibFolioOrdersType
+// $arrServiceslibFolioOrdersType = updateArrayWithIdsForMultipleFields($destinationDBConnection, $arrServiceslibFolioOrdersType, 'SERVICESlibFolioOrdersType',['orderType'], true);
+//$arrServiceslibFolioOrdersType = getTableAsAssociativeArray($destinationDBConnection,'SERVICESlibFolioOrdersType');
 // Update $arrRESERVATIONlibProperty
 // $arrServiceslibServiceItems = updateArrayWithIdsForMultipleFields($destinationDBConnection, $arrServiceslibServiceItems, 'SERVICESlibServiceItems',['itemName', 'itemCode', 'ratePlanCode'], false);
 $arrServiceslibServiceItems = getTableAsAssociativeArray($destinationDBConnection,'SERVICESlibServiceItems');
@@ -2133,17 +2305,22 @@ $arrServiceslibServiceItems = getTableAsAssociativeArray($destinationDBConnectio
 // 6) SERVICESpayment
 //Create child associative arrays using the populated parent tables
 // 1) RESERVATIONstay
-$arrRESERVATIONstay = createArrReservationStay($destinationDBConnection,$myDataSemiParsed, $arrReservationlibSource, $arrRESERVATIONlibProperty);
-
+$arrRESERVATIONstay = createArrReservationStay($destinationDBConnection,$myDataSemiParsed, $arrReservationlibSource, $arrReservationlibProperty);
 // 2) CUSTOMERrelationship
-$arrCUSTOMERrelationship = createArrCUSTOMERrelationship($myDataSemiParsed);
+$arrCUSTOMERrelationship = createArrCUSTOMERmembership($myDataSemiParsed, $arrCustomerlibContactType, $arrCustomerContact);
 // 3) CUSTOMERmembership
-$arrCUSTOMERmembership = createArrCUSTOMERmembership($myDataSemiParsed);
+$arrCUSTOMERmembership = createArrCUSTOMERmembership($myDataSemiParsed, $arrCustomerlibLoyaltyProgram, $arrCustomerContact);
 // 4) SERVICESpayment
-$arrSERVICESpayment = createArrSERVICESpayment($myDataSemiParsed);
+$arrSERVICESpayment = createArrSERVICESpayment($myDataSemiParsed, $arrServiceslibTender);
 //Populate child tables
 // 1) RESERVATIONgroupStay
-// 2) CUSTOMERrelationship9
+//Upsert into RESERVATIONstay table
+try {
+    upsertReservationStay($arrRESERVATIONstay, $destinationDBConnection);
+} catch (Exception $e) {
+    echo 'Error: ' . $e->getMessage();
+}
+// 2) CUSTOMERrelationship
 // 3) CUSTOMERmembership
 // 4) SERVICESpayment
 // Grandchild tables
@@ -2151,18 +2328,34 @@ $arrSERVICESpayment = createArrSERVICESpayment($myDataSemiParsed);
 // 2) RESERVATIONstayStatusStay
 // 3) RESERVATIONgroupStay
 // 4) SERVICESfolioOrders
-//Grandchild arrays and tables
+//Create grandchild associative arrays using the populated parent tables
 // 1) RESERVATIONgroupStay
 // 2) SERVICESfolioOrders
-//create grandchild associative arrays
+//Populate grandchild tables
 // 1) RESERVATIONgroupStay
 // 2) SERVICESfolioOrders
 
 //Populate grandchild tables
-
-print_r($arrRESERVATIONstay);
+var_dump(array_slice($arrRESERVATIONstay, 0, 20, true));
+//var_dump(array_slice($arrReservationGroup, 0, 10, true));
+// print_r($arrCUSTOMERrelationship);
+//var_dump(array_slice($arrCustomerlibLoyaltyProgram, 0, 10, true));
+//var_dump(array_slice($arrSERVICESpayment, 0, 5, true));
+//print($etlStartTStamp);
+//echo "\n";
+//print($importCode);
+//echo "\n";
+//print($insertCount);
+//echo "\n";
+//print($updateCount);
+//echo "\n";
+//print(getLatestEtlTimestamp($destinationDBConnection));
+//var_dump(array_slice($arrCustomerlibContactType, 0, 10, true));
 // var_dump(parseAndFlattenArray($myDataSemiParsed));
 // print_r($arrReservationlibSource);
 // var_dump($arrReservationlibProperty);
 // var_dump($arrReservationlibProperty);
+
+//updateEtlDuration($destinationDBConnection)
+
 ?>
