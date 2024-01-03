@@ -741,142 +741,6 @@ function createCUSTOMERcontact($array) {
     return $customerContacts;
 }
 
-//function to insert associative array data into a MySQL table with the same fields
-function ParentTableValidation($tableName, $arrayOfAssocArrays, $dbConnection) {
-// Define the schema for each table
-    $tableSchemas = [
-        'CUSTOMERcontact' => [
-            'firstName' => ['type' => 'varchar', 'length' => 32],
-            'lastName' => ['type' => 'varchar', 'length' => 32],
-            'title' => ['type' => 'varchar', 'length' => 32],
-            'email' => ['type' => 'varchar', 'length' => 64],
-            'birthDate' => ['type' => 'date'],
-            'languageCode' => ['type' => 'varchar', 'length' => 16],
-            'languageFormat' => ['type' => 'varchar', 'length' => 32],
-            'extGuestId' => ['type' => 'varchar', 'length' => 45],
-            'metaData' => ['type' => 'json'],
-            'dataSource' => ['type' => 'varchar', 'length' => 24],
-        ],
-        'RESERVATIONlibRoom' => [
-            'roomNumber' => ['type' => 'varchar', 'length' => 32],
-            'metaData' => ['type' => 'json'],
-            'dataSource' => ['type' => 'varchar', 'length' => 24],
-        ],
-        'RESERVATIONlibSource' => [
-            'sourceName' => ['type' => 'varchar', 'length' => 64],
-            'sourceType' => ['type' => 'varchar', 'length' => 32],
-            'metaData' => ['type' => 'json'],
-            'dataSource' => ['type' => 'varchar', 'length' => 24],
-        ],
-        'RESERVATIONlibProperty' => [
-            'chainCode' => ['type' => 'varchar', 'length' => 32],
-            'propertyCode' => ['type' => 'varchar', 'length' => 32],
-            'metaData' => ['type' => 'json'],
-            'dataSource' => ['type' => 'varchar', 'length' => 24],
-        ],
-        'CUSTOMERlibLoyaltyProgram' => [
-            'name' => ['type' => 'varchar', 'length' => 64],
-            'source' => ['type' => 'varchar', 'length' => 64],
-            'metaData' => ['type' => 'json'],
-            'dataSource' => ['type' => 'varchar', 'length' => 24],
-        ],
-        'SERVICESlibTender' => [
-            'paymentMethod' => ['type' => 'varchar', 'length' => 64],
-            'metaData' => ['type' => 'json'],
-            'dataSource' => ['type' => 'varchar', 'length' => 24],
-        ],
-        'SERVICESlibServiceItems' => [
-            'itemName' => ['type' => 'varchar', 'length' => 64],
-            'itemCode' => ['type' => 'varchar', 'length' => 64],
-            'ratePlanCode' => ['type' => 'varchar', 'length' => 64],
-            'metaData' => ['type' => 'json'],
-            'dataSource' => ['type' => 'varchar', 'length' => 24],
-        ],
-        'SERVICESlibFolioOrdersType' => [
-            'orderType' => ['type' => 'varchar', 'length' => 32],
-            'metaData' => ['type' => 'json'],
-            // 'dataSource' field is not mentioned in this table's structure
-        ],
-        // Add more tables as per your database schema
-        'RESERVATIONgroup' => [
-            'groupName' => ['type' => 'varchar', 'length' => 64],
-            'groupNumber' => ['type' => 'varchar', 'length' => 64],
-            'groupStartDate' => ['type' => 'date'],
-            'groupEndDate' => ['type' => 'date'],
-            'metaData' => ['type' => 'json'],
-            'dataSource' => ['type' => 'varchar', 'length' => 24],
-        ],
-        'CUSTOMERlibContactType' => [
-            'type' => ['type' => 'varchar', 'length' => 32],
-            'metaData' => ['type' => 'json'],
-            'dataSource' => ['type' => 'varchar', 'length' => 24],
-        ],
-        'RESERVATIONlibStayStatus' => [
-            'statusName' => ['type' => 'varchar', 'length' => 64],
-            'metaData' => ['type' => 'json'],
-            'dataSource' => ['type' => 'varchar', 'length' => 24],
-        ],
-        'RESERVATIONlibRoomType' => [
-            'typeName' => ['type' => 'varchar', 'length' => 64],
-            'typeCode' => ['type' => 'varchar', 'length' => 32],
-            'metaData' => ['type' => 'json'],
-            'dataSource' => ['type' => 'varchar', 'length' => 24],
-        ],
-        'RESERVATIONlibRoomClass' => [
-            'className' => ['type' => 'varchar', 'length' => 32],
-            'metaData' => ['type' => 'json'],
-            'dataSource' => ['type' => 'varchar', 'length' => 24],
-        ],
-    ];
-
-// Check if the table name is valid
-    if (!array_key_exists($tableName, $tableSchemas)) {
-        throw new Exception("Invalid table name: $tableName");
-    }
-
-// Iterate over each associative array in the array of associative arrays
-foreach ($arrayOfAssocArrays as $assocArray) {
-    // Validate the associative array against the table schema
-    foreach ($assocArray as $key => $value) {
-        if (!array_key_exists($key, $tableSchemas[$tableName])) {
-            throw new Exception("Invalid field: $key for table: $tableName");
-        }
-
-
-        // Type and length check
-        $fieldInfo = $tableSchemas[$tableName][$key];
-        $expectedType = $fieldInfo['type'];
-        $expectedLength = $fieldInfo['length'] ?? PHP_INT_MAX; // Default to a large number if length is not set
-
-        // Check type
-        if ($expectedType == 'varchar') {
-            if (!is_string($value)) {
-                throw new Exception("Type mismatch: Expected string for field $key, got " . gettype($value));
-            }
-        } elseif ($expectedType == 'int') {
-            if (!is_int($value)) {
-                throw new Exception("Type mismatch: Expected integer for field $key, got " . gettype($value));
-            }
-        } elseif ($expectedType == 'date') {
-            if (!is_string($value) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) { // Simple regex for date format check
-                throw new Exception("Type mismatch or format error: Expected date (YYYY-MM-DD) for field $key");
-            }
-        } elseif ($expectedType == 'json') {
-            if (!is_string($value) || is_null(json_decode($value))) {
-                throw new Exception("Type mismatch or format error: Expected JSON string for field $key");
-            }
-        }
-        // Add more type checks as per your requirements
-
-        // Check length
-        if (is_string($value) && strlen($value) > $expectedLength) {
-            throw new Exception("Length error: Data too long for field $key. Expected maximum length $expectedLength");
-        }
-    }
-
-
-}
-}
 function upsertCustomerContactType($data, $dbConnection) {
     $tableName = 'CUSTOMERlibContactType';
 
@@ -1692,12 +1556,13 @@ function upsertReservationStay($data, $dbConnection) {
     $tableName = 'RESERVATIONstay';
 
     foreach ($data as $element) {
-        // Convert ISO 8601 datetime to Unix timestamp
-        $createDateTime = strtotime($element['createDateTime']) ?: null;
-        $modifyDateTime = strtotime($element['modifyDateTime']) ?: null;
+        $createDateTime = $element['createDateTime'] ?? null;
+        $modifyDateTime = $element['modifyDateTime'] ?? null;
         $startDate = $element['startDate'] ?? null;
         $endDate = $element['endDate'] ?? null;
+        $createdBy = $element['createdBy'] ?? null;
         $extPMSConfNum = $element['extPMSConfNum'] ?? null;
+        $extGuestID = $element['extGuestID'] ?? null;
         $dataSource = $element['dataSource'] ?? null;
         $libSourceId = $element['libSourceId'] ?? null;
         $libPropertyId = $element['libPropertyId'] ?? null;
@@ -1706,12 +1571,13 @@ function upsertReservationStay($data, $dbConnection) {
 
         try {
             // Check if a record with this combination already exists
-            $checkQuery = "SELECT `id` FROM `$tableName` WHERE `createDateTime` = FROM_UNIXTIME(?) AND `modifyDateTime` = FROM_UNIXTIME(?) AND `startDate` = ? AND `endDate` = ? AND `extPMSConfNum` = ?";
+            $checkQuery = "SELECT `id` FROM `$tableName` WHERE `createDateTime` = ? AND `modifyDateTime` = ? AND `startDate` = ? AND `endDate` = ? AND `extPMSConfNum` = ?";
             $stmt = $dbConnection->prepare($checkQuery);
             if (!$stmt) {
                 throw new Exception("Prepare failed: " . $dbConnection->error);
             }
 
+            // Assuming createDateTime and modifyDateTime are integers, and the rest are strings
             $stmt->bind_param("iisss", $createDateTime, $modifyDateTime, $startDate, $endDate, $extPMSConfNum);
             $stmt->execute();
             $result = $stmt->get_result();
@@ -1719,26 +1585,28 @@ function upsertReservationStay($data, $dbConnection) {
 
             if ($exists) {
                 // Update
-                $updateQuery = "UPDATE `$tableName` SET `extPMSConfNum` = ?, `dataSource` = ?, `libSourceId` = ?, `libPropertyId` = ? WHERE `createDateTime` = FROM_UNIXTIME(?) AND `modifyDateTime` = FROM_UNIXTIME(?) AND `startDate` = ? AND `endDate` = ? AND `extPMSConfNum` = ?";
+                $updateQuery = "UPDATE `$tableName` SET `extPMSConfNum` = ?, `dataSource` = ?, `libSourceId` = ?, `libPropertyId` = ?, `createdBy` = ? WHERE `createDateTime` = ? AND `modifyDateTime` = ? AND `startDate` = ? AND `endDate` = ?";
                 $updateStmt = $dbConnection->prepare($updateQuery);
                 if (!$updateStmt) {
                     throw new Exception("Prepare failed: " . $dbConnection->error);
                 }
 
-                $updateStmt->bind_param("ssiiissss", $extPMSConfNum, $dataSource, $libSourceId, $libPropertyId, $createDateTime, $modifyDateTime, $startDate, $endDate, $extPMSConfNum);
+                // Adjust the types based on your actual data types
+                $updateStmt->bind_param("ssiisssss", $extPMSConfNum, $dataSource, $libSourceId, $libPropertyId, $createdBy, $createDateTime, $modifyDateTime, $startDate, $endDate);
                 $updateStmt->execute();
                 if ($updateStmt->error) {
                     throw new Exception("Error in update operation: " . $updateStmt->error);
                 }
             } else {
                 // Insert
-                $insertQuery = "INSERT INTO `$tableName` (`createDateTime`, `modifyDateTime`, `startDate`, `endDate`, `extPMSConfNum`, `dataSource`, `libSourceId`, `libPropertyId`) VALUES (FROM_UNIXTIME(?), FROM_UNIXTIME(?), ?, ?, ?, ?, ?, ?)";
+                $insertQuery = "INSERT INTO `$tableName` (`createDateTime`, `modifyDateTime`, `startDate`, `endDate`, `extPMSConfNum`, `dataSource`, `libSourceId`, `libPropertyId`, `createdBy`, `extGuestID`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                 $insertStmt = $dbConnection->prepare($insertQuery);
                 if (!$insertStmt) {
                     throw new Exception("Prepare failed: " . $dbConnection->error);
                 }
 
-                $insertStmt->bind_param("iissssii", $createDateTime, $modifyDateTime, $startDate, $endDate, $extPMSConfNum, $dataSource, $libSourceId, $libPropertyId);
+                // Adjust the types based on your actual data types
+                $insertStmt->bind_param("iissssiiss", $createDateTime, $modifyDateTime, $startDate, $endDate, $extPMSConfNum, $dataSource, $libSourceId, $libPropertyId, $createdBy, $extGuestID);
                 $insertStmt->execute();
                 if ($insertStmt->error) {
                     throw new Exception("Error in insert operation: " . $insertStmt->error);
@@ -1756,6 +1624,10 @@ function upsertReservationStay($data, $dbConnection) {
         }
     }
 }
+
+
+
+
 
 function upsertCustomerRelationship($data, $dbConnection) {
     $tableName = 'CUSTOMERrelationship';
@@ -1957,7 +1829,7 @@ function getTableAsAssociativeArray($connection, $tableName) {
 
 
 //create the arrRESERVATIONstay array by parsing from $myDataSemiParsed
-function createArrReservationStay(
+function createArrRESERVATIONstay(
     $connection,
     $myDataSemiParsed,
     $arrRESERVATIONlibSource,
@@ -1967,7 +1839,7 @@ function createArrReservationStay(
 
     // Create lookup arrays for source and property Ids
     $sourceLookup = createLookup($connection, 'RESERVATIONlibSource', 'sourceName', 'sourceType');
-    $propertyLookup = createLookup($connection, 'RESERVATIONlibProperty','propertyCode', 'chainCode');
+    $propertyLookup = createLookup($connection, 'RESERVATIONlibProperty', 'propertyCode', 'chainCode');
 
     foreach ($myDataSemiParsed as $entry) {
         $profiles = json_decode($entry['profiles'], true) ?? [];
@@ -1976,21 +1848,24 @@ function createArrReservationStay(
         $sourceType = $profileData['type'] ?? 'UNKNOWN';
         $propertyCode = $entry['extracted_property_code'] ?? 'UNKNOWN';
         $chainCode = $entry['extracted_chain_code'] ?? 'UNKNOWN';
-        $propertyCode = $entry['extracted_property_code'] ?? 'UNKNOWN';
-        $chainCode = $entry['extracted_chain_code'] ?? 'UNKNOWN';
+
+        // Convert createdDateTime and lastModifiedDateTime to Unix timestamps
+        $createDateTime = isset($entry['createdDateTime']) ? $entry['createdDateTime'] : null;
+        $modifyDateTime = isset($entry['lastModifiedDateTime']) ? $entry['lastModifiedDateTime'] : null;
 
         // Populate libSourceId and libPropertyId based on lookup
         $libSourceId = $sourceLookup[$sourceName][$sourceType] ?? null;
         $libPropertyId = $propertyLookup[$propertyCode][$chainCode] ?? null;
+
         $arrRESERVATIONStay[] = [
-            'createDateTime' => $entry['createdDateTime'] ?? null,
-            'modifyDateTime' => $entry['lastModifiedDateTime'] ?? null,
+            'createDateTime' => strtotime($createDateTime),
+            'modifyDateTime' => strtotime($modifyDateTime),
             'startDate' => $entry['arrival'] ?? null,
             'endDate' => $entry['departure'] ?? null,
-            'createdBy' => $entry['createdBy'] ?? null,
+            'createdBy' => $entry['createdBy'] ?? null, // Extract createdBy field
             'metaData' => null,
             'extPMSConfNum' => $entry['confirmation_number'] ?? null,
-            'extGuestId' => 'populated via trigger',
+            'extGuestID' => $entry['extracted_guest_id'],
             'dataSource' => 'HAPI', // Assuming 'HAPI' is constant
             'libSourceId' => $libSourceId,
             'libPropertyId' => $libPropertyId,
@@ -2000,9 +1875,11 @@ function createArrReservationStay(
             'sourceType' => $sourceType,
         ];
     }
-    // return $propertyLookup;
+
     return $arrRESERVATIONStay;
 }
+
+
 
 
 //create the arrCUSTOMERrelationship array by parsing from $myDataSemiParsed
@@ -2062,32 +1939,6 @@ function createArrCUSTOMERrelationship($myDataSemiParsed, $arrCUSTOMERlibContact
 
 
 
-// Assuming getContactIdFromDB is a function that retrieves the contact ID from CUSTOMERcontact table
-function getContactIdFromDB($dbConnection, $firstName, $lastName, $extGuestId) {
-    // Initialize the ID to null
-    $contactId = null;
-
-    // Prepare the SQL statement to prevent SQL injection
-    $stmt = $dbConnection->prepare("SELECT `id` FROM `CUSTOMERcontact` WHERE `firstName` = ? AND `lastName` = ? AND `extGuestId` = ? LIMIT 1");
-
-    // Bind the parameters
-    $stmt->bind_param("sss", $firstName, $lastName, $extGuestId);
-
-    // Execute the query
-    if ($stmt->execute()) {
-        // Bind the result
-        $stmt->bind_result($contactId);
-
-        // Fetch the result. If there's a result, $contactId will be set.
-        $stmt->fetch();
-    }
-
-    // Close the statement
-    $stmt->close();
-
-    // Return the found ID or null
-    return $contactId;
-}
 
 
 
@@ -2268,29 +2119,46 @@ function create_arrRESERVATIONgroupStay($arrRESERVATIONstay, $arrRESERVATIONgrou
     return $arrRESERVATIONgroupStay;
 }
 
+function indexArrReservationStay($arrRESERVATIONstay) {
+    $indexedStays = [];
+    foreach ($arrRESERVATIONstay as $stay) {
+        // Create a unique key for each stay
+        $key = $stay['startDate'] . '|' . $stay['endDate'] . '|' . strtotime($stay['createDateTime']) . '|' . strtotime($stay['modifyDateTime']);
+        $indexedStays[$key] = $stay['id'];
+    }
+    return $indexedStays;
+}
+
 function createArrRESERVATIONstayStatusStay($myDataSemiParsed, $arrRESERVATIONstay, $arrRESERVATIONlibStayStatus) {
     $arrRESERVATIONstayStatusStay = [];
 
+    // Indexing arrRESERVATIONstay for faster lookup
+    $indexArrReservationStay = [];
+    foreach ($arrRESERVATIONstay as $stay) {
+        // Use string values for createDateTime and modifyDateTime for consistent comparison
+        $indexKey = $stay['createDateTime'] . '_' . $stay['modifyDateTime'] . '_' . $stay['startDate'] . '_' . $stay['endDate'];
+        $indexArrReservationStay[$indexKey] = $stay['id'];
+    }
+
     foreach ($myDataSemiParsed as $entry) {
-        // Look up the stayStatusID using statusName
+        // Convert the entry dates to Unix timestamps for matching
+        $createTimestamp = isset($entry['createdDateTime']) ? (string)strtotime($entry['createdDateTime']) : '0';
+        $modifyTimestamp = isset($entry['lastModifiedDateTime']) ? (string)strtotime($entry['lastModifiedDateTime']) : '0';
+
+        // Find the stayStatusID based on statusName
         $stayStatusID = null;
         foreach ($arrRESERVATIONlibStayStatus as $status) {
-            if ($status['statusName'] === $entry['ext_status'] ?? 'UNKNOWN') {
+            if ($status['statusName'] === ($entry['ext_status'] ?? 'UNKNOWN')) {
                 $stayStatusID = $status['id'];
                 break;
             }
         }
 
-        // Look up the stayID using startDate, endDate, and extGuestID
-        $stayID = null;
-        foreach ($arrRESERVATIONstay as $stay) {
-            if ($stay['startDate'] === $entry['arrival'] &&
-                $stay['endDate'] === $entry['departure'] &&
-                $stay['extGuestID'] === $entry['extracted_guest_id']) {
-                $stayID = $stay['id'];
-                break;
-            }
-        }
+        // Construct the index key for lookup
+        $lookupKey = $createTimestamp . '_' . $modifyTimestamp . '_' . $entry['arrival'] . '_' . $entry['departure'];
+
+        // Look up the stayID using the index
+        $stayID = $indexArrReservationStay[$lookupKey] ?? null;
 
         // Create the array for this item
         $arrRESERVATIONstayStatusStay[] = [
@@ -2298,8 +2166,10 @@ function createArrRESERVATIONstayStatusStay($myDataSemiParsed, $arrRESERVATIONst
             'cancellationDateTime' => $entry['cancellationDetails']['cancellationDateTime'] ?? null,
             'cancellationReasonCode' => $entry['cancellationDetails']['cancellationReasonCode'] ?? null,
             'cancellationReasonText' => $entry['Cancellation']['cancellationReasonText'] ?? null,
-            'dataSource' => 'HAPI', // Assuming 'HAPI' is a constant value
+            'dataSource' => 'HAPI', // Assuming 'HAPI' is constant
             'stayID' => $stayID,
+            'createDateTime' => $createTimestamp,
+            'modifyDateTime' => $modifyTimestamp,
             'startDate' => $entry['arrival'] ?? null,
             'endDate' => $entry['departure'] ?? null,
             'extGuestID' => $entry['extracted_guest_id'],
@@ -2310,6 +2180,123 @@ function createArrRESERVATIONstayStatusStay($myDataSemiParsed, $arrRESERVATIONst
 
     return $arrRESERVATIONstayStatusStay;
 }
+
+
+function upsertReservationStayStatusStay($data, $dbConnection) {
+    $tableName = 'RESERVATIONstayStatusStay';
+    $errorLogFile = 'error_log.txt'; // Define the error log file path
+
+    foreach ($data as $element) {
+        // Skip the record if stayId is null
+        if (empty($element['stayID'])) {
+            $timestamp = date('Y-m-d H:i:s');
+            $logMessage = "[$timestamp] Skipped record due to null stayID: " . json_encode($element) . PHP_EOL;
+            error_log($logMessage, 3, $errorLogFile);
+            continue;
+        }
+
+        $cancelledBy = $element['cancelledBy'] ?? null;
+        $cancellationDateTime = $element['cancellationDateTime'] ?? null;
+        $cancellationReasonCode = $element['cancellationReasonCode'] ?? null;
+        $cancellationReasonText = $element['cancellationReasonText'] ?? null;
+        $dataSource = $element['dataSource'] ?? null;
+        $stayId = $element['stayID'];
+        $stayStatusId = $element['stayStatusID'] ?? null;
+
+        $dbConnection->begin_transaction();
+
+        try {
+            // Check if a record with this combination already exists
+            $checkQuery = "SELECT `id` FROM `$tableName` WHERE `stayId` = ? AND `stayStatusId` = ?";
+            $stmt = $dbConnection->prepare($checkQuery);
+            if (!$stmt) {
+                throw new Exception("Prepare failed: " . $dbConnection->error);
+            }
+
+            $stmt->bind_param("ii", $stayId, $stayStatusId);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $exists = $result->fetch_assoc();
+
+            if ($exists) {
+                // Update
+                $updateQuery = "UPDATE `$tableName` SET `cancelledBy` = ?, `cancellationDateTime` = ?, `cancellationReasonCode` = ?, `cancellationReasonText` = ?, `dataSource` = ? WHERE `stayId` = ? AND `stayStatusId` = ?";
+                $updateStmt = $dbConnection->prepare($updateQuery);
+                if (!$updateStmt) {
+                    throw new Exception("Prepare failed: " . $dbConnection->error);
+                }
+
+                $updateStmt->bind_param("sisssii", $cancelledBy, $cancellationDateTime, $cancellationReasonCode, $cancellationReasonText, $dataSource, $stayId, $stayStatusId);
+                $updateStmt->execute();
+                if ($updateStmt->error) {
+                    throw new Exception("Error in update operation: " . $updateStmt->error);
+                }
+            } else {
+                // Insert
+                $insertQuery = "INSERT INTO `$tableName` (`cancelledBy`, `cancellationDateTime`, `cancellationReasonCode`, `cancellationReasonText`, `dataSource`, `stayId`, `stayStatusId`) VALUES (?, ?, ?, ?, ?, ?, ?)";
+                $insertStmt = $dbConnection->prepare($insertQuery);
+                if (!$insertStmt) {
+                    throw new Exception("Prepare failed: " . $dbConnection->error);
+                }
+
+                $insertStmt->bind_param("sisssii", $cancelledBy, $cancellationDateTime, $cancellationReasonCode, $cancellationReasonText, $dataSource, $stayId, $stayStatusId);
+                $insertStmt->execute();
+                if ($insertStmt->error) {
+                    throw new Exception("Error in insert operation: " . $insertStmt->error);
+                }
+            }
+
+            // Commit the transaction
+            $dbConnection->commit();
+
+        } catch (Exception $e) {
+            // Rollback the transaction on error
+            $dbConnection->rollback();
+            error_log("Upsert failed: " . $e->getMessage(), 3, $errorLogFile);
+            throw $e;
+        }
+    }
+}
+
+function createArrReservationRoomDetails($myDataSemiParsed) {
+    $arrReservationRoomDetails = [];
+
+    foreach ($myDataSemiParsed as $entry) {
+        $guestDetails = isset($entry['Guests'][0]['guest']['names'][0]) ? $entry['Guests'][0]['guest']['names'][0] : [];
+
+        $roomDetails = [
+            'startDate' => $entry['occupancyDetails']['start'] ?? null,
+            'endDate' => $entry['occupancyDetails']['end'] ?? null,
+            'amount' => $entry['Prices']['amount'] ?? null,
+            'ratePlanCode' => $entry['ratePlans']['code'] ?? null,
+            'isBlocked' => ($entry['Blocks']['isempty'] ?? true) == false,
+            'isComplimentary' => $entry['isComplimentary'] ?? null,
+            'isHouseUse' => $entry['isHouseUse'] ?? null,
+            'extraBedType' => $entry['occupiedUnits']['extrabed']['type'] ?? null,
+            'extraBedCount' => $entry['occupiedUnits']['extrabed']['count'] ?? null,
+            'dataSource' => 'HAPI',
+            'contactID' => null, // Placeholder for future update
+            'firstName' => $guestDetails['givenName'] ?? null,
+            'lastName' => $guestDetails['surname'] ?? null,
+            'extGuestId' => $entry['extracted_guest_id'] ?? null,
+            'libRoomId' => null, // Placeholder for future update
+            'roomNumber' => $entry['occupiedUnits']['unitId'] ?? null,
+            'stayId' => null, // Placeholder for future update
+            'createDateTime' => $entry['createdDateTime'] ?? null,
+            'modifyDateTime' => $entry['lastModifiedDateTime'] ?? null,
+            'extPMSConfNum' => $entry['confirmation_number'] ?? null,
+            'libRoomTypeId' => null, // Placeholder for future update
+            'roomNumber' => $entry['occupiedUnits']['unitId'] ?? null,
+            'libRoomClassId' => null, // Placeholder for future update
+            'className' => 'UNKNOWN',
+        ];
+
+        $arrReservationRoomDetails[] = $roomDetails;
+    }
+
+    return $arrReservationRoomDetails;
+}
+
 
 // Example usage:
 // $arrRESERVATIONstayStatusStay = create_arrRESERVATIONstayStatusStay($myDataSemiParsed, $arrRESERVATIONstay, $arrRESERVATIONlibStayStatus);
@@ -2598,7 +2585,7 @@ $arrSERVICESlibServiceItems = getTableAsAssociativeArray($destinationDBConnectio
 
 // 5) CUSTOMERmembership
 // 6) SERVICESpayment
-//Create child associative arrays using the populated parent tables
+//Create child associative arrays using the populated parent tables and the raw data
 // 1) RESERVATIONstay
 $arrRESERVATIONstay = createArrReservationStay($destinationDBConnection,$myDataSemiParsed, $arrRESERVATIONlibSource, $arrRESERVATIONlibProperty);
 // 2) CUSTOMERrelationship
@@ -2652,8 +2639,11 @@ $arrSERVICESpayment = getTableAsAssociativeArray($destinationDBConnection,'SERVI
 // 4) SERVICESfolioOrders
 //Create grandchild associative arrays using the populated parent tables
 // 1) RESERVATIONroomDetails
-//$arrRESERVATIONroomDetails = createArrReservationRoomDetails($myDataSemiParsed, $arrRESERVATIONlibRoom, $arrRESERVATIONstay, $arrRESERVATIONlibRoomType,$arrRESERVATIONlibRoomClass);
+$arrRESERVATIONroomDetails = createArrReservationRoomDetails($myDataSemiParsed);
 // 2) RESERVATIONstayStatusStay
+// First, index $arrRESERVATIONstay
+$indexedArrRESERVATIONstay = indexArrReservationStay($arrRESERVATIONstay);
+
 $arrRESERVATIONstayStatusStay = createArrRESERVATIONstayStatusStay($myDataSemiParsed, $arrRESERVATIONstay, $arrRESERVATIONlibStayStatus);
 // 3) RESERVATIONgroupStay
 //May need to put this one on hold until we get actual group data from Hapi =/
@@ -2662,18 +2652,25 @@ $arrRESERVATIONstayStatusStay = createArrRESERVATIONstayStatusStay($myDataSemiPa
 //Populate grandchild tables
 // 1) RESERVATIONroomDetails
 // 2) RESERVATIONstayStatusStay
+try {
+    upsertReservationStayStatusStay($myDataSemiParsed, $destinationDBConnection);
+} catch (Exception $e) {
+    echo 'Error: ' . $e->getMessage();
+}
+
 // 3) RESERVATIONgroupStay
 // 4) SERVICESfolioOrders
 // Get Grandchild table associative arrays with new primary keys
 // 1) RESERVATIONroomDetails
 // 2) RESERVATIONstayStatusStay
+$arrRESERVATIONstay = getTableAsAssociativeArray($destinationDBConnection,'RESERVATIONstayStatusStay');
 // 3) RESERVATIONgroupStay
 // 4) SERVICESfolioOrders
 
 //Populate grandchild tables
-var_dump(array_slice($arrRESERVATIONstay, 0, 10, true));
-var_dump(array_slice($arrRESERVATIONstayStatusStay, 0, 10, true));
-//var_dump($arrRESERVATIONstayStatusStay);
+//var_dump(array_slice($arrRESERVATIONstay, 0, 10, true));
+//var_dump(array_slice($arrRESERVATIONstayStatusStay, 0, 10, true));
+var_dump($arrRESERVATIONroomDetails);
 //print_r($arrRESERVATIONstayStatusStay);
 //print_r($arrRESERVATIONroomDetails);
 //var_dump(array_slice($arrCUSTOMERlibLoyaltyProgram, 0, 10, true));

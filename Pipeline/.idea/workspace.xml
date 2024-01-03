@@ -8,6 +8,7 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Hapi ETL_PHP.php" beforeDir="false" afterPath="$PROJECT_DIR$/Hapi ETL_PHP.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/error_log.txt" beforeDir="false" afterPath="$PROJECT_DIR$/error_log.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/extGuestID_query_&amp;_populate_insert.sql" beforeDir="false" afterPath="$PROJECT_DIR$/extGuestID_query_&amp;_populate_insert.sql" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -53,7 +54,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1703792593145</updated>
-      <workItem from="1703792594158" duration="60166000" />
+      <workItem from="1703792594158" duration="91295000" />
     </task>
     <servers />
   </component>

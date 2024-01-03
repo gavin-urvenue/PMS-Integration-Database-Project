@@ -31,7 +31,7 @@ DELIMITER ;
 
 DELIMITER //
 
-CREATE TRIGGER extGuestID_query_&_populate_insert
+CREATE TRIGGER extGuestID_query_populate_insert
 AFTER INSERT ON RESERVATIONstay
 FOR EACH ROW
 BEGIN
@@ -43,7 +43,7 @@ DELIMITER ;
 
 DELIMITER //
 
-CREATE TRIGGER extGuestID_query_&_populate_update
+CREATE TRIGGER extGuestID_query_populate_update
 AFTER UPDATE ON RESERVATIONstay
 FOR EACH ROW
 BEGIN
