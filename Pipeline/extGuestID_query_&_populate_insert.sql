@@ -17,7 +17,7 @@ BEGIN
     -- Select the guest ID from CUSTOMERcontact based on the new stay ID
     SELECT c.extGuestID INTO guestID
     FROM CUSTOMERcontact c 
-    INNER JOIN SERVICESfolioOrders fo ON c.id = fo.contactId
+    INNER JOIN ReservationStay s ON c.id = s.contactId
     WHERE fo.stayid = newStayID;
 
     -- Update the RESERVATIONstay table with the guest ID
