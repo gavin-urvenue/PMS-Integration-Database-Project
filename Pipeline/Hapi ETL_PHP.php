@@ -1,7 +1,7 @@
 <?php
 
 //variables
-$schemaVersion = 1.38;
+$schemaVersion = 1.39;
 // Database Connections:
 $originTableName = 'hapi_raw_reservations';
 $originHost = 'localhost:3306';
