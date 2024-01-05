@@ -59,7 +59,7 @@ function getLatestEtlTimestamp($destinationDBConnection)
 }
 
 function fetchDataFromMySQLTable($tableName, $originDBConnection, $destinationDBConnection, &$insertCount, &$updateCount) {
-
+    $errorLogFile = 'error_log.txt'; // Define the error log file path
 
     try {
         // Check connection
@@ -111,8 +111,9 @@ function fetchDataFromMySQLTable($tableName, $originDBConnection, $destinationDB
         $originDBConnection->rollback();
 
         // Log the error
-        error_log($e->getMessage(), 3, 'error_log.txt');
-
+        $errorTimestamp = date('Y-m-d H:i:s'); // Format the date and time as you prefer
+        $errorLogMessage = "[{$errorTimestamp}] fetchDataFromMySQLTable failed: " . $e->getMessage() . PHP_EOL;
+        error_log($errorLogMessage, 3, $errorLogFile);
         // Optionally rethrow the exception if you want to handle it further up the call stack
         throw $e;
     }
@@ -143,7 +144,8 @@ function insertEtlTrackingInfo($destinationDBConnection, $insertCount, $updateCo
         }
 
         // Log the success message
-        $successMessage = "Successfully inserted tracking info into PMSDATABASEmisc";
+        $errorTimestamp = date('Y-m-d H:i:s'); // Format the date and time as you prefer
+        $successMessage = "[{$errorTimestamp}] Successfully inserted tracking info into PMSDATABASEmisc";
         error_log($successMessage, 3, 'error_log.txt');
 
     } catch (Exception $e) {
@@ -161,6 +163,7 @@ function insertEtlTrackingInfo($destinationDBConnection, $insertCount, $updateCo
 
 function updateEtlDuration($destDBConnection)
 {
+    $errorLogFile = 'error_log.txt'; // Define the error log file path
     try {
         // Check destination connection
         if ($destDBConnection->connect_error) {
@@ -184,13 +187,17 @@ function updateEtlDuration($destDBConnection)
 
     } catch (Exception $e) {
         // Handle exceptions, such as logging and re-throwing
-        error_log($e->getMessage(), 3, 'error_log.txt');
+        // Log the error
+        $errorTimestamp = date('Y-m-d H:i:s'); // Format the date and time as you prefer
+        $errorLogMessage = "[{$errorTimestamp}] Upsert failed: " . $e->getMessage() . PHP_EOL;
+        error_log($errorLogMessage, 3, $errorLogFile);
         throw $e;
     }
 }
 
 function getFirstNonNullImportCode($originDBConnection, $tableName)
 {
+    $errorLogFile = 'error_log.txt'; // Define the error log file path
     $importCode = '';
 
     try {
@@ -206,7 +213,9 @@ function getFirstNonNullImportCode($originDBConnection, $tableName)
         }
 
     } catch (Exception $e) {
-        error_log("Error fetching import_code: " . $e->getMessage(), 3, 'error_log.txt');
+        $errorTimestamp = date('Y-m-d H:i:s'); // Format the date and time as you prefer
+        $errorLogMessage = "[{$errorTimestamp}] getFirstNonNullImportCode failed: " . $e->getMessage() . PHP_EOL;
+        error_log($errorLogMessage, 3, $errorLogFile);
     }
 
     return $importCode;
@@ -219,6 +228,7 @@ function createReservationLibProperty($reservations)
 {
     $reservationLibProperty = [];
     $seenCodes = [];
+
 
 
 
@@ -593,15 +603,7 @@ function createSERVICESLibTender($data)
 
 ////Function to create and populate the SERVICESlibServiceItems Table Associative Array
 function createSERVICESlibserviceitems($array) {
-    $serviceItems = [
-        [ // Add the 'UNKNOWN' record at the beginning of the array
-            'itemName' => 'UNKNOWN',
-            'itemCode' => 'UNKNOWN',
-            'ratePlanCode' => 'UNKNOWN',
-            'dataSource' => 'HAPI'
-        ]
-    ];
-
+    $serviceItems = [];
     $uniqueCheck = []; // Array to keep track of existing items to prevent duplicates
 
     foreach ($array as $item) {
@@ -616,23 +618,38 @@ function createSERVICESlibserviceitems($array) {
             'dataSource' => 'HAPI' // Data source is always 'HAPI'
         ];
 
-        // Extract item code from Services
-        if (!empty($ratePlans) && isset($ratePlans[0]['code'])) {
-            $serviceItemData['itemCode'] = $ratePlans[0]['code'];
-        }
-
         // Extract rate plan code from Prices
         if (!empty($prices) && isset($prices[0]['ratePlanCode'])) {
             $serviceItemData['ratePlanCode'] = $prices[0]['ratePlanCode'];
         }
 
+        // Extract item code from Services
+        if (!empty($ratePlans) && isset($ratePlans[0]['code'])) {
+            $serviceItemData['itemCode'] = $ratePlans[0]['code'];
+        }
+
         // Create a unique key to check for duplicates
         $uniqueKey = $serviceItemData['itemCode'] . '|' . $serviceItemData['ratePlanCode'];
-        if (!empty($serviceItemData['itemCode']) && !empty($serviceItemData['ratePlanCode']) && !isset($uniqueCheck[$uniqueKey])) {
-            $serviceItems[] = $serviceItemData;
+        if (!isset($uniqueCheck[$uniqueKey])) {
+            $serviceItems[] = $serviceItemData; // Original record
             $uniqueCheck[$uniqueKey] = true; // Mark this key as seen
+
+            // Duplicate the record with 'UNKNOWN' itemCode if ratePlanCode is not 'UNKNOWN'
+            if ($serviceItemData['ratePlanCode'] !== 'UNKNOWN') {
+                $duplicateItem = $serviceItemData;
+                $duplicateItem['itemCode'] = 'UNKNOWN';
+                $serviceItems[] = $duplicateItem; // Duplicated record
+            }
         }
     }
+
+    // Add the 'UNKNOWN' record at the beginning of the array
+    array_unshift($serviceItems, [
+        'itemName' => 'UNKNOWN',
+        'itemCode' => 'UNKNOWN',
+        'ratePlanCode' => 'UNKNOWN',
+        'dataSource' => 'HAPI'
+    ]);
 
     return $serviceItems;
 }
@@ -2277,12 +2294,20 @@ function createArrReservationRoomDetails($myDataSemiParsed, $arrCUSTOMERcontact,
         $indexedRoomTypes[$roomType['typeCode']] = $roomType['id'];
     }
 
+    // Find the default ID for 'UNKNOWN' room type
+    $defaultLibRoomTypeId = null;
+    foreach ($arrRESERVATIONlibRoomType as $roomType) {
+        if ($roomType['typeCode'] === 'UNKNOWN' && $roomType['typeName'] === 'UNKNOWN') {
+            $defaultLibRoomTypeId = $roomType['id'];
+            break;
+        }
+    }
+
     $indexedRoomClasses = [];
     foreach ($arrRESERVATIONlibRoomClass as $roomClass) {
         $indexedRoomClasses[$roomClass['className']] = $roomClass['id'];
     }
 
-    // Indexing for libRoom lookup
     $indexedLibRooms = [];
     foreach ($arrRESERVATIONlibRoom as $room) {
         $indexedLibRooms[$room['roomNumber']] = $room['id'];
@@ -2304,11 +2329,13 @@ function createArrReservationRoomDetails($myDataSemiParsed, $arrCUSTOMERcontact,
 
         // Extract room number and typeCode from occupiedUnits
         $occupiedUnits = json_decode($entry['occupiedUnits'], true);
-        $roomNumber = (!empty($occupiedUnits) && isset($occupiedUnits[0]['unitId'])) ? $occupiedUnits[0]['unitId'] : 'UNKNOWN';
-        $typeCode = (!empty($occupiedUnits) && isset($occupiedUnits[0]['unitTypeCode'])) ? $occupiedUnits[0]['unitTypeCode'] : 'UNKNOWN';
+        $roomNumber = $occupiedUnits[0]['unitId'] ?? 'UNKNOWN';
+        $typeCode = $occupiedUnits[0]['unitTypeCode'] ?? 'UNKNOWN';
 
-        // Lookup libRoomId based on roomNumber
+        // Lookup libRoomId and libRoomTypeId based on roomNumber and typeCode
         $libRoomId = $indexedLibRooms[$roomNumber] ?? null;
+        $libRoomTypeId = $indexedRoomTypes[$typeCode] ?? $defaultLibRoomTypeId;
+
 
         if ($guestDetails) {
             $givenName = $guestDetails['names'][0]['givenName'] ?? null;
@@ -2322,8 +2349,8 @@ function createArrReservationRoomDetails($myDataSemiParsed, $arrCUSTOMERcontact,
             $stayId = $indexedStays[$stayIndex] ?? null;
 
             // Room type and class lookups
-            $roomTypeCode = json_decode($entry['occupiedUnits'], true)[0]['unitTypeCode'] ?? null;
-            $libRoomTypeId = $indexedRoomTypes[$roomTypeCode] ?? null;
+//            $roomTypeCode = json_decode($entry['occupiedUnits'], true)[0]['unitTypeCode'] ?? null;
+//            $libRoomTypeId = $indexedRoomTypes[$roomTypeCode] ?? null;
             $className = 'UNKNOWN'; // Replace with actual logic to determine class name
             $libRoomClassId = $indexedRoomClasses[$className] ?? null;
 
@@ -2440,7 +2467,43 @@ function upsertReservationRoomDetails($arrRESERVATIONroomDetails, $dbConnection)
     }
 }
 
-function createArrSERVICESfolioOrders($normalizedData) {
+function createArrSERVICESfolioOrders($normalizedData, $arrCUSTOMERcontact, $arrRESERVATIONstay, $arrSERVICESpayment, $arrSERVICESlibServiceItems, $arrSERVICESlibFolioOrdersType) {
+    // Indexing customer contacts for fast lookup
+    $indexedCustomerContacts = [];
+    foreach ($arrCUSTOMERcontact as $contact) {
+        $index = $contact['firstName'] . '|' . $contact['lastName'] . '|' . $contact['extGuestID'];
+        $indexedCustomerContacts[$index] = $contact['id'];
+    }
+
+    // Indexing reservation stays for fast lookup
+    $indexedReservationStays = [];
+    foreach ($arrRESERVATIONstay as $stay) {
+        $index = $stay['createDateTime'] . '|' . $stay['modifyDateTime'] . '|' . $stay['startDate'] . '|' . $stay['endDate'];
+        $indexedReservationStays[$index] = $stay['id'];
+    }
+
+    // Indexing payments for fast lookup
+    $indexedPayments = [];
+    foreach ($arrSERVICESpayment as $payment) {
+        $index = $payment['paymentAmount'] . '|' . $payment['currencyCode'];
+        $indexedPayments[$index] = $payment['id'];
+    }
+
+
+// Indexing libServiceItems for fast lookup
+    $indexedLibServiceItems = [];
+    foreach ($arrSERVICESlibServiceItems as $item) {
+        $index = $item['itemCode'] . '|' . $item['ratePlanCode'];
+        $indexedLibServiceItems[$index] = $item['id'];
+    }
+
+    // Indexing libFolioOrdersType for fast lookup, adjusted for nested structure
+    $indexedLibFolioOrdersType = [];
+    foreach ($arrSERVICESlibFolioOrdersType as $entry) {
+        $folioOrderTypeData = $entry['SERVICESlibFolioOrdersType'];
+        $indexedLibFolioOrdersType[$folioOrderTypeData['orderType']] = $folioOrderTypeData['id'];
+    }
+
     $arrSERVICESfolioOrders = [];
 
     foreach ($normalizedData as $data) {
@@ -2448,26 +2511,69 @@ function createArrSERVICESfolioOrders($normalizedData) {
         $firstName = $guestDetails['names'][0]['givenName'] ?? 'UNKNOWN';
         $lastName = $guestDetails['names'][0]['surname'] ?? 'UNKNOWN';
         $extGuestId = $data['extracted_guest_id'] ?? null;
-        $startDate = $data['arrival'] ?? null;
+        $createDateTime = strtotime($data['createdDateTime']) ?? null;
+        $modifyDateTime = strtotime($data['lastModifiedDateTime']) ?? null;
+        $startDate = $data['arrival'] ?? null; // Assuming these are already in the correct format
         $endDate = $data['departure'] ?? null;
+        $stayId = $indexedCustomerContacts[$extGuestId] ?? null; // Lookup for stayId
+        // Populate libServiceItemsId using itemCode and ratePlanCode
+        $itemCode = $data['services'][0]['code'] ?? 'UNKNOWN';
+        $ratePlanCode = $data['prices'][0]['ratePlanCode'] ?? 'UNKNOWN';
+        $libServiceItemsIndex = $itemCode . '|' . $ratePlanCode;
+        $libServiceItemsId = $indexedLibServiceItems[$libServiceItemsIndex] ?? $indexedLibServiceItems['UNKNOWN' . '|' . 'UNKNOWN'];
+        // Retrieve the libFolioOrdersTypeId using the folioOrderType
+        // Determine the folioOrderType here
+        $folioOrderType = null;
+
+
+        // Now use the determined folioOrderType for the lookup
+        $libFolioOrdersTypeId = isset($indexedLibFolioOrdersType[$folioOrderType]) ? $indexedLibFolioOrdersType[$folioOrderType] : null;
+
+
+        // Create index for the contact id lookup
+        $contactIndex = $firstName . '|' . $lastName . '|' . $extGuestId;
+        // Lookup for stayId using the index
+        $customerId = $indexedCustomerContacts[$contactIndex] ?? null;
+
+
+        // Create index for stay lookup
+        $stayIndex = $createDateTime . '|' . $modifyDateTime . '|' . $startDate . '|' . $endDate;
+        // Lookup for stayId using the index
+        $stayId = $indexedReservationStays[$stayIndex] ?? null;
+
+        // Populate paymentId using paymentAmount and currencyCode
+        $paymentAmount = null;
+        $currencyCode = $data['currency']['code'] ?? null;
+        $paymentIndex = $paymentAmount . '|' . $currencyCode;
+        $paymentId = $indexedPayments[$paymentIndex] ?? null;
+
+
+
 
         // Common fields for all folio orders
         $commonFields = [
             'dataSource' => 'HAPI',
+            'contactId' => $customerId,
             'firstName' => $firstName,
             'lastName' => $lastName,
             'extGuestId' => $extGuestId,
+            'stayId' => $stayId,
             'startDateLookup' => $startDate,
             'endDateLookup' => $endDate,
             'extPMSConfNum' => $data['confirmation_number'] ?? null,
-            'createDateTime' => $data['createdDateTime'] ?? null,
-            'modifyDateTime' => $data['lastModifiedDateTime'] ?? null,
-            'paymentAmount' =>  null,
-            'currencyCode' => $data['currency']['code'] ?? null,
-            'itemCode' => $data['services'][0]['code'] ?? null,
-            'ratePlanCode' => $data['prices'][0]['ratePlanCode']
+            'createDateTime' => $createDateTime ?? null,
+            'modifyDateTime' => $modifyDateTime ?? null,
+            'paymentId' => $paymentId,
+            'paymentAmount' =>  $paymentAmount,
+            'currencyCode' => $currencyCode,
+            'libServiceItemsId' => $libServiceItemsId,
+            'itemCode' => $data['services'][0]['code'] ?? 'UNKNOWN',
+            'ratePlanCode' => $data['prices'][0]['ratePlanCode'] ?? 'UNKNOWN',
+            'libFolioOrdersTypeId' => $libFolioOrdersTypeId,
 
         ];
+
+
 
         // SERVICE type folio order
         if (isset($data['services'])) {
@@ -2484,7 +2590,6 @@ function createArrSERVICESfolioOrders($normalizedData) {
                 $serviceOrder['endDate']  = null;
                 $serviceOrder['amount']  = null;
                 $serviceOrder['fixedChargesQuantity']  = null;
-                $serviceOrder['ratePlanCode']  = $data['services']['code'] ?? null;
                 $serviceOrder['transferId']  =  null;
                 $serviceOrder['transferDateTime']  =  null;
                 $serviceOrder['transferOnArrival']  =  null;
@@ -2506,11 +2611,10 @@ function createArrSERVICESfolioOrders($normalizedData) {
             $reservationOrder['amountBeforeTax'] = $data['reservationTotal']['amountBeforeTax'] ?? $data['prices'][0]['amount'];
             $reservationOrder['amountAfterTax'] = $data['reservationTotal']['amountAfterTax'] ?? $data['prices'][0]['amount'] + $data['taxes'][0]['amount'];
             $reservationOrder['postingFrequency'] = null;
-            $reservationOrder['startDate'] = $data['bookedUnits']['start'] ?? null;
-            $reservationOrder['endDate']  = $data['bookedUnits']['end'] ?? null;
+            $reservationOrder['startDate'] = $data['bookedUnits'][0]['start'] ?? null;
+            $reservationOrder['endDate']  = $data['bookedUnits'][0]['end'] ?? null;
             $reservationOrder['amount']  = $data['prices'][0]['amount'] ?? null;
             $reservationOrder['fixedChargesQuantity']  = null;
-            $reservationOrder['ratePlanCode']  = $data['prices']['ratePlanCode'] ?? null;
             $reservationOrder['transferId']  =  $data['transferId']['id'] ?? null;
             $reservationOrder['transferDateTime']  =  $data['transferDateTime']['dateTime'] ?? null;
             $reservationOrder['transferOnArrival']  =  $data['transferOnArrival']['isOnArrival'] ?? null;
@@ -2536,7 +2640,6 @@ function createArrSERVICESfolioOrders($normalizedData) {
                 $otherOrder['endDate']  = $data['fixedCharges']['end'] ?? null;
                 $otherOrder['amount']  = null;
                 $otherOrder['fixedChargesQuantity']  = null;
-                $otherOrder['ratePlanCode']  = null;
                 $otherOrder['transferId']  =  null;
                 $otherOrder['transferDateTime']  =  null;
                 $otherOrder['transferOnArrival']  =  null;
@@ -2546,32 +2649,58 @@ function createArrSERVICESfolioOrders($normalizedData) {
             }
 
         }
-
         // Add UNKNOWN type folio order if none of the above apply
         if (empty($arrSERVICESfolioOrders)) {
             $unknownOrder = $commonFields;
-            $unknownOrder['folioOrderType'] = 'UNKNOWN';
+//            $unknownOrder['folioOrderType'] = 'UNKNOWN';
             // Add default/unknown values for all other fields
             $arrSERVICESfolioOrders[] = $unknownOrder;
         }
+
     }
+    populateLibFolioOrdersTypeId($arrSERVICESfolioOrders, $arrSERVICESlibFolioOrdersType);
+
+
 
     return $arrSERVICESfolioOrders;
 }
 
 
+function populateLibFolioOrdersTypeId(&$arrSERVICESfolioOrders, $arrSERVICESlibFolioOrdersType) {
+    // Indexing libFolioOrdersType for fast lookup
+    $indexedLibFolioOrdersType = [];
+    foreach ($arrSERVICESlibFolioOrdersType as $entry) {
+        $orderType = $entry['orderType'];
+        $orderId = $entry['id']; // Directly accessing the 'id'
+        $indexedLibFolioOrdersType[$orderType] = $orderId;
+    }
 
-// Implement this function based on your specific rules for determining the folio order type
-function determineFolioOrderType($entry) {
-    // Placeholder logic
-    if (isset($entry['bookedUnits'])) {
-        return 'RESERVATION';
-    } elseif (isset($entry['occupiedUnits'])) {
-        return 'SERVICE';
-    } else {
-        return 'OTHERS';
+    // Loop through each folio order and assign the correct libFolioOrdersTypeId
+    foreach ($arrSERVICESfolioOrders as $key => &$order) {
+        if (isset($order['folioOrderType']) && isset($indexedLibFolioOrdersType[$order['folioOrderType']])) {
+            $order['libFolioOrdersTypeId'] = $indexedLibFolioOrdersType[$order['folioOrderType']];
+        } else {
+            $order['libFolioOrdersTypeId'] = null; // Set to null if no match is found
+        }
     }
 }
+
+
+function removeDuplicateOrders($arrSERVICESfolioOrders) {
+    // Serialize each order to make it a string
+    $serializedOrders = array_map('serialize', $arrSERVICESfolioOrders);
+
+    // Remove duplicates
+    $uniqueSerializedOrders = array_unique($serializedOrders);
+
+    // Unserialize each order to convert it back to its original array form
+    $uniqueOrders = array_map('unserialize', $uniqueSerializedOrders);
+
+    return $uniqueOrders;
+}
+
+
+
 
 
 function normalizeMyDataSemiParsed($myDataSemiParsed) {
@@ -2597,6 +2726,8 @@ function normalizeMyDataSemiParsed($myDataSemiParsed) {
         }
     }
 
+
+
     return $normalizedData;
 }
 
@@ -2605,6 +2736,144 @@ function isJson($string) {
     return json_last_error() === JSON_ERROR_NONE;
 }
 
+function upsertSERVICESfolioOrders($arrSERVICESfolioOrders, $dbConnection) {
+    $tableName = 'SERVICESfolioOrders';
+    $errorLogFile = 'error_log.txt'; // Define the error log file path
+
+
+
+    foreach ($arrSERVICESfolioOrders as $order) {
+        // Extract the fields that will be used for matching existing records
+        $contactId = $order['contactId'];
+        $stayId = $order['stayId'];
+        $paymentId = $order['paymentId'];
+        $libServiceItemsId = $order['libServiceItemsId'];
+        $libFolioOrdersTypeId = $order['libFolioOrdersTypeId'];
+        // ... Other fields as necessary
+
+        $dbConnection->begin_transaction();
+        try {
+            // Check if a record with this combination already exists
+            $checkQuery = "SELECT `id` FROM `$tableName` WHERE `contactId` = ? AND `stayId` = ? AND `paymentId` = ? AND `libServiceItemsId` = ? AND `libFolioOrdersTypeId` = ?";
+            $stmt = $dbConnection->prepare($checkQuery);
+            if (!$stmt) {
+                throw new Exception("Prepare failed: " . $dbConnection->error);
+            }
+
+            $stmt->bind_param("iiiii", $contactId, $stayId, $paymentId, $libServiceItemsId, $libFolioOrdersTypeId);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $exists = $result->fetch_assoc();
+
+            if ($exists) {
+                // Update existing record
+                $updateQuery = "UPDATE `$tableName` SET 
+                    `folioOrderType` = ?, 
+                    `unitCount` = ?, 
+                    `unitPrice` = ?, 
+                    `fixedCost` = ?, 
+                    `postingFrequency` = ?, 
+                    `startDate` = ?, 
+                    `endDate` = ?, 
+                    `amount` = ?, 
+                    `fixedChargesQuantity` = ?, 
+                    `ratePlanCode` = ?, 
+                    `transferId` = ?, 
+                    `transferDateTime` = ?, 
+                    `transferisOnArrival` = ?, 
+                    `isIncluded` = ?
+                WHERE `contactId` = ? AND `stayId` = ? AND `paymentId` = ? AND `libServiceItemsId` = ? AND `libFolioOrdersTypeId` = ?";
+
+                $updateStmt = $dbConnection->prepare($updateQuery);
+                $updateStmt->bind_param("siddsssdisisiisiiiii",
+                    $order['folioOrderType'],
+                    $order['unitCount'],
+                    $order['unitPrice'],
+                    $order['fixedCost'],
+                    $order['postingFrequency'],
+                    $order['startDate'],
+                    $order['endDate'],
+                    $order['amount'],
+                    $order['fixedChargesQuantity'],--
+                    $order['ratePlanCode'],
+                    $order['transferId'],
+                    $order['transferDateTime'],
+                    $order['transferisOnArrival'],
+                    $order['isIncluded'],
+                    $order['dataSource'],
+                    // Where conditions
+                    $contactId,
+                    $stayId,
+                    $paymentId,
+                    $libServiceItemsId,
+                    $libFolioOrdersTypeId
+                );
+                $updateStmt->execute();
+            } else {
+                // Insert new record
+                $insertQuery = "INSERT INTO `$tableName` (
+                    `folioOrderType`, 
+                    `unitCount`, 
+                    `unitPrice`, 
+                    `fixedCost`, 
+                    `postingFrequency`, 
+                    `startDate`, 
+                    `endDate`, 
+                    `amount`, 
+                    `fixedChargesQuantity`, 
+                    `ratePlanCode`, 
+                    `transferId`, 
+                    `transferDateTime`, 
+                    `transferisOnArrival`, 
+                    `isIncluded`,
+                    `dataSource`,
+                    `contactId`, 
+                    `stayId`, 
+                    `paymentId`, 
+                    `libServiceItemsId`, 
+                    `libFolioOrdersTypeId`
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+                $insertStmt = $dbConnection->prepare($insertQuery);
+                $insertStmt->bind_param("siddsssdisisiisiiiii",
+                    $order['folioOrderType'],
+                    $order['unitCount'],
+                    $order['unitPrice'],
+                    $order['fixedCost'],
+                    $order['postingFrequency'],
+                    $order['startDate'],
+                    $order['endDate'],
+                    $order['amount'],
+                    $order['fixedChargesQuantity'],
+                    $order['ratePlanCode'],
+                    $order['transferId'],
+                    $order['transferDateTime'],
+                    $order['transferOnArrival'],
+                    $order['isIncluded'],
+                    $order['dataSource'],
+                    // Inserted values
+                    $contactId,
+                    $stayId,
+                    $paymentId,
+                    $libServiceItemsId,
+                    $libFolioOrdersTypeId
+                );
+                $insertStmt->execute();
+            }
+
+            // Commit the transaction
+            $dbConnection->commit();
+
+        } catch (Exception $e) {
+            // Rollback the transaction on error
+            $errorTimestamp = date('Y-m-d H:i:s'); // Format the date and time as you prefer
+            $errorLogMessage = "[{$errorTimestamp}] Upsert failed: " . $e->getMessage() . PHP_EOL;
+            $dbConnection->rollback();
+            error_log($errorLogMessage, 3, $errorLogFile);
+            throw $e;
+        }
+    }
+}
 
 
 
@@ -2699,11 +2968,6 @@ $arrRESERVATIONlibRoom = createRESERVATIONLibRoom($myDataSemiParsed);
 /// GRANDCHILD
 //can't populate until primary keys for parent tables are established. These are made via a table trigger/stored proc combo
 ///
-
-
-
-
-
 
 
 
@@ -2889,7 +3153,7 @@ $arrRESERVATIONlibStayStatus = getTableAsAssociativeArray($destinationDBConnecti
 $arrSERVICESlibTender = getTableAsAssociativeArray($destinationDBConnection,'SERVICESlibTender');
 // Update $arrSERVICESlibFolioOrdersType
 // $arrSERVICESlibFolioOrdersType = updateArrayWithIdsForMultipleFields($destinationDBConnection, $arrSERVICESlibFolioOrdersType, 'SERVICESlibFolioOrdersType',['orderType'], true);
-//$arrSERVICESlibFolioOrdersType = getTableAsAssociativeArray($destinationDBConnection,'SERVICESlibFolioOrdersType');
+$arrSERVICESlibFolioOrdersType = getTableAsAssociativeArray($destinationDBConnection,'SERVICESlibFolioOrdersType');
 // Update $arrRESERVATIONlibProperty
 // $arrSERVICESlibServiceItems = updateArrayWithIdsForMultipleFields($destinationDBConnection, $arrSERVICESlibServiceItems, 'SERVICESlibServiceItems',['itemName', 'itemCode', 'ratePlanCode'], false);
 $arrSERVICESlibServiceItems = getTableAsAssociativeArray($destinationDBConnection,'SERVICESlibServiceItems');
@@ -2913,7 +3177,7 @@ $arrCUSTOMERmembership = createArrCUSTOMERmembership($myDataSemiParsed, $arrCUST
 // 4) SERVICESpayment
 $arrSERVICESpayment = createArrSERVICESpayment($myDataSemiParsed, $arrSERVICESlibTender);
 //Populate child tables
-// 1) RESERVATIONgroupStay
+// 1) RESERVATIONstay
 //Upsert into RESERVATIONstay table
 try {
     upsertRESERVATIONstay($arrRESERVATIONstay, $destinationDBConnection);
@@ -2956,7 +3220,6 @@ $arrSERVICESpayment = getTableAsAssociativeArray($destinationDBConnection,'SERVI
 // 3) RESERVATIONgroupStay
 // 4) SERVICESfolioOrders
 //Create grandchild associative arrays using the populated parent tables
-//*currently here
 // 1) RESERVATIONroomDetails
 $arrRESERVATIONroomDetails = createArrReservationRoomDetails($myDataSemiParsed, $arrCUSTOMERcontact, $arrRESERVATIONstay,$arrRESERVATIONlibRoomType, $arrRESERVATIONlibRoomClass, $arrRESERVATIONlibRoom);
 // 2) RESERVATIONstayStatusStay
@@ -2968,7 +3231,9 @@ $arrRESERVATIONstayStatusStay = createArrRESERVATIONstayStatusStay($myDataSemiPa
 //May need to put this one on hold until we get actual group data from Hapi =/
 //$arrRESERVATIONgroupStay = create_arrRESERVATIONgroupStay($arrRESERVATIONstay, $arrRESERVATIONgroup);
 // 4) SERVICESfolioOrders
-$arrSERVICESFolioOrders = createArrSERVICESfolioOrders($normalizedData);
+$arrSERVICESfolioOrders = createArrSERVICESfolioOrders($normalizedData, $arrCUSTOMERcontact, $arrRESERVATIONstay, $arrSERVICESpayment, $arrSERVICESlibServiceItems, $arrSERVICESlibFolioOrdersType);
+//remove duplicate records
+$arrSERVICESfolioOrders = removeDuplicateOrders($arrSERVICESfolioOrders);
 //Populate grandchild tables
 // 1) RESERVATIONroomDetails
 try {
@@ -2983,89 +3248,27 @@ try {
     echo 'Error: ' . $e->getMessage();
 }
 
-
-
 // 3) RESERVATIONgroupStay
+//skipped since HAPI is not offering any group data
 // 4) SERVICESfolioOrders
+try {
+    upsertSERVICESfolioOrders($arrSERVICESfolioOrders, $destinationDBConnection);
+} catch (Exception $e) {
+    echo 'Error: ' . $e->getMessage();
+}
 // Get Grandchild table associative arrays with new primary keys
 // 1) RESERVATIONroomDetails
-//$arrRESERVATIONroomDetails = getTableAsAssociativeArray($destinationDBConnection,'RESERVATIONroomDetails');
+$arrRESERVATIONroomDetails = getTableAsAssociativeArray($destinationDBConnection,'RESERVATIONroomDetails');
 // 2) RESERVATIONstayStatusStay
-//$arrRESERVATIONstayStatusStay = getTableAsAssociativeArray($destinationDBConnection,'RESERVATIONstayStatusStay');
+$arrRESERVATIONstayStatusStay = getTableAsAssociativeArray($destinationDBConnection,'RESERVATIONstayStatusStay');
 // 3) RESERVATIONgroupStay
+//skipped since HAPI is not offering any group data
 // 4) SERVICESfolioOrders
+$arrSERVICESfolioOrders = getTableAsAssociativeArray($destinationDBConnection,'SERVICESfolioOrders');
 
 //Populate grandchild tables
 //print('$arrCUSTOMERcontact:');
-//var_dump(array_slice($myDataSemiParsed, 0, 10, true));
-//print('$arrCUSTOMERcontact:');
-//print_r(array_slice($normalizedData, 0, 20, true));
-//print('$arrRESERVATIONstay:');
-//var_dump(array_slice($arrRESERVATIONstay, 0, 10, true));
-print_r(array_slice($arrSERVICESFolioOrders, 0, 10, true));
-//var_dump($arrCUSTOMERcontact);
-//var_dump($arrRESERVATIONlibStayStatus);
-//var_dump($arrRESERVATIONlibRoom);
-//var_dump($arrRESERVATIONlibRoomType);
-//print_r($normalizedData);
-//print_r($arrRESERVATIONroomDetails);
-//var_dump(array_slice($arrCUSTOMERcontact, 0, 10, true));
-//var_dump(array_slice($arrRESERVATIONlibStayStatus, 0, 10, true));
-//var_dump(array_slice($arrRESERVATIONlibRoom, 0, 10, true));
-//var_dump(array_slice($arrRESERVATIONlibRoomType, 0, 10, true));
-//print($etlStartTStamp);
-//echo "\n";
-//print($importCode);
-//echo "\n";
-//print($insertCount);
-//echo "\n";
-//print($updateCount);
-//echo "\n";
-//print(getLatestEtlTimestamp($destinationDBConnection));
-//var_dump(array_slice($arrCUSTOMERlibContactType, 0, 10, true));
-// var_dump(parseAndFlattenArray($myDataSemiParsed));
-// print_r($arrRESERVATIONlibSource);
-// var_dump($arrRESERVATIONlibProperty);
-// var_dump($arrRESERVATIONlibProperty);
-
-//// Check for null foreign keys
-//// Assuming $arr is your associative array
-//$arr = $arrCUSTOMERrelationship; // replace this with your actual array
-//
-//$contactTypeIdCounts = [];
-//$contactIdCounts = [];
-//
-//foreach ($arr as $item) {
-//    // Count for contactTypeId
-//    if (isset($item['contactTypeId'])) {
-//        $contactTypeId = $item['contactTypeId'];
-//        if (!isset($contactTypeIdCounts[$contactTypeId])) {
-//            $contactTypeIdCounts[$contactTypeId] = 0;
-//        }
-//        $contactTypeIdCounts[$contactTypeId]++;
-//    }
-//
-//    // Count for contactId
-//    if (isset($item['contactId'])) {
-//        $contactId = $item['contactId'];
-//        if (!isset($contactIdCounts[$contactId])) {
-//            $contactIdCounts[$contactId] = 0;
-//        }
-//        $contactIdCounts[$contactId]++;
-//    }
-//}
-//
-//// Output the results
-//echo "Counts for each contactTypeId:\n";
-//foreach ($contactTypeIdCounts as $contactTypeId => $count) {
-//    echo "contactTypeId: " . $contactTypeId . " - Count: " . $count . "\n";
-//}
-//
-//echo "\nCounts for each contactId:\n";
-//foreach ($contactIdCounts as $contactId => $count) {
-//    echo "contactId: " . $contactId . " - Count: " . $count . "\n";
-//}
-
+//var_dump(array_slice($arrSERVICESfolioOrders, 0, 30, true));
 
 
 try {
