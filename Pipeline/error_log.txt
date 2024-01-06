@@ -1,3 +1,0 @@
-Successfully fetched 500 records from hapi_raw_reservationsSuccessfully inserted tracking info into PMSDATABASEmisc[2024-01-05 19:10:28] Upsert failed: Column 'contactId' cannot be null
-Successfully fetched 500 records from hapi_raw_reservations[2024-01-05 19:43:57] Successfully inserted tracking info into PMSDATABASEmisc[2024-01-05 19:44:20] Upsert failed: Column 'contactId' cannot be null
-Successfully fetched 500 records from hapi_raw_reservations[2024-01-05 19:47:53] Successfully inserted tracking info into PMSDATABASEmisc[2024-01-05 19:48:22] Upsert failed: Column 'contactId' cannot be null
