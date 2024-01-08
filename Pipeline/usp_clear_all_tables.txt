@@ -1,0 +1,30 @@
+CREATE DEFINER=`root`@`localhost` PROCEDURE `usp_clear_all_tables`()
+BEGIN
+    -- delete grandchild records
+    DELETE FROM RESERVATIONgroupStay;
+    DELETE FROM RESERVATIONstayStatusStay;
+    DELETE FROM RESERVATIONroomDetails;
+    DELETE FROM SERVICESfolioOrders;
+
+    -- delete child records
+    DELETE FROM CUSTOMERrelationship;
+    DELETE FROM RESERVATIONstay;
+    DELETE FROM CUSTOMERmembership;
+    DELETE FROM SERVICESpayment;
+
+    -- delete parent records
+    DELETE FROM CUSTOMERlibContactType;
+    DELETE FROM CUSTOMERcontact;
+    DELETE FROM RESERVATIONlibRoom;
+    DELETE FROM RESERVATIONlibSource;
+    DELETE FROM RESERVATIONlibProperty;
+    DELETE FROM CUSTOMERlibLoyaltyProgram;
+    DELETE FROM SERVICESlibTender;
+    DELETE FROM SERVICESlibServiceItems;
+    DELETE FROM SERVICESlibFolioOrdersType;
+    DELETE FROM RESERVATIONgroup;
+    DELETE FROM RESERVATIONlibStayStatus;
+    DELETE FROM RESERVATIONlibRoomType;
+    DELETE FROM RESERVATIONlibRoomClass;
+    DELETE FROM PMSDATABASEmisc;
+END

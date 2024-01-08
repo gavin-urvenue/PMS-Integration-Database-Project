@@ -6,6 +6,8 @@
  * whenever RESERVATIONstay is updated or inserted into.
  * 
  * v1.0 - Initial Creation
+ *
+ * Update 1/8/2024, this doesn't work on Urvenue databases because the cdc triggers partnered with these triggers create an endless loop. Need to put the stored procedure in here in a job.
  **/
 
 DELIMITER //

@@ -224,238 +224,277 @@ function getFirstNonNullImportCode($originDBConnection, $tableName)
 
 
 ////Function to create and populate the ReservationlibProperty Table Associative Array
-function createReservationLibProperty($reservations)
-{
-    $reservationLibProperty = [];
-    $seenCodes = [];
+function createReservationLibProperty($reservations) {
+    $errorLogFile = 'error_log.txt'; // Define the error log file path
 
+    try {
+        $reservationLibProperty = [];
+        $seenCodes = [];
 
+        foreach ($reservations as $reservation) {
+            // Validate if necessary fields exist in $reservation
+            if (!isset($reservation['extracted_property_code']) || !isset($reservation['extracted_chain_code'])) {
+                throw new Exception("Necessary fields missing in the reservation data.");
+            }
 
+            $propertyCode = $reservation['extracted_property_code'];
+            $chainCode = $reservation['extracted_chain_code'];
 
-    foreach ($reservations as $reservation) {
-        $propertyCode = $reservation['extracted_property_code'];
-        $chainCode = $reservation['extracted_chain_code'];
+            // Check for duplicate rows
+            $codeCombo = $propertyCode . $chainCode;
+            if (in_array($codeCombo, $seenCodes)) {
+                continue;
+            }
+            $seenCodes[] = $codeCombo;
 
-        // Check for duplicate rows
-        $codeCombo = $propertyCode . $chainCode;
-        if (in_array($codeCombo, $seenCodes)) {
-            continue;
+            // Create and populate the new associative array
+            $newRecord = [
+                'propertyCode' => $propertyCode,
+                'chainCode' => $chainCode,
+                'dataSource' => 'HAPI',
+            ];
+
+            $reservationLibProperty[] = $newRecord;
         }
-        $seenCodes[] = $codeCombo;
 
-        // Create and populate the new associative array
-        $newRecord = [
-            'propertyCode' => $propertyCode,
-            'chainCode' => $chainCode,
+        // Add a row with unknown propertyCode
+        $unknownRow = [
+            'propertyCode' => 'UNKNOWN',
+            'chainCode' => 'UNKNOWN',
             'dataSource' => 'HAPI',
         ];
+        array_unshift($reservationLibProperty, $unknownRow);
 
-        $reservationLibProperty[] = $newRecord;
+        return $reservationLibProperty;
+    } catch (Exception $e) {
+        // Handle the exception
+        $errorTimestamp = date('Y-m-d H:i:s');
+        $errorLogMessage = "[{$errorTimestamp}] Error in createReservationLibProperty: " . $e->getMessage() . PHP_EOL;
+        error_log($errorLogMessage, 3, $errorLogFile);
+        // Optionally rethrow the exception if you need further handling outside this function
+        throw $e;
     }
-
-    // Add a row with unknown propertyCode
-    $unknownRow = [
-        'propertyCode' => 'UNKNOWN',
-        'chainCode' => 'UNKNOWN',
-        'dataSource' => 'HAPI',
-    ];
-    array_unshift($reservationLibProperty, $unknownRow);
-
-    return $reservationLibProperty;
 }
+
 
 ////Function to create and populate the ReservationlibSource Table Associative Array
-function createReservationLibSource($data)
-{
-    if (empty($data)) {
-        echo "Invalid data array\n";
-        return;
-    }
+function createReservationLibSource($data) {
+    $errorLogFile = 'error_log.txt'; // Define the error log file path
 
-    $result = [];
+    try {
+        if (empty($data)) {
+            throw new Exception("Invalid data array.");
+        }
 
-    // Add initial row with Unknown values
-    $result[] = [
-        'RESERVATIONlibsource' => [
-            'sourceName' => 'UNKNOWN',
-            'sourceType' => 'UNKNOWN',
-            'dataSource' => 'HAPI',
-        ],
-    ];
+        $result = [];
 
-    foreach ($data as $profile) {
-        if (!empty($profile['profiles'])) {
-            $profiles = json_decode($profile['profiles'], true);
+        // Add initial row with Unknown values
+        $result[] = [
+            'RESERVATIONlibsource' => [
+                'sourceName' => 'UNKNOWN',
+                'sourceType' => 'UNKNOWN',
+                'dataSource' => 'HAPI',
+            ],
+        ];
 
-            foreach ($profiles as $profileData) {
-                $reservationLibSource = [
-                    'RESERVATIONlibsource' => [
-                        'sourceName' => $profileData['names'][0]['name'] ?? "",
-                        'sourceType' => $profileData['type'] ?? "",
-                        'dataSource' => 'HAPI',
-                    ],
-                    // You can add more fields here based on your mapping
-                    // Example:
-                    // 'additionalField' => $profileData['someValue'] ?? "",
-                ];
+        foreach ($data as $profile) {
+            if (!empty($profile['profiles'])) {
+                $profiles = json_decode($profile['profiles'], true);
 
-                // Check for duplicate rows
-                if (!in_array($reservationLibSource, $result)) {
-                    $result[] = $reservationLibSource;
+                foreach ($profiles as $profileData) {
+                    $reservationLibSource = [
+                        'RESERVATIONlibsource' => [
+                            'sourceName' => $profileData['names'][0]['name'] ?? "",
+                            'sourceType' => $profileData['type'] ?? "",
+                            'dataSource' => 'HAPI',
+                        ],
+                        // Additional fields can be added here
+                    ];
+
+                    // Check for duplicate rows
+                    if (!in_array($reservationLibSource, $result)) {
+                        $result[] = $reservationLibSource;
+                    }
                 }
             }
         }
+
+        return $result;
+    } catch (Exception $e) {
+        // Handle the exception
+        $errorTimestamp = date('Y-m-d H:i:s');
+        $errorLogMessage = "[{$errorTimestamp}] Error in createReservationLibSource: " . $e->getMessage() . PHP_EOL;
+        error_log($errorLogMessage, 3, $errorLogFile);
+        // Optionally rethrow the exception if you need further handling outside this function
+        throw $e;
     }
-
-    // Add a row with unknown propertyCode
-    $unknownRow = [
-        'sourceName' => 'UNKNOWN',
-        'sourceType' => 'UNKNOWN',
-        'dataSource' => 'HAPI',
-    ];
-    array_unshift($reservationLibSource, $unknownRow);
-
-    return $result;
 }
 
+
 ////Function to create and populate the ReservationlibRoomType Table Associative Array
-function createReservationLibRoomType($data)
-{
-    if (empty($data)) {
-        echo "Invalid data array\n";
-        return;
-    }
+function createReservationLibRoomType($data) {
+    $errorLogFile = 'error_log.txt'; // Define the error log file path
 
-    $result[] = [
-        'ReservationLibRoomType' => [
-            'typeName' => 'UNKNOWN',
-            'typeCode' => 'UNKNOWN',
-            'dataSource' => 'HAPI',
-        ],
-    ];
+    try {
+        if (empty($data)) {
+            throw new Exception("Invalid data array.");
+        }
 
-    foreach ($data as $reservation) {
-        if (!empty($reservation['occupiedUnits'])) {
-            $occupiedUnits = json_decode($reservation['occupiedUnits'], true);
+        $result = [];
 
-            foreach ($occupiedUnits as $unit) {
-                $unitTypeCode = $unit['unitTypeCode'] ?? 'UNKNOWN';
+        // Add initial row with Unknown values
+        $result[] = [
+            'ReservationLibRoomType' => [
+                'typeName' => 'UNKNOWN',
+                'typeCode' => 'UNKNOWN',
+                'dataSource' => 'HAPI',
+            ],
+        ];
 
-                $reservationLibRoomType = [
-                    'ReservationLibRoomType' => [
-                        'typeName' => 'UNKNOWN',
-                        'typeCode' => $unitTypeCode,
-                        'dataSource' => 'HAPI',
-                    ],
-                    // You can add more fields here based on your mapping
-                    // Example:
-                    // 'additionalField' => $unit['someValue'] ?? "",
-                ];
+        foreach ($data as $reservation) {
+            if (!empty($reservation['occupiedUnits'])) {
+                $occupiedUnits = json_decode($reservation['occupiedUnits'], true);
 
-                // Check for duplicate rows
-                if (!in_array($reservationLibRoomType, $result)) {
-                    $result[] = $reservationLibRoomType;
+                foreach ($occupiedUnits as $unit) {
+                    $unitTypeCode = $unit['unitTypeCode'] ?? 'UNKNOWN';
+
+                    $reservationLibRoomType = [
+                        'ReservationLibRoomType' => [
+                            'typeName' => 'UNKNOWN',
+                            'typeCode' => $unitTypeCode,
+                            'dataSource' => 'HAPI',
+                        ],
+                        // Additional fields can be added here
+                    ];
+
+                    // Check for duplicate rows
+                    if (!in_array($reservationLibRoomType, $result)) {
+                        $result[] = $reservationLibRoomType;
+                    }
                 }
             }
         }
-    }
 
-    return $result;
+        return $result;
+    } catch (Exception $e) {
+        // Handle the exception
+        $errorTimestamp = date('Y-m-d H:i:s');
+        $errorLogMessage = "[{$errorTimestamp}] Error in createReservationLibRoomType: " . $e->getMessage() . PHP_EOL;
+        error_log($errorLogMessage, 3, $errorLogFile);
+        // Optionally rethrow the exception if you need further handling outside this function
+        throw $e;
+    }
 }
 
 ////Function to create and populate the ReservationLibStayStatus Table Associative Array
-function createReservationLibStayStatus($data)
-{
-    if (empty($data)) {
-        echo "Invalid data array\n";
-        return;
-    }
+function createReservationLibStayStatus($data) {
+    $errorLogFile = 'error_log.txt'; // Define the error log file path
 
-    $result = [];
+    try {
+        if (empty($data)) {
+            throw new Exception("Invalid data array.");
+        }
 
-    // Add 'Unknown' row at the beginning
-    $unknownRow = [
-        'RESERVATIONlibstaystatus' => [
-            'statusName' => 'UNKNOWN',
-            'dataSource' => 'HAPI',
-        ],
-    ];
+        $result = [];
 
-    $result[] = $unknownRow;
-
-    foreach ($data as $reservation) {
-        $extStatus = $reservation['ext_status'] ?? 'UNKNOWN';
-
-        $reservationLibStayStatus = [
+        // Add 'Unknown' row at the beginning
+        $unknownRow = [
             'RESERVATIONlibstaystatus' => [
-                'statusName' => $extStatus,
+                'statusName' => 'UNKNOWN',
                 'dataSource' => 'HAPI',
             ],
-            // You can add more fields here based on your mapping
-            // Example:
-            // 'additionalField' => $reservation['someValue'] ?? "",
         ];
 
-        // Check for duplicate rows
-        if (!in_array($reservationLibStayStatus, $result)) {
-            $result[] = $reservationLibStayStatus;
-        }
-    }
+        $result[] = $unknownRow;
 
-    return $result;
+        foreach ($data as $reservation) {
+            $extStatus = $reservation['ext_status'] ?? 'UNKNOWN';
+            $reservationLibStayStatus = [
+                'RESERVATIONlibstaystatus' => [
+                    'statusName' => $extStatus,
+                    'dataSource' => 'HAPI',
+                ],
+                // Additional fields can be added here
+            ];
+
+            // Check for duplicate rows
+            if (!in_array($reservationLibStayStatus, $result)) {
+                $result[] = $reservationLibStayStatus;
+            }
+        }
+
+        return $result;
+    } catch (Exception $e) {
+        // Handle the exception
+        $errorTimestamp = date('Y-m-d H:i:s');
+        $errorLogMessage = "[{$errorTimestamp}] Error in createReservationLibStayStatus: " . $e->getMessage() . PHP_EOL;
+        error_log($errorLogMessage, 3, $errorLogFile);
+        // Optionally rethrow the exception if you need further handling outside this function
+        throw $e;
+    }
 }
+
+
 
 ////Function to create and populate the ReservationGroup Table Associative Array
-function createReservationGroup($data)
-{
-    if (empty($data)) {
-        echo "Invalid data array\n";
-        return;
-    }
+function createReservationGroup($data) {
+    $errorLogFile = 'error_log.txt'; // Define the error log file path
 
-    $result = [];
+    try {
+        if (empty($data)) {
+            throw new Exception("Invalid data array.");
+        }
 
-    // Add 'Unknown' row at the beginning
-    $unknownRow = [
-        'RESERVATIONgroup' => [
-            'groupName' => 'UNKNOWN',
-            'groupNumber' => 'UNKNOWN',
-            'groupStartDate' => '',
-            'groupEndDate' => '',
-            'dataSource' => 'HAPI',
-        ],
-    ];
+        $result = [];
 
-    $result[] = $unknownRow;
-
-    foreach ($data as $reservation) {
-        // Extract relevant data for RESERVATIONgroup mapping
-        $groupName = $reservation['groupName'] ?? 'UNKNOWN';
-        $groupNumber = $reservation['groupNumber'] ?? 'UNKNOWN';
-        $groupStartDate = $reservation['groupStartDate'] ?? '';
-        $groupEndDate = $reservation['groupEndDate'] ?? '';
-
-        $reservationGroup = [
+        // Add 'Unknown' row at the beginning
+        $unknownRow = [
             'RESERVATIONgroup' => [
-                'groupName' => $groupName,
-                'groupNumber' => $groupNumber,
-                'groupStartDate' => $groupStartDate,
-                'groupEndDate' => $groupEndDate,
+                'groupName' => 'UNKNOWN',
+                'groupNumber' => 'UNKNOWN',
+                'groupStartDate' => '',
+                'groupEndDate' => '',
                 'dataSource' => 'HAPI',
             ],
-            // You can add more fields here based on your mapping
-            // Example:
-            // 'additionalField' => $reservation['someValue'] ?? "",
         ];
 
-        // Check for duplicate rows
-        if (!in_array($reservationGroup, $result)) {
-            $result[] = $reservationGroup;
-        }
-    }
+        $result[] = $unknownRow;
 
-    return $result;
+        foreach ($data as $reservation) {
+            // Extract relevant data for RESERVATIONgroup mapping
+            $groupName = $reservation['groupName'] ?? 'UNKNOWN';
+            $groupNumber = $reservation['groupNumber'] ?? 'UNKNOWN';
+            $groupStartDate = $reservation['groupStartDate'] ?? '';
+            $groupEndDate = $reservation['groupEndDate'] ?? '';
+
+            $reservationGroup = [
+                'RESERVATIONgroup' => [
+                    'groupName' => $groupName,
+                    'groupNumber' => $groupNumber,
+                    'groupStartDate' => $groupStartDate,
+                    'groupEndDate' => $groupEndDate,
+                    'dataSource' => 'HAPI',
+                ],
+                // Additional fields can be added here
+            ];
+
+            // Check for duplicate rows
+            if (!in_array($reservationGroup, $result)) {
+                $result[] = $reservationGroup;
+            }
+        }
+
+        return $result;
+    } catch (Exception $e) {
+        // Handle the exception
+        $errorTimestamp = date('Y-m-d H:i:s');
+        $errorLogMessage = "[{$errorTimestamp}] Error in createReservationGroup: " . $e->getMessage() . PHP_EOL;
+        error_log($errorLogMessage, 3, $errorLogFile);
+        // Optionally rethrow the exception if needed
+        throw $e;
+    }
 }
+
 
 ////Function to create and populate the ReservationLibRoomClass Table Associative Array
 function createReservationLibRoomClass($data)
