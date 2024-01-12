@@ -62,6 +62,29 @@ catch (Exception $e)
     echo 'Error: ' . $e->getMessage();
 }
 
+
+//Check if myDataSemiParsed is empty.
+if (empty($myDataSemiParsed))
+    {
+
+        try {
+            insertEtlTrackingInfo($destinationDBConnection,$insertCount,$updateCount, $importCode, $schemaVersion);
+        }
+        catch (Exception $e)
+        {
+            echo 'Error: ' . $e->getMessage();
+        }
+
+        try {
+            updateEtlDuration($destinationDBConnection);
+        } catch (Exception $e) {
+            echo 'Error: ' . $e->getMessage();
+        }
+
+        exit();
+
+    }
+
 //Normalized $myDataSemiParsed as it was almost unuseable for some of the heavily nested data
 
 try {
@@ -427,4 +450,7 @@ try {
 } catch (Exception $e) {
     echo 'Error: ' . $e->getMessage();
 }
+
+print_r($arrSERVICESfolioOrders);
+
 ?>

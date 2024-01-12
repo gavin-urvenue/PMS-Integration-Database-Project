@@ -67,11 +67,19 @@ select count(*), 'CUSTOMERcontact'  from CUSTOMERcontact
 UNION
 select count(*), 'CUSTOMERlibLoyaltyProgram'  from CUSTOMERlibLoyaltyProgram
 UNION
+select count(*), 'CUSTOMERrelationship'  from CUSTOMERrelationship c  
+UNION
+select count(*), 'CUSTOMERmembership'  from CUSTOMERmembership c2 
+UNION
 select count(*), 'SERVICESlibTender'  from SERVICESlibTender lt 
 UNION
 select count(*), 'SERVICESlibServiceItems'  from SERVICESlibServiceItems lsi 
 UNION
 select count(*), 'SERVICESlibFolioOrdersType'  from SERVICESlibFolioOrdersType lfo 
+UNION
+select count(*), 'SERVICESpayment'  from SERVICESpayment s
+UNION
+select count(*), 'SERVICESfolioOrders' from SERVICESfolioOrders so 
 UNION
 select count(*), 'RESERVATIONlibRoom'  from RESERVATIONlibRoom
 UNION
@@ -92,14 +100,6 @@ UNION
 select count(*), 'RESERVATIONroomDetails' from RESERVATIONroomDetails rd 
 UNION
 select count(*), 'RESERVATIONstayStatusStay' from RESERVATIONstayStatusStay rss 
-UNION
-select count(*), 'CUSTOMERrelationship'  from CUSTOMERrelationship c  
-UNION
-select count(*), 'CUSTOMERmembership'  from CUSTOMERmembership c2 
-UNION
-select count(*), 'SERVICESpayment'  from SERVICESpayment s
-UNION
-select count(*), 'SERVICESfolioOrders' from SERVICESfolioOrders so 
 UNION
 select count(*), 'RESERVATIONgroupStay' from RESERVATIONgroupStay rs2 
 UNION

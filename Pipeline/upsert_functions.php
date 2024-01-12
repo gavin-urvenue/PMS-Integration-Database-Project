@@ -1,20 +1,26 @@
 <?php
 
 function upsertCustomerContactType($data, $dbConnection) {
+    // Define the error log file path
+    $errorLogFile = dirname(__FILE__) . '/error_log.txt';
+
     $tableName = 'CUSTOMERlibContactType';
 
     foreach ($data as $element) {
-        if (isset($element[$tableName])) {
-            $type = $element[$tableName]['type'];
-            $dataSource = $element[$tableName]['dataSource'];
+        try {
+            if (isset($element[$tableName])) {
+                $type = $element[$tableName]['type'];
+                $dataSource = $element[$tableName]['dataSource'];
 
-            // Start a transaction
-            $dbConnection->begin_transaction();
+                // Start a transaction
+                $dbConnection->begin_transaction();
 
-            try {
-                // Check if a record with this type already exists
+                // Prepare the check query
                 $checkQuery = "SELECT `id` FROM `$tableName` WHERE `type` = ?";
                 $stmt = $dbConnection->prepare($checkQuery);
+                if (!$stmt) {
+                    throw new Exception("Failed to prepare statement: " . $dbConnection->error);
+                }
                 $stmt->bind_param("s", $type);
                 $stmt->execute();
                 $result = $stmt->get_result();
@@ -22,51 +28,69 @@ function upsertCustomerContactType($data, $dbConnection) {
 
                 // Upsert query
                 if ($exists) {
-                    // Update
+                    // Update existing record
                     $updateQuery = "UPDATE `$tableName` SET `dataSource` = ? WHERE `type` = ?";
                     $updateStmt = $dbConnection->prepare($updateQuery);
+                    if (!$updateStmt) {
+                        throw new Exception("Failed to prepare update statement: " . $dbConnection->error);
+                    }
                     $updateStmt->bind_param("ss", $dataSource, $type);
                     $updateStmt->execute();
                 } else {
-                    // Insert
+                    // Insert new record
                     $insertQuery = "INSERT INTO `$tableName` (`type`, `dataSource`) VALUES (?, ?)";
                     $insertStmt = $dbConnection->prepare($insertQuery);
+                    if (!$insertStmt) {
+                        throw new Exception("Failed to prepare insert statement: " . $dbConnection->error);
+                    }
                     $insertStmt->bind_param("ss", $type, $dataSource);
                     $insertStmt->execute();
                 }
 
                 // Commit the transaction
                 $dbConnection->commit();
-
-            } catch (Exception $e) {
-                // Rollback the transaction on error
-                $dbConnection->rollback();
-                throw $e;  // Re-throw the exception
+            } else {
+                throw new Exception("Invalid data structure.");
             }
-        } else {
-            throw new Exception("Invalid data structure.");
+        } catch (Exception $e) {
+            // Rollback the transaction and log the error
+            $dbConnection->rollback();
+            $errorTimestamp = date('Y-m-d H:i:s');
+            $errorLogMessage = "[{$errorTimestamp}] Error in upsertCustomerContactType: " . $e->getMessage() . PHP_EOL;
+            error_log($errorLogMessage, 3, $errorLogFile);
+
+            // Re-throw the exception for further handling
+            throw $e;
         }
     }
 }
 
 
 
+
+
 function upsertReservationLibRoom($data, $dbConnection) {
+    // Define the error log file path
+    $errorLogFile = dirname(__FILE__) . '/error_log.txt';
+
     $tableName = 'RESERVATIONlibRoom';
 
     foreach ($data as $record) {
-        // Extract the required fields
-        $roomNumber = $record['roomNumber'] ?? null;
-        $dataSource = $record['dataSource'] ?? null;
-        $metaData = $record['metaData'] ?? null;  // Assuming metaData is optional
-
-        // Start a transaction
-        $dbConnection->begin_transaction();
-
         try {
-            // Check if a record with this room number already exists
+            // Extract the required fields
+            $roomNumber = $record['roomNumber'] ?? null;
+            $dataSource = $record['dataSource'] ?? null;
+            $metaData = json_encode($record['metaData'] ?? []); // Convert metaData array to JSON string
+
+            // Start a transaction
+            $dbConnection->begin_transaction();
+
+            // Prepare the check query
             $checkQuery = "SELECT COUNT(*) FROM `$tableName` WHERE `roomNumber` = ?";
             $stmt = $dbConnection->prepare($checkQuery);
+            if (!$stmt) {
+                throw new Exception("Failed to prepare statement: " . $dbConnection->error);
+            }
             $stmt->bind_param("s", $roomNumber);
             $stmt->execute();
             $result = $stmt->get_result();
@@ -74,24 +98,25 @@ function upsertReservationLibRoom($data, $dbConnection) {
 
             // Upsert query
             if ($exists) {
-                // Update
+                // Update existing record
                 $updateQuery = "UPDATE `$tableName` SET `metaData` = ?, `dataSource` = ? WHERE `roomNumber` = ?";
                 $updateStmt = $dbConnection->prepare($updateQuery);
+                if (!$updateStmt) {
+                    throw new Exception("Failed to prepare update statement: " . $dbConnection->error);
+                }
                 $updateStmt->bind_param("sss", $metaData, $dataSource, $roomNumber);
-            } else {
-                // Insert
-                $insertQuery = "INSERT INTO `$tableName` (`roomNumber`, `metaData`, `dataSource`) VALUES (?, ?, ?)";
-                $insertStmt = $dbConnection->prepare($insertQuery);
-                $insertStmt->bind_param("sss", $roomNumber, $metaData, $dataSource);
-            }
-
-            // Execute the query
-            if ($exists) {
                 $updateStmt->execute();
                 if ($updateStmt->error) {
                     throw new Exception("Error in update operation: " . $updateStmt->error);
                 }
             } else {
+                // Insert new record
+                $insertQuery = "INSERT INTO `$tableName` (`roomNumber`, `metaData`, `dataSource`) VALUES (?, ?, ?)";
+                $insertStmt = $dbConnection->prepare($insertQuery);
+                if (!$insertStmt) {
+                    throw new Exception("Failed to prepare insert statement: " . $dbConnection->error);
+                }
+                $insertStmt->bind_param("sss", $roomNumber, $metaData, $dataSource);
                 $insertStmt->execute();
                 if ($insertStmt->error) {
                     throw new Exception("Error in insert operation: " . $insertStmt->error);
@@ -100,385 +125,434 @@ function upsertReservationLibRoom($data, $dbConnection) {
 
             // Commit the transaction
             $dbConnection->commit();
-
         } catch (Exception $e) {
-            // Rollback the transaction on error
+            // Rollback the transaction and log the error
             $dbConnection->rollback();
-            throw $e;  // Re-throw the exception
+            $errorTimestamp = date('Y-m-d H:i:s');
+            $errorLogMessage = "[{$errorTimestamp}] Error in upsertReservationLibRoom: " . $e->getMessage() . PHP_EOL;
+            error_log($errorLogMessage, 3, $errorLogFile);
+
+            // Re-throw the exception for further handling
+            throw $e;
         }
     }
 }
 
+
 function upsertReservationLibSource($data, $dbConnection) {
+    // Define the error log file path
+    $errorLogFile = 'error_log.txt';
+
     $tableName = 'RESERVATIONlibSource';
 
     foreach ($data as $element) {
-        if (isset($element['RESERVATIONlibsource'])) {  // Ensure this key matches your actual data structure
-            $record = $element['RESERVATIONlibsource'];  // Same here
+        try {
+            if (isset($element['RESERVATIONlibsource'])) {
+                $record = $element['RESERVATIONlibsource'];
 
-            // Extract the required fields
-            $sourceName = $record['sourceName'] ?? null;
-            $sourceType = $record['sourceType'] ?? null;
-            $dataSource = $record['dataSource'] ?? null;
-            $metaData = $record['metaData'] ?? null;  // Assuming metaData is optional
+                $sourceName = $record['sourceName'] ?? null;
+                $sourceType = $record['sourceType'] ?? null;
+                $dataSource = $record['dataSource'] ?? null;
+                $metaData = json_encode($record['metaData'] ?? []); // Convert metaData array to JSON string
 
-            // Start a transaction
-            $dbConnection->begin_transaction();
+                $dbConnection->begin_transaction();
 
-            try {
-                // Check if a record with this combination already exists
                 $checkQuery = "SELECT COUNT(*) FROM `$tableName` WHERE `sourceName` = ? AND `sourceType` = ?";
                 $stmt = $dbConnection->prepare($checkQuery);
+                if (!$stmt) {
+                    throw new Exception("Failed to prepare statement: " . $dbConnection->error);
+                }
+
                 $stmt->bind_param("ss", $sourceName, $sourceType);
                 $stmt->execute();
                 $result = $stmt->get_result();
                 $exists = $result->fetch_row()[0] > 0;
 
-                // Upsert query
                 if ($exists) {
-                    // Update
                     $updateQuery = "UPDATE `$tableName` SET `dataSource` = ?, `metaData` = ? WHERE `sourceName` = ? AND `sourceType` = ?";
                     $updateStmt = $dbConnection->prepare($updateQuery);
-                    $updateStmt->bind_param("ssss", $dataSource, $metaData, $sourceName, $sourceType);
-                } else {
-                    // Insert
-                    $insertQuery = "INSERT INTO `$tableName` (`sourceName`, `sourceType`, `dataSource`, `metaData`) VALUES (?, ?, ?, ?)";
-                    $insertStmt = $dbConnection->prepare($insertQuery);
-                    $insertStmt->bind_param("ssss", $sourceName, $sourceType, $dataSource, $metaData);
-                }
+                    if (!$updateStmt) {
+                        throw new Exception("Failed to prepare update statement: " . $dbConnection->error);
+                    }
 
-                // Execute the query
-                if ($exists) {
+                    $updateStmt->bind_param("ssss", $dataSource, $metaData, $sourceName, $sourceType);
                     $updateStmt->execute();
                     if ($updateStmt->error) {
                         throw new Exception("Error in update operation: " . $updateStmt->error);
                     }
                 } else {
+                    $insertQuery = "INSERT INTO `$tableName` (`sourceName`, `sourceType`, `dataSource`, `metaData`) VALUES (?, ?, ?, ?)";
+                    $insertStmt = $dbConnection->prepare($insertQuery);
+                    if (!$insertStmt) {
+                        throw new Exception("Failed to prepare insert statement: " . $dbConnection->error);
+                    }
+
+                    $insertStmt->bind_param("ssss", $sourceName, $sourceType, $dataSource, $metaData);
                     $insertStmt->execute();
                     if ($insertStmt->error) {
                         throw new Exception("Error in insert operation: " . $insertStmt->error);
                     }
                 }
 
-                // Commit the transaction
                 $dbConnection->commit();
-
-            } catch (Exception $e) {
-                // Rollback the transaction on error
-                $dbConnection->rollback();
-                throw $e;  // Re-throw the exception
+            } else {
+                throw new Exception("Invalid data structure.");
             }
-        } else {
-            throw new Exception("Invalid data structure.");
+        } catch (Exception $e) {
+            $dbConnection->rollback();
+
+            // Log the error
+            $errorTimestamp = date('Y-m-d H:i:s');
+            $errorLogMessage = "[{$errorTimestamp}] Error in upsertReservationLibSource: " . $e->getMessage() . PHP_EOL;
+            error_log($errorLogMessage, 3, $errorLogFile);
+
+            throw $e;
         }
     }
 }
 
+
+
 function upsertReservationLibProperty($data, $dbConnection) {
     $tableName = 'RESERVATIONlibProperty';
+    $errorLogFile = 'error_log.txt'; // Define the error log file path
 
     foreach ($data as $record) {
-        // Extract the required fields
-        $propertyCode = $record['propertyCode'] ?? null;
-        $chainCode = $record['chainCode'] ?? null;
-        $dataSource = $record['dataSource'] ?? null;
-        $metaData = $record['metaData'] ?? null;  // Assuming metaData is optional
-
-        // Start a transaction
-        $dbConnection->begin_transaction();
-
         try {
-            // Check if a record with this combination already exists
+            $propertyCode = $record['propertyCode'] ?? null;
+            $chainCode = $record['chainCode'] ?? null;
+            $dataSource = $record['dataSource'] ?? null;
+            $metaData = json_encode($record['metaData'] ?? []); // Convert metaData array to JSON string
+
+            $dbConnection->begin_transaction();
+
             $checkQuery = "SELECT COUNT(*) FROM `$tableName` WHERE `propertyCode` = ? AND `chainCode` = ?";
             $stmt = $dbConnection->prepare($checkQuery);
+            if (!$stmt) {
+                throw new Exception("Failed to prepare statement: " . $dbConnection->error);
+            }
+
             $stmt->bind_param("ss", $propertyCode, $chainCode);
             $stmt->execute();
             $result = $stmt->get_result();
             $exists = $result->fetch_row()[0] > 0;
 
-            // Upsert query
             if ($exists) {
-                // Update
                 $updateQuery = "UPDATE `$tableName` SET `dataSource` = ?, `metaData` = ? WHERE `propertyCode` = ? AND `chainCode` = ?";
                 $updateStmt = $dbConnection->prepare($updateQuery);
-                $updateStmt->bind_param("ssss", $dataSource, $metaData, $propertyCode, $chainCode);
-            } else {
-                // Insert
-                $insertQuery = "INSERT INTO `$tableName` (`propertyCode`, `chainCode`, `dataSource`, `metaData`) VALUES (?, ?, ?, ?)";
-                $insertStmt = $dbConnection->prepare($insertQuery);
-                $insertStmt->bind_param("ssss", $propertyCode, $chainCode, $dataSource, $metaData);
-            }
+                if (!$updateStmt) {
+                    throw new Exception("Failed to prepare update statement: " . $dbConnection->error);
+                }
 
-            // Execute the query
-            if ($exists) {
+                $updateStmt->bind_param("ssss", $dataSource, $metaData, $propertyCode, $chainCode);
                 $updateStmt->execute();
                 if ($updateStmt->error) {
                     throw new Exception("Error in update operation: " . $updateStmt->error);
                 }
             } else {
+                $insertQuery = "INSERT INTO `$tableName` (`propertyCode`, `chainCode`, `dataSource`, `metaData`) VALUES (?, ?, ?, ?)";
+                $insertStmt = $dbConnection->prepare($insertQuery);
+                if (!$insertStmt) {
+                    throw new Exception("Failed to prepare insert statement: " . $dbConnection->error);
+                }
+
+                $insertStmt->bind_param("ssss", $propertyCode, $chainCode, $dataSource, $metaData);
                 $insertStmt->execute();
                 if ($insertStmt->error) {
                     throw new Exception("Error in insert operation: " . $insertStmt->error);
                 }
             }
 
-            // Commit the transaction
             $dbConnection->commit();
 
         } catch (Exception $e) {
-            // Rollback the transaction on error
             $dbConnection->rollback();
-            throw $e;  // Re-throw the exception
+
+            // Log the error
+            $errorTimestamp = date('Y-m-d H:i:s');
+            $errorLogMessage = "[{$errorTimestamp}] Error in upsertReservationLibProperty: " . $e->getMessage() . PHP_EOL;
+            error_log($errorLogMessage, 3, $errorLogFile);
+
+            throw $e;
         }
     }
 }
 
+
 function upsertCustomerLibLoyaltyProgram($data, $dbConnection) {
     $tableName = 'CUSTOMERlibLoyaltyProgram';
+    $errorLogFile = 'error_log.txt'; // Define the error log file path
 
     foreach ($data as $element) {
-        if (isset($element['CUSTOMERlibLoyaltyProgram'])) {
-            $record = $element['CUSTOMERlibLoyaltyProgram'];
-            // Extract the required fields
-            $name = $record['Name'] ?? null;
-            $source = $record['Source'] ?? null;
-            $dataSource = $record['dataSource'] ?? null;
-            $metaData = json_encode($record['metaData'] ?? []);  // Convert metaData array to JSON string
+        try {
+            if (isset($element['CUSTOMERlibLoyaltyProgram'])) {
+                $record = $element['CUSTOMERlibLoyaltyProgram'];
 
-            // Start a transaction
-            $dbConnection->begin_transaction();
+                $name = $record['Name'] ?? null;
+                $source = $record['Source'] ?? null;
+                $dataSource = $record['dataSource'] ?? null;
+                $metaData = json_encode($record['metaData'] ?? []);
 
-            try {
-                // Check if a record with this combination already exists
+                $dbConnection->begin_transaction();
+
                 $checkQuery = "SELECT COUNT(*) FROM `$tableName` WHERE `name` = ? AND `source` = ?";
                 $stmt = $dbConnection->prepare($checkQuery);
+                if (!$stmt) {
+                    throw new Exception("Failed to prepare statement: " . $dbConnection->error);
+                }
+
                 $stmt->bind_param("ss", $name, $source);
                 $stmt->execute();
                 $result = $stmt->get_result();
                 $exists = $result->fetch_row()[0] > 0;
 
-                // Upsert query
                 if ($exists) {
-                    // Update
                     $updateQuery = "UPDATE `$tableName` SET `metaData` = ?, `dataSource` = ? WHERE `name` = ? AND `source` = ?";
                     $updateStmt = $dbConnection->prepare($updateQuery);
-                    $updateStmt->bind_param("ssss", $metaData, $dataSource, $name, $source);
-                } else {
-                    // Insert
-                    $insertQuery = "INSERT INTO `$tableName` (`name`, `source`, `dataSource`, `metaData`) VALUES (?, ?, ?, ?)";
-                    $insertStmt = $dbConnection->prepare($insertQuery);
-                    $insertStmt->bind_param("ssss", $name, $source, $dataSource, $metaData);
-                }
+                    if (!$updateStmt) {
+                        throw new Exception("Failed to prepare update statement: " . $dbConnection->error);
+                    }
 
-                // Execute the query
-                if ($exists) {
+                    $updateStmt->bind_param("ssss", $metaData, $dataSource, $name, $source);
                     $updateStmt->execute();
                     if ($updateStmt->error) {
                         throw new Exception("Error in update operation: " . $updateStmt->error);
                     }
                 } else {
+                    $insertQuery = "INSERT INTO `$tableName` (`name`, `source`, `dataSource`, `metaData`) VALUES (?, ?, ?, ?)";
+                    $insertStmt = $dbConnection->prepare($insertQuery);
+                    if (!$insertStmt) {
+                        throw new Exception("Failed to prepare insert statement: " . $dbConnection->error);
+                    }
+
+                    $insertStmt->bind_param("ssss", $name, $source, $dataSource, $metaData);
                     $insertStmt->execute();
                     if ($insertStmt->error) {
                         throw new Exception("Error in insert operation: " . $insertStmt->error);
                     }
                 }
 
-                // Commit the transaction
                 $dbConnection->commit();
 
-            } catch (Exception $e) {
-                // Rollback the transaction on error
-                $dbConnection->rollback();
-                throw $e;  // Re-throw the exception
+            } else {
+                throw new Exception("Invalid data structure.");
             }
-        } else {
-            throw new Exception("Invalid data structure.");
+        } catch (Exception $e) {
+            $dbConnection->rollback();
+
+            // Log the error
+            $errorTimestamp = date('Y-m-d H:i:s');
+            $errorLogMessage = "[{$errorTimestamp}] Error in upsertCustomerLibLoyaltyProgram: " . $e->getMessage() . PHP_EOL;
+            error_log($errorLogMessage, 3, $errorLogFile);
+
+            throw $e;
         }
     }
 }
 
+
 function upsertServicesLibTender($data, $dbConnection) {
     $tableName = 'SERVICESlibTender';
+    $errorLogFile = 'error_log.txt'; // Define the error log file path
 
     foreach ($data as $record) {
-        // Extract the required fields
-        $paymentMethod = $record['paymentMethod'] ?? null;
-        $dataSource = $record['dataSource'] ?? null;
-        $metaData = json_encode($record['metaData'] ?? []);  // Convert metaData array to JSON string
-
-        // Start a transaction
-        $dbConnection->begin_transaction();
-
         try {
-            // Check if a record with this payment method already exists
+            $paymentMethod = $record['paymentMethod'] ?? null;
+            $dataSource = $record['dataSource'] ?? null;
+            $metaData = json_encode($record['metaData'] ?? []);
+
+            $dbConnection->begin_transaction();
+
             $checkQuery = "SELECT COUNT(*) FROM `$tableName` WHERE `paymentMethod` = ?";
             $stmt = $dbConnection->prepare($checkQuery);
+            if (!$stmt) {
+                throw new Exception("Failed to prepare statement: " . $dbConnection->error);
+            }
+
             $stmt->bind_param("s", $paymentMethod);
             $stmt->execute();
             $result = $stmt->get_result();
             $exists = $result->fetch_row()[0] > 0;
 
-            // Upsert query
             if ($exists) {
-                // Update
                 $updateQuery = "UPDATE `$tableName` SET `dataSource` = ?, `metaData` = ? WHERE `paymentMethod` = ?";
                 $updateStmt = $dbConnection->prepare($updateQuery);
-                $updateStmt->bind_param("sss", $dataSource, $metaData, $paymentMethod);
-            } else {
-                // Insert
-                $insertQuery = "INSERT INTO `$tableName` (`paymentMethod`, `dataSource`, `metaData`) VALUES (?, ?, ?)";
-                $insertStmt = $dbConnection->prepare($insertQuery);
-                $insertStmt->bind_param("sss", $paymentMethod, $dataSource, $metaData);
-            }
+                if (!$updateStmt) {
+                    throw new Exception("Failed to prepare update statement: " . $dbConnection->error);
+                }
 
-            // Execute the query
-            if ($exists) {
+                $updateStmt->bind_param("sss", $dataSource, $metaData, $paymentMethod);
                 $updateStmt->execute();
                 if ($updateStmt->error) {
                     throw new Exception("Error in update operation: " . $updateStmt->error);
                 }
             } else {
+                $insertQuery = "INSERT INTO `$tableName` (`paymentMethod`, `dataSource`, `metaData`) VALUES (?, ?, ?)";
+                $insertStmt = $dbConnection->prepare($insertQuery);
+                if (!$insertStmt) {
+                    throw new Exception("Failed to prepare insert statement: " . $dbConnection->error);
+                }
+
+                $insertStmt->bind_param("sss", $paymentMethod, $dataSource, $metaData);
                 $insertStmt->execute();
                 if ($insertStmt->error) {
                     throw new Exception("Error in insert operation: " . $insertStmt->error);
                 }
             }
 
-            // Commit the transaction
             $dbConnection->commit();
 
         } catch (Exception $e) {
-            // Rollback the transaction on error
             $dbConnection->rollback();
-            throw $e;  // Re-throw the exception
+
+            // Log the error
+            $errorTimestamp = date('Y-m-d H:i:s');
+            $errorLogMessage = "[{$errorTimestamp}] Error in upsertServicesLibTender: " . $e->getMessage() . PHP_EOL;
+            error_log($errorLogMessage, 3, $errorLogFile);
+
+            throw $e;
         }
     }
 }
 
+
 function upsertServicesLibServiceItems($data, $dbConnection) {
     $tableName = 'SERVICESlibServiceItems';
+    $errorLogFile = 'error_log.txt'; // Define the error log file path
 
     foreach ($data as $record) {
-        // Extract the required fields
-        $itemName = $record['itemName'] ?? null;
-        $itemCode = $record['itemCode'] ?? null;
-        $ratePlanCode = $record['ratePlanCode'] ?? null;
-        $dataSource = $record['dataSource'] ?? null;
-        $metaData = json_encode($record['metaData'] ?? []);  // Convert metaData array to JSON string
-
-        // Start a transaction
-        $dbConnection->begin_transaction();
-
         try {
-            // Check if a record with this combination already exists
+            $itemName = $record['itemName'] ?? null;
+            $itemCode = $record['itemCode'] ?? null;
+            $ratePlanCode = $record['ratePlanCode'] ?? null;
+            $dataSource = $record['dataSource'] ?? null;
+            $metaData = json_encode($record['metaData'] ?? []);
+
+            $dbConnection->begin_transaction();
+
             $checkQuery = "SELECT COUNT(*) FROM `$tableName` WHERE `itemName` = ? AND `itemCode` = ? AND `ratePlanCode` = ?";
             $stmt = $dbConnection->prepare($checkQuery);
+            if (!$stmt) {
+                throw new Exception("Failed to prepare statement: " . $dbConnection->error);
+            }
+
             $stmt->bind_param("sss", $itemName, $itemCode, $ratePlanCode);
             $stmt->execute();
             $result = $stmt->get_result();
             $exists = $result->fetch_row()[0] > 0;
 
-            // Upsert query
             if ($exists) {
-                // Update
                 $updateQuery = "UPDATE `$tableName` SET `dataSource` = ?, `metaData` = ? WHERE `itemName` = ? AND `itemCode` = ? AND `ratePlanCode` = ?";
                 $updateStmt = $dbConnection->prepare($updateQuery);
-                $updateStmt->bind_param("sssss", $dataSource, $metaData, $itemName, $itemCode, $ratePlanCode);
-            } else {
-                // Insert
-                $insertQuery = "INSERT INTO `$tableName` (`itemName`, `itemCode`, `ratePlanCode`, `dataSource`, `metaData`) VALUES (?, ?, ?, ?, ?)";
-                $insertStmt = $dbConnection->prepare($insertQuery);
-                $insertStmt->bind_param("sssss", $itemName, $itemCode, $ratePlanCode, $dataSource, $metaData);
-            }
+                if (!$updateStmt) {
+                    throw new Exception("Failed to prepare update statement: " . $dbConnection->error);
+                }
 
-            // Execute the query
-            if ($exists) {
+                $updateStmt->bind_param("sssss", $dataSource, $metaData, $itemName, $itemCode, $ratePlanCode);
                 $updateStmt->execute();
                 if ($updateStmt->error) {
                     throw new Exception("Error in update operation: " . $updateStmt->error);
                 }
             } else {
+                $insertQuery = "INSERT INTO `$tableName` (`itemName`, `itemCode`, `ratePlanCode`, `dataSource`, `metaData`) VALUES (?, ?, ?, ?, ?)";
+                $insertStmt = $dbConnection->prepare($insertQuery);
+                if (!$insertStmt) {
+                    throw new Exception("Failed to prepare insert statement: " . $dbConnection->error);
+                }
+
+                $insertStmt->bind_param("sssss", $itemName, $itemCode, $ratePlanCode, $dataSource, $metaData);
                 $insertStmt->execute();
                 if ($insertStmt->error) {
                     throw new Exception("Error in insert operation: " . $insertStmt->error);
                 }
             }
 
-            // Commit the transaction
             $dbConnection->commit();
 
         } catch (Exception $e) {
-            // Rollback the transaction on error
             $dbConnection->rollback();
-            throw $e;  // Re-throw the exception
+
+            // Log the error
+            $errorTimestamp = date('Y-m-d H:i:s');
+            $errorLogMessage = "[{$errorTimestamp}] Error in upsertServicesLibServiceItems: " . $e->getMessage() . PHP_EOL;
+            error_log($errorLogMessage, 3, $errorLogFile);
+
+            throw $e;
         }
     }
 }
 
+
 function upsertServicesLibFolioOrdersType($data, $dbConnection) {
     $tableName = 'SERVICESlibFolioOrdersType';
+    $errorLogFile = 'error_log.txt'; // Define the error log file path
 
     foreach ($data as $element) {
-        if (isset($element[$tableName])) {
-            $record = $element[$tableName];
+        try {
+            if (isset($element[$tableName])) {
+                $record = $element[$tableName];
 
-            // Extract the required fields
-            $orderType = $record['orderType'] ?? null;
-            if ($orderType === null || $orderType === '') {
-                error_log("Skipped a record due to missing orderType", 3, 'error_log.txt');
-                continue; // Skip this record if orderType is not set or is an empty string
-            }
+                $orderType = $record['orderType'] ?? null;
+                if ($orderType === null || $orderType === '') {
+                    error_log("Skipped a record due to missing orderType", 3, $errorLogFile);
+                    continue; // Skip this record if orderType is not set or is an empty string
+                }
 
-            $metaData = json_encode($record['metaData'] ?? []);  // Convert metaData array to JSON string
+                $metaData = json_encode($record['metaData'] ?? []); // Convert metaData array to JSON string
 
-            // Start a transaction
-            $dbConnection->begin_transaction();
+                $dbConnection->begin_transaction();
 
-            try {
-                // Check if a record with this order type already exists
                 $checkQuery = "SELECT `id` FROM `$tableName` WHERE `orderType` = ?";
                 $stmt = $dbConnection->prepare($checkQuery);
+                if (!$stmt) {
+                    throw new Exception("Failed to prepare statement: " . $dbConnection->error);
+                }
+
                 $stmt->bind_param("s", $orderType);
                 $stmt->execute();
                 $result = $stmt->get_result();
                 $exists = $result->fetch_assoc();
 
-                // Upsert query
                 if ($exists) {
-                    // Update
                     $updateQuery = "UPDATE `$tableName` SET `metaData` = ? WHERE `orderType` = ?";
                     $updateStmt = $dbConnection->prepare($updateQuery);
-                    $updateStmt->bind_param("ss", $metaData, $orderType);
-                } else {
-                    // Insert
-                    $insertQuery = "INSERT INTO `$tableName` (`orderType`, `metaData`) VALUES (?, ?)";
-                    $insertStmt = $dbConnection->prepare($insertQuery);
-                    $insertStmt->bind_param("ss", $orderType, $metaData);
-                }
+                    if (!$updateStmt) {
+                        throw new Exception("Failed to prepare update statement: " . $dbConnection->error);
+                    }
 
-                // Execute the query
-                if ($exists) {
+                    $updateStmt->bind_param("ss", $metaData, $orderType);
                     $updateStmt->execute();
                     if ($updateStmt->error) {
                         throw new Exception("Error in update operation: " . $updateStmt->error);
                     }
                 } else {
+                    $insertQuery = "INSERT INTO `$tableName` (`orderType`, `metaData`) VALUES (?, ?)";
+                    $insertStmt = $dbConnection->prepare($insertQuery);
+                    if (!$insertStmt) {
+                        throw new Exception("Failed to prepare insert statement: " . $dbConnection->error);
+                    }
+
+                    $insertStmt->bind_param("ss", $orderType, $metaData);
                     $insertStmt->execute();
                     if ($insertStmt->error) {
                         throw new Exception("Error in insert operation: " . $insertStmt->error);
                     }
                 }
 
-                // Commit the transaction
                 $dbConnection->commit();
 
-            } catch (Exception $e) {
-                // Rollback the transaction on error
-                $dbConnection->rollback();
-                throw $e;
+            } else {
+                throw new Exception("Invalid data structure.");
             }
-        } else {
-            throw new Exception("Invalid data structure.");
+        } catch (Exception $e) {
+            $dbConnection->rollback();
+
+            // Log the error
+            $errorTimestamp = date('Y-m-d H:i:s');
+            $errorLogMessage = "[{$errorTimestamp}] Error in upsertServicesLibFolioOrdersType: " . $e->getMessage() . PHP_EOL;
+            error_log($errorLogMessage, 3, $errorLogFile);
+
+            throw $e;
         }
     }
 }
@@ -486,92 +560,101 @@ function upsertServicesLibFolioOrdersType($data, $dbConnection) {
 
 function upsertReservationGroup($data, $dbConnection) {
     $tableName = 'RESERVATIONgroup';
+    $errorLogFile = 'error_log.txt'; // Define the error log file path
 
     foreach ($data as $element) {
-        if (isset($element['RESERVATIONgroup'])) {
-            $record = $element['RESERVATIONgroup'];
+        try {
+            if (isset($element['RESERVATIONgroup'])) {
+                $record = $element['RESERVATIONgroup'];
 
-            // Extract the required fields
-            $groupName = $record['groupName'] ?? null;
-            $groupNumber = $record['groupNumber'] ?? null;
-            $groupStartDate = $record['groupStartDate'] ?? null;
-            $groupEndDate = $record['groupEndDate'] ?? null;
-            $dataSource = $record['dataSource'] ?? null;
-            $metaData = json_encode($record['metaData'] ?? []);
+                $groupName = $record['groupName'] ?? null;
+                $groupNumber = $record['groupNumber'] ?? null;
+                $groupStartDate = $record['groupStartDate'] ?? null;
+                $groupEndDate = $record['groupEndDate'] ?? null;
+                $dataSource = $record['dataSource'] ?? null;
+                $metaData = json_encode($record['metaData'] ?? []);
 
-            // Handle NULL dates properly
-            $groupStartDate = !empty($groupStartDate) ? $groupStartDate : null;
-            $groupEndDate = !empty($groupEndDate) ? $groupEndDate : null;
+                $groupStartDate = !empty($groupStartDate) ? $groupStartDate : null;
+                $groupEndDate = !empty($groupEndDate) ? $groupEndDate : null;
 
-            // Start a transaction
-            $dbConnection->begin_transaction();
+                $dbConnection->begin_transaction();
 
-            try {
-                // Prepare the check query
                 $stmt = $dbConnection->prepare("SELECT `id` FROM `$tableName` WHERE `groupName` = ? AND `groupNumber` = ? AND (`groupStartDate` = ? OR `groupStartDate` IS NULL) AND (`groupEndDate` = ? OR `groupEndDate` IS NULL)");
+                if (!$stmt) {
+                    throw new Exception("Failed to prepare statement: " . $dbConnection->error);
+                }
+
                 $stmt->bind_param("ssss", $groupName, $groupNumber, $groupStartDate, $groupEndDate);
                 $stmt->execute();
                 $result = $stmt->get_result();
                 $exists = $result->fetch_assoc();
 
-                // Upsert query
                 if ($exists) {
-                    // Update
                     $updateStmt = $dbConnection->prepare("UPDATE `$tableName` SET `metaData` = ?, `dataSource` = ? WHERE `groupName` = ? AND `groupNumber` = ? AND (`groupStartDate` = ? OR `groupStartDate` IS NULL) AND (`groupEndDate` = ? OR `groupEndDate` IS NULL)");
-                    $updateStmt->bind_param("ssssss", $metaData, $dataSource, $groupName, $groupNumber, $groupStartDate, $groupEndDate);
-                } else {
-                    // Insert
-                    $insertStmt = $dbConnection->prepare("INSERT INTO `$tableName` (`groupName`, `groupNumber`, `groupStartDate`, `groupEndDate`, `dataSource`, `metaData`) VALUES (?, ?, ?, ?, ?, ?)");
-                    $insertStmt->bind_param("ssssss", $groupName, $groupNumber, $groupStartDate, $groupEndDate, $dataSource, $metaData);
-                }
+                    if (!$updateStmt) {
+                        throw new Exception("Failed to prepare update statement: " . $dbConnection->error);
+                    }
 
-                // Execute the query
-                if ($exists) {
+                    $updateStmt->bind_param("ssssss", $metaData, $dataSource, $groupName, $groupNumber, $groupStartDate, $groupEndDate);
                     $updateStmt->execute();
                     if ($updateStmt->error) {
                         throw new Exception("Error in update operation: " . $updateStmt->error);
                     }
                 } else {
+                    $insertStmt = $dbConnection->prepare("INSERT INTO `$tableName` (`groupName`, `groupNumber`, `groupStartDate`, `groupEndDate`, `dataSource`, `metaData`) VALUES (?, ?, ?, ?, ?, ?)");
+                    if (!$insertStmt) {
+                        throw new Exception("Failed to prepare insert statement: " . $dbConnection->error);
+                    }
+
+                    $insertStmt->bind_param("ssssss", $groupName, $groupNumber, $groupStartDate, $groupEndDate, $dataSource, $metaData);
                     $insertStmt->execute();
                     if ($insertStmt->error) {
                         throw new Exception("Error in insert operation: " . $insertStmt->error);
                     }
                 }
 
-                // Commit the transaction
                 $dbConnection->commit();
 
-            } catch (Exception $e) {
-                // Rollback the transaction on error
-                $dbConnection->rollback();
-                throw $e;
+            } else {
+                throw new Exception("Invalid data structure.");
             }
-        } else {
-            throw new Exception("Invalid data structure.");
+        } catch (Exception $e) {
+            $dbConnection->rollback();
+
+            // Log the error
+            $errorTimestamp = date('Y-m-d H:i:s');
+            $errorLogMessage = "[{$errorTimestamp}] Error in upsertReservationGroup: " . $e->getMessage() . PHP_EOL;
+            error_log($errorLogMessage, 3, $errorLogFile);
+
+            throw $e;
         }
     }
 }
 
 
+
 function upsertReservationLibStayStatus($data, $dbConnection) {
     $tableName = 'RESERVATIONlibStayStatus';
+    $errorLogFile = 'error_log.txt'; // Define the error log file path
 
     foreach ($data as $element) {
-        if (isset($element['RESERVATIONlibstaystatus'])) {
-            $record = $element['RESERVATIONlibstaystatus'];
+        try {
+            if (isset($element['RESERVATIONlibstaystatus'])) {
+                $record = $element['RESERVATIONlibstaystatus'];
 
-            // Extract the required fields
-            $statusName = $record['statusName'] ?? null;
-            $dataSource = $record['dataSource'] ?? null;
-            $metaData = json_encode($record['metaData'] ?? []);  // Convert metaData array to JSON string
+                $statusName = $record['statusName'] ?? null;
+                $dataSource = $record['dataSource'] ?? null;
+                $metaData = json_encode($record['metaData'] ?? []);
 
-            // Start a transaction
-            $dbConnection->begin_transaction();
+                $dbConnection->begin_transaction();
 
-            try {
                 // Check if a record with this status name already exists
                 $checkQuery = "SELECT COUNT(*) FROM `$tableName` WHERE `statusName` = ?";
                 $stmt = $dbConnection->prepare($checkQuery);
+                if (!$stmt) {
+                    throw new Exception("Failed to prepare statement: " . $dbConnection->error);
+                }
+
                 $stmt->bind_param("s", $statusName);
                 $stmt->execute();
                 $result = $stmt->get_result();
@@ -579,64 +662,73 @@ function upsertReservationLibStayStatus($data, $dbConnection) {
 
                 // Upsert query
                 if ($exists) {
-                    // Update
                     $updateQuery = "UPDATE `$tableName` SET `dataSource` = ?, `metaData` = ? WHERE `statusName` = ?";
                     $updateStmt = $dbConnection->prepare($updateQuery);
-                    $updateStmt->bind_param("sss", $dataSource, $metaData, $statusName);
-                } else {
-                    // Insert
-                    $insertQuery = "INSERT INTO `$tableName` (`statusName`, `dataSource`, `metaData`) VALUES (?, ?, ?)";
-                    $insertStmt = $dbConnection->prepare($insertQuery);
-                    $insertStmt->bind_param("sss", $statusName, $dataSource, $metaData);
-                }
+                    if (!$updateStmt) {
+                        throw new Exception("Failed to prepare update statement: " . $dbConnection->error);
+                    }
 
-                // Execute the query
-                if ($exists) {
+                    $updateStmt->bind_param("sss", $dataSource, $metaData, $statusName);
                     $updateStmt->execute();
                     if ($updateStmt->error) {
                         throw new Exception("Error in update operation: " . $updateStmt->error);
                     }
                 } else {
+                    $insertQuery = "INSERT INTO `$tableName` (`statusName`, `dataSource`, `metaData`) VALUES (?, ?, ?)";
+                    $insertStmt = $dbConnection->prepare($insertQuery);
+                    if (!$insertStmt) {
+                        throw new Exception("Failed to prepare insert statement: " . $dbConnection->error);
+                    }
+
+                    $insertStmt->bind_param("sss", $statusName, $dataSource, $metaData);
                     $insertStmt->execute();
                     if ($insertStmt->error) {
                         throw new Exception("Error in insert operation: " . $insertStmt->error);
                     }
                 }
 
-                // Commit the transaction
                 $dbConnection->commit();
 
-            } catch (Exception $e) {
-                // Rollback the transaction on error
-                $dbConnection->rollback();
-                throw $e;
+            } else {
+                throw new Exception("Invalid data structure.");
             }
-        } else {
-            throw new Exception("Invalid data structure.");
+        } catch (Exception $e) {
+            $dbConnection->rollback();
+
+            // Log the error
+            $errorTimestamp = date('Y-m-d H:i:s');
+            $errorLogMessage = "[{$errorTimestamp}] Error in upsertReservationLibStayStatus: " . $e->getMessage() . PHP_EOL;
+            error_log($errorLogMessage, 3, $errorLogFile);
+
+            throw $e;
         }
     }
 }
 
+
 function upsertReservationLibRoomType($data, $dbConnection) {
     $tableName = 'RESERVATIONlibRoomType';
+    $errorLogFile = 'error_log.txt'; // Define the error log file path
 
     foreach ($data as $element) {
-        if (isset($element['ReservationLibRoomType'])) { // Adjusted to match your array key
-            $record = $element['ReservationLibRoomType']; // Adjusted to match your array key
+        try {
+            if (isset($element['ReservationLibRoomType'])) {
+                $record = $element['ReservationLibRoomType'];
 
-            // Extract the required fields
-            $typeName = $record['typeName'] ?? null;
-            $typeCode = $record['typeCode'] ?? null;
-            $dataSource = $record['dataSource'] ?? null;
-            $metaData = json_encode($record['metaData'] ?? []);  // Convert metaData array to JSON string
+                $typeName = $record['typeName'] ?? null;
+                $typeCode = $record['typeCode'] ?? null;
+                $dataSource = $record['dataSource'] ?? null;
+                $metaData = json_encode($record['metaData'] ?? []);
 
-            // Start a transaction
-            $dbConnection->begin_transaction();
+                $dbConnection->begin_transaction();
 
-            try {
                 // Check if a record with this combination already exists
                 $checkQuery = "SELECT `id` FROM `$tableName` WHERE `typeName` = ? AND `typeCode` = ?";
                 $stmt = $dbConnection->prepare($checkQuery);
+                if (!$stmt) {
+                    throw new Exception("Failed to prepare statement: " . $dbConnection->error);
+                }
+
                 $stmt->bind_param("ss", $typeName, $typeCode);
                 $stmt->execute();
                 $result = $stmt->get_result();
@@ -644,63 +736,72 @@ function upsertReservationLibRoomType($data, $dbConnection) {
 
                 // Upsert query
                 if ($exists) {
-                    // Update
                     $updateQuery = "UPDATE `$tableName` SET `dataSource` = ?, `metaData` = ? WHERE `typeName` = ? AND `typeCode` = ?";
                     $updateStmt = $dbConnection->prepare($updateQuery);
-                    $updateStmt->bind_param("ssss", $dataSource, $metaData, $typeName, $typeCode);
-                } else {
-                    // Insert
-                    $insertQuery = "INSERT INTO `$tableName` (`typeName`, `typeCode`, `dataSource`, `metaData`) VALUES (?, ?, ?, ?)";
-                    $insertStmt = $dbConnection->prepare($insertQuery);
-                    $insertStmt->bind_param("ssss", $typeName, $typeCode, $dataSource, $metaData);
-                }
+                    if (!$updateStmt) {
+                        throw new Exception("Failed to prepare update statement: " . $dbConnection->error);
+                    }
 
-                // Execute the query
-                if ($exists) {
+                    $updateStmt->bind_param("ssss", $dataSource, $metaData, $typeName, $typeCode);
                     $updateStmt->execute();
                     if ($updateStmt->error) {
                         throw new Exception("Error in update operation: " . $updateStmt->error);
                     }
                 } else {
+                    $insertQuery = "INSERT INTO `$tableName` (`typeName`, `typeCode`, `dataSource`, `metaData`) VALUES (?, ?, ?, ?)";
+                    $insertStmt = $dbConnection->prepare($insertQuery);
+                    if (!$insertStmt) {
+                        throw new Exception("Failed to prepare insert statement: " . $dbConnection->error);
+                    }
+
+                    $insertStmt->bind_param("ssss", $typeName, $typeCode, $dataSource, $metaData);
                     $insertStmt->execute();
                     if ($insertStmt->error) {
                         throw new Exception("Error in insert operation: " . $insertStmt->error);
                     }
                 }
 
-                // Commit the transaction
                 $dbConnection->commit();
 
-            } catch (Exception $e) {
-                // Rollback the transaction on error
-                $dbConnection->rollback();
-                throw $e;
+            } else {
+                throw new Exception("Invalid data structure.");
             }
-        } else {
-            throw new Exception("Invalid data structure.");
+        } catch (Exception $e) {
+            $dbConnection->rollback();
+
+            // Log the error
+            $errorTimestamp = date('Y-m-d H:i:s');
+            $errorLogMessage = "[{$errorTimestamp}] Error in upsertReservationLibRoomType: " . $e->getMessage() . PHP_EOL;
+            error_log($errorLogMessage, 3, $errorLogFile);
+
+            throw $e;
         }
     }
 }
 
+
 function upsertReservationLibRoomClass($data, $dbConnection) {
     $tableName = 'RESERVATIONlibRoomClass';
+    $errorLogFile = 'error_log.txt'; // Define the error log file path
 
     foreach ($data as $element) {
-        if (isset($element['RESERVATIONlibRoomClass'])) {
-            $record = $element['RESERVATIONlibRoomClass'];
+        try {
+            if (isset($element['RESERVATIONlibRoomClass'])) {
+                $record = $element['RESERVATIONlibRoomClass'];
 
-            // Extract the required fields
-            $className = $record['className'] ?? null;
-            $dataSource = $record['dataSource'] ?? null;
-            $metaData = json_encode($record['metaData'] ?? []);  // Convert metaData array to JSON string
+                $className = $record['className'] ?? null;
+                $dataSource = $record['dataSource'] ?? null;
+                $metaData = json_encode($record['metaData'] ?? []); // Convert metaData array to JSON string
 
-            // Start a transaction
-            $dbConnection->begin_transaction();
+                $dbConnection->begin_transaction();
 
-            try {
                 // Check if a record with this class name already exists
                 $checkQuery = "SELECT `id` FROM `$tableName` WHERE `className` = ?";
                 $stmt = $dbConnection->prepare($checkQuery);
+                if (!$stmt) {
+                    throw new Exception("Failed to prepare statement: " . $dbConnection->error);
+                }
+
                 $stmt->bind_param("s", $className);
                 $stmt->execute();
                 $result = $stmt->get_result();
@@ -708,62 +809,69 @@ function upsertReservationLibRoomClass($data, $dbConnection) {
 
                 // Upsert query
                 if ($exists) {
-                    // Update
                     $updateQuery = "UPDATE `$tableName` SET `dataSource` = ?, `metaData` = ? WHERE `className` = ?";
                     $updateStmt = $dbConnection->prepare($updateQuery);
-                    $updateStmt->bind_param("sss", $dataSource, $metaData, $className);
-                } else {
-                    // Insert
-                    $insertQuery = "INSERT INTO `$tableName` (`className`, `dataSource`, `metaData`) VALUES (?, ?, ?)";
-                    $insertStmt = $dbConnection->prepare($insertQuery);
-                    $insertStmt->bind_param("sss", $className, $dataSource, $metaData);
-                }
+                    if (!$updateStmt) {
+                        throw new Exception("Failed to prepare update statement: " . $dbConnection->error);
+                    }
 
-                // Execute the query
-                if ($exists) {
+                    $updateStmt->bind_param("sss", $dataSource, $metaData, $className);
                     $updateStmt->execute();
                     if ($updateStmt->error) {
                         throw new Exception("Error in update operation: " . $updateStmt->error);
                     }
                 } else {
+                    $insertQuery = "INSERT INTO `$tableName` (`className`, `dataSource`, `metaData`) VALUES (?, ?, ?)";
+                    $insertStmt = $dbConnection->prepare($insertQuery);
+                    if (!$insertStmt) {
+                        throw new Exception("Failed to prepare insert statement: " . $dbConnection->error);
+                    }
+
+                    $insertStmt->bind_param("sss", $className, $dataSource, $metaData);
                     $insertStmt->execute();
                     if ($insertStmt->error) {
                         throw new Exception("Error in insert operation: " . $insertStmt->error);
                     }
                 }
 
-                // Commit the transaction
                 $dbConnection->commit();
 
-            } catch (Exception $e) {
-                // Rollback the transaction on error
-                $dbConnection->rollback();
-                throw $e;
+            } else {
+                throw new Exception("Invalid data structure.");
             }
-        } else {
-            throw new Exception("Invalid data structure.");
+        } catch (Exception $e) {
+            $dbConnection->rollback();
+
+            // Log the error
+            $errorTimestamp = date('Y-m-d H:i:s');
+            $errorLogMessage = "[{$errorTimestamp}] Error in upsertReservationLibRoomClass: " . $e->getMessage() . PHP_EOL;
+            error_log($errorLogMessage, 3, $errorLogFile);
+
+            throw $e;
         }
     }
 }
 
+
 function upsertReservationStay($data, $dbConnection) {
     $tableName = 'RESERVATIONstay';
+    $errorLogFile = 'error_log.txt'; // Define the error log file path
 
     foreach ($data as $element) {
-        $createDateTime = $element['createDateTime'] ?? null;
-        $modifyDateTime = $element['modifyDateTime'] ?? null;
-        $startDate = $element['startDate'] ?? null;
-        $endDate = $element['endDate'] ?? null;
-        $createdBy = $element['createdBy'] ?? null;
-        $extPMSConfNum = $element['extPMSConfNum'] ?? null;
-        $extGuestID = $element['extGuestID'] ?? null;
-        $dataSource = $element['dataSource'] ?? null;
-        $libSourceId = $element['libSourceId'] ?? null;
-        $libPropertyId = $element['libPropertyId'] ?? null;
-
-        $dbConnection->begin_transaction();
-
         try {
+            $createDateTime = $element['createDateTime'] ?? null;
+            $modifyDateTime = $element['modifyDateTime'] ?? null;
+            $startDate = $element['startDate'] ?? null;
+            $endDate = $element['endDate'] ?? null;
+            $createdBy = $element['createdBy'] ?? null;
+            $extPMSConfNum = $element['extPMSConfNum'] ?? null;
+            $extGuestID = $element['extGuestID'] ?? null;
+            $dataSource = $element['dataSource'] ?? null;
+            $libSourceId = $element['libSourceId'] ?? null;
+            $libPropertyId = $element['libPropertyId'] ?? null;
+
+            $dbConnection->begin_transaction();
+
             // Check if a record with this combination already exists
             $checkQuery = "SELECT `id` FROM `$tableName` WHERE `createDateTime` = ? AND `modifyDateTime` = ? AND `startDate` = ? AND `endDate` = ? AND `extPMSConfNum` = ?";
             $stmt = $dbConnection->prepare($checkQuery);
@@ -771,7 +879,6 @@ function upsertReservationStay($data, $dbConnection) {
                 throw new Exception("Prepare failed: " . $dbConnection->error);
             }
 
-            // Assuming createDateTime and modifyDateTime are integers, and the rest are strings
             $stmt->bind_param("iisss", $createDateTime, $modifyDateTime, $startDate, $endDate, $extPMSConfNum);
             $stmt->execute();
             $result = $stmt->get_result();
@@ -785,7 +892,6 @@ function upsertReservationStay($data, $dbConnection) {
                     throw new Exception("Prepare failed: " . $dbConnection->error);
                 }
 
-                // Adjust the types based on your actual data types
                 $updateStmt->bind_param("ssiisssss", $extPMSConfNum, $dataSource, $libSourceId, $libPropertyId, $createdBy, $createDateTime, $modifyDateTime, $startDate, $endDate);
                 $updateStmt->execute();
                 if ($updateStmt->error) {
@@ -799,7 +905,6 @@ function upsertReservationStay($data, $dbConnection) {
                     throw new Exception("Prepare failed: " . $dbConnection->error);
                 }
 
-                // Adjust the types based on your actual data types
                 $insertStmt->bind_param("iissssiiss", $createDateTime, $modifyDateTime, $startDate, $endDate, $extPMSConfNum, $dataSource, $libSourceId, $libPropertyId, $createdBy, $extGuestID);
                 $insertStmt->execute();
                 if ($insertStmt->error) {
@@ -807,13 +912,16 @@ function upsertReservationStay($data, $dbConnection) {
                 }
             }
 
-            // Commit the transaction
             $dbConnection->commit();
 
         } catch (Exception $e) {
-            // Rollback the transaction on error
             $dbConnection->rollback();
-            error_log("Upsert failed: " . $e->getMessage(), 3, 'error_log.txt');
+
+            // Log the error
+            $errorTimestamp = date('Y-m-d H:i:s');
+            $errorLogMessage = "[{$errorTimestamp}] Error in upsertReservationStay: " . $e->getMessage() . PHP_EOL;
+            error_log($errorLogMessage, 3, $errorLogFile);
+
             throw $e;
         }
     }
@@ -822,9 +930,10 @@ function upsertReservationStay($data, $dbConnection) {
 
 
 
-
 function upsertCustomerRelationship($data, $dbConnection) {
     $tableName = 'CUSTOMERrelationship';
+    $errorLogFile = 'error_log.txt'; // Define the error log file path
+
 
     foreach ($data as $element) {
         $isPrimaryGuest = isset($element['isPrimaryGuest']) ? (int)$element['isPrimaryGuest'] : null;
@@ -874,8 +983,13 @@ function upsertCustomerRelationship($data, $dbConnection) {
             $dbConnection->commit();
 
         } catch (Exception $e) {
-            // Rollback the transaction on error
             $dbConnection->rollback();
+
+            // Log the error
+            $errorTimestamp = date('Y-m-d H:i:s');
+            $errorLogMessage = "[{$errorTimestamp}] Error in upsertCustomerRelationship: " . $e->getMessage() . PHP_EOL;
+            error_log($errorLogMessage, 3, $errorLogFile);
+
             throw $e;
         }
     }
@@ -883,8 +997,11 @@ function upsertCustomerRelationship($data, $dbConnection) {
 
 function upsertCustomerMembership($data, $dbConnection) {
     $tableName = 'CUSTOMERmembership';
+    $errorLogFile = 'error_log.txt'; // Define the error log file path
+
 
     foreach ($data as $element) {
+        try {
         $level = $element['level'] ?? null;
         $membershipCode = $element['membershipCode'] ?? null;
         $dataSource = $element['dataSource'] ?? null;
@@ -894,7 +1011,7 @@ function upsertCustomerMembership($data, $dbConnection) {
         // Start a transaction
         $dbConnection->begin_transaction();
 
-        try {
+
             // Check if a record with this combination already exists
             $checkQuery = "SELECT `id` FROM `$tableName` WHERE `contactId` = ? AND `libLoyaltyProgramId` = ? AND `level` = ? AND `membershipCode` = ?";
             $stmt = $dbConnection->prepare($checkQuery);
@@ -933,8 +1050,13 @@ function upsertCustomerMembership($data, $dbConnection) {
             $dbConnection->commit();
 
         } catch (Exception $e) {
-            // Rollback the transaction on error
             $dbConnection->rollback();
+
+            // Log the error
+            $errorTimestamp = date('Y-m-d H:i:s');
+            $errorLogMessage = "[{$errorTimestamp}] Error in upsertCustomerMembership: " . $e->getMessage() . PHP_EOL;
+            error_log($errorLogMessage, 3, $errorLogFile);
+
             throw $e;
         }
     }
@@ -942,8 +1064,11 @@ function upsertCustomerMembership($data, $dbConnection) {
 
 function upsertServicesPayment($data, $dbConnection) {
     $tableName = 'SERVICESpayment';
+    $errorLogFile = 'error_log.txt'; // Define the error log file path
+
 
     foreach ($data as $element) {
+        try {
         $paymentAmount = $element['paymentAmount'] ?? null;
         $currencyCode = $element['currencyCode'] ?? null;
         $dataSource = $element['dataSource'] ?? null;
@@ -952,7 +1077,6 @@ function upsertServicesPayment($data, $dbConnection) {
         // Start a transaction
         $dbConnection->begin_transaction();
 
-        try {
             // Construct the check query with consideration for NULL values
             $checkQuery = "SELECT COUNT(*) as count FROM `$tableName` WHERE 
                 (`paymentAmount` = ? OR (? IS NULL AND `paymentAmount` IS NULL)) AND 
@@ -970,6 +1094,9 @@ function upsertServicesPayment($data, $dbConnection) {
             if ($row['count'] == 0) {
                 $insertQuery = "INSERT INTO `$tableName` (`paymentAmount`, `currencyCode`, `dataSource`, `libTenderId`) VALUES (?, ?, ?, ?)";
                 $insertStmt = $dbConnection->prepare($insertQuery);
+                if (!$insertStmt) {
+                    throw new Exception("Failed to prepare insert statement: " . $dbConnection->error);
+                }
                 $insertStmt->bind_param("dssi", $paymentAmount, $currencyCode, $dataSource, $libTenderId);
                 $insertStmt->execute();
 
@@ -982,8 +1109,13 @@ function upsertServicesPayment($data, $dbConnection) {
             $dbConnection->commit();
 
         } catch (Exception $e) {
-            // Rollback the transaction on error
             $dbConnection->rollback();
+
+            // Log the error
+            $errorTimestamp = date('Y-m-d H:i:s');
+            $errorLogMessage = "[{$errorTimestamp}] Error in upsertServicesPayment: " . $e->getMessage() . PHP_EOL;
+            error_log($errorLogMessage, 3, $errorLogFile);
+
             throw $e;
         }
     }
@@ -992,6 +1124,7 @@ function upsertServicesPayment($data, $dbConnection) {
 
 function upsertCustomerContact($data, $dbConnection) {
     $tableName = 'CUSTOMERcontact';
+    $errorLogFile = 'error_log.txt'; // Define the error log file path
 
     foreach ($data as $record) {
         // Extract the required fields
@@ -1052,6 +1185,12 @@ function upsertCustomerContact($data, $dbConnection) {
         } catch (Exception $e) {
             // Rollback the transaction on error
             $dbConnection->rollback();
+
+            // Log the error
+            $errorTimestamp = date('Y-m-d H:i:s');
+            $errorLogMessage = "[{$errorTimestamp}] Error in upsertReservationRoomDetails: " . $e->getMessage() . PHP_EOL;
+            error_log($errorLogMessage, 3, $errorLogFile);
+
             throw $e;  // Re-throw the exception
         }
     }
@@ -1128,8 +1267,13 @@ function upsertReservationStayStatusStay($data, $dbConnection) {
         } catch (Exception $e) {
             // Rollback the transaction on error
             $dbConnection->rollback();
-            error_log("Upsert failed: " . $e->getMessage(), 3, $errorLogFile);
-            throw $e;
+
+            // Log the error
+            $errorTimestamp = date('Y-m-d H:i:s');
+            $errorLogMessage = "[{$errorTimestamp}] Error in upsertReservationStayStatusStay: " . $e->getMessage() . PHP_EOL;
+            error_log($errorLogMessage, 3, $errorLogFile);
+
+            throw $e;  // Re-throw the exception
         }
     }
 }
@@ -1213,8 +1357,13 @@ function upsertReservationRoomDetails($arrRESERVATIONroomDetails, $dbConnection)
         } catch (Exception $e) {
             // Rollback the transaction on error
             $dbConnection->rollback();
-            error_log("Upsert failed: " . $e->getMessage(), 3, $errorLogFile);
-            throw $e;
+
+            // Log the error
+            $errorTimestamp = date('Y-m-d H:i:s');
+            $errorLogMessage = "[{$errorTimestamp}] Error in upsertReservationRoomDetails: " . $e->getMessage() . PHP_EOL;
+            error_log($errorLogMessage, 3, $errorLogFile);
+
+            throw $e;  // Re-throw the exception
         }
     }
 }
@@ -1349,11 +1498,14 @@ function upsertSERVICESfolioOrders($arrSERVICESfolioOrders, $dbConnection) {
 
         } catch (Exception $e) {
             // Rollback the transaction on error
-            $errorTimestamp = date('Y-m-d H:i:s'); // Format the date and time as you prefer
-            $errorLogMessage = "[{$errorTimestamp}] Upsert failed: " . $e->getMessage() . PHP_EOL;
             $dbConnection->rollback();
+
+            // Log the error
+            $errorTimestamp = date('Y-m-d H:i:s');
+            $errorLogMessage = "[{$errorTimestamp}] Error in upsertSERVICESfolioOrders: " . $e->getMessage() . PHP_EOL;
             error_log($errorLogMessage, 3, $errorLogFile);
-            throw $e;
+
+            throw $e;  // Re-throw the exception
         }
     }
 }

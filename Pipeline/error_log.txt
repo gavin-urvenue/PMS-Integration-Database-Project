@@ -1,3 +1,0 @@
-Successfully fetched 500 records from hapi_raw_reservations[2024-01-08 19:54:14] Successfully inserted tracking info into PMSDATABASEmisc[2024-01-08 19:54:47] Upsert failed: Column 'contactId' cannot be null
-Successfully fetched 500 records from hapi_raw_reservations[2024-01-08 20:13:45] Successfully inserted tracking info into PMSDATABASEmiscSuccessfully fetched 0 records from hapi_raw_reservations[2024-01-08 20:19:28] Successfully inserted tracking info into PMSDATABASEmisc[2024-01-08 20:19:28] Error in createReservationLibSource: Invalid data array.
-Successfully fetched 500 records from hapi_raw_reservations[2024-01-08 20:22:48] Successfully inserted tracking info into PMSDATABASEmisc[2024-01-08 20:23:16] Upsert failed: Column 'contactId' cannot be null
