@@ -1,4 +1,7 @@
 <?php
+//These are all of the functions having to do with preparing the associative arrays for
+// upsert into the final OLTP database
+
 ////Function to remove duplicate records from an array based on 2 fields
 function removeDuplicateRows2D($data, $key1, $key2)
 {
@@ -304,7 +307,6 @@ function createReservationLibSource($data) {
             throw new Exception("Invalid data array.");
         }
 
-        $result = [];
 
         // Add initial row with Unknown values
         $result[] = [
@@ -366,7 +368,6 @@ function createReservationLibRoomType($data) {
             throw new Exception("Invalid data array.");
         }
 
-        $result = [];
 
         // Add initial row with Unknown values
         $result[] = [
@@ -421,7 +422,6 @@ function createReservationLibStayStatus($data) {
             throw new Exception("Invalid data array.");
         }
 
-        $result = [];
 
         // Add 'Unknown' row at the beginning
         $unknownRow = [
@@ -472,7 +472,6 @@ function createReservationGroup($data) {
             throw new Exception("Invalid data array.");
         }
 
-        $result = [];
 
         // Add 'Unknown' row at the beginning
         $unknownRow = [
@@ -899,8 +898,87 @@ function createSERVICESlibFolioOrderType() {
 }
 
 
+
 ////Function to create and populate the CUSTOMERcontact Table Associative Array
-function createCUSTOMERcontact($array) {
+//function createArrCUSTOMERcontact($array) {
+//    // Define the error log file path
+//    $errorLogFile = dirname(__FILE__) . '/error_log.txt';
+//
+//    try {
+//        $customerContacts = [
+//            [ // Add a 'UNKNOWN' record at the beginning of the array
+//                'firstName' => 'UNKNOWN',
+//                'lastName' => 'UNKNOWN',
+//                'title' => 'UNKNOWN',
+//                'email' => 'UNKNOWN',
+//                'languageCode' => 'UNKNOWN',
+//                'languageFormat' => 'UNKNOWN',
+//                'extGuestId' => 'UNKNOWN',
+//                'dataSource' => 'HAPI'
+//            ]
+//        ];
+//
+//        $uniqueCheck = []; // Array to keep track of existing contacts to prevent duplicates
+//
+//        foreach ($array as $item) {
+//            if (isset($item['guests']) && $item['guests'] !== null) {
+//                $guests = json_decode($item['guests'], true);
+//
+//                if (json_last_error() !== JSON_ERROR_NONE) {
+//                    // Log the JSON error
+//                    $errorTimestamp = date('Y-m-d H:i:s');
+//                    $errorLogMessage = "[{$errorTimestamp}] JSON decode error in guests: " . json_last_error_msg() . PHP_EOL;
+//                    error_log($errorLogMessage, 3, $errorLogFile);
+//                    continue;
+//                }
+//
+//                foreach ($guests as $guest) {
+//                    if (!isset($guest['guest']) || !isset($guest['guest']['names'][0])) {
+//                        continue;
+//                    }
+//                    $guestData = $guest['guest'];
+//                    $nameData = $guestData['names'][0];
+//
+//                    $contact = [
+//                        'firstName' => $nameData['givenName'] ?? '',
+//                        'lastName' => $nameData['surname'] ?? '',
+//                        'title' => $nameData['title'] ?? '',
+//                        'email' => $guestData['email'] ?? '',
+//                        'birthDate' => $guestData['dateOfBirth'] ?? null,
+//                        'languageCode' => $guestData['primaryLanguage']['code'] ?? '',
+//                        'languageFormat' => $guestData['primaryLanguage']['format'] ?? '',
+//                        'extGuestId' => $item['extracted_guest_id'] ?? '',
+//                        'isPrimary' => $guest['isPrimary'] ?? '',
+//                        'dataSource' => 'HAPI'
+//                    ];
+//
+//                    $uniqueId = $contact['firstName'] . '|' . $contact['lastName'] . '|' . $contact['extGuestId'];
+//                    if (!isset($uniqueCheck[$uniqueId])) {
+//                        $customerContacts[] = $contact;
+//                        $uniqueCheck[$uniqueId] = true;
+//                    }
+//                }
+//            }
+//        }
+//
+//        // Log the success message
+//        $errorTimestamp = date('Y-m-d H:i:s');
+//        $successMessage = "[{$errorTimestamp}] Successfully processed CUSTOMER contacts";
+//        error_log($successMessage, 3, $errorLogFile);
+//
+//        return $customerContacts;
+//    } catch (Exception $e) {
+//        // Log the exception
+//        $errorTimestamp = date('Y-m-d H:i:s');
+//        $errorLogMessage = "[{$errorTimestamp}] Error in createCUSTOMERcontact: " . $e->getMessage() . PHP_EOL;
+//        error_log($errorLogMessage, 3, $errorLogFile);
+//
+//        // Optionally rethrow the exception if further handling is required
+//        throw $e;
+//    }
+//}
+
+function createArrCUSTOMERcontact($normalizedData) {
     // Define the error log file path
     $errorLogFile = dirname(__FILE__) . '/error_log.txt';
 
@@ -920,30 +998,33 @@ function createCUSTOMERcontact($array) {
 
         $uniqueCheck = []; // Array to keep track of existing contacts to prevent duplicates
 
-        foreach ($array as $item) {
-            if (isset($item['guests']) && $item['guests'] !== null) {
-                $guests = json_decode($item['guests'], true);
-
-                if (json_last_error() !== JSON_ERROR_NONE) {
-                    // Log the JSON error
-                    $errorTimestamp = date('Y-m-d H:i:s');
-                    $errorLogMessage = "[{$errorTimestamp}] JSON decode error in guests: " . json_last_error_msg() . PHP_EOL;
-                    error_log($errorLogMessage, 3, $errorLogFile);
-                    continue;
-                }
-
-                foreach ($guests as $guest) {
-                    if (!isset($guest['guest'])) {
+        foreach ($normalizedData as $item) {
+            if (isset($item['guests']) && !empty($item['guests'])) {
+                foreach ($item['guests'] as $guest) {
+                    if (!isset($guest['guest']) || !isset($guest['guest']['names'][0])) {
                         continue;
                     }
                     $guestData = $guest['guest'];
+                    $nameData = $guestData['names'][0];
 
-                    // Initialize the contact array with default values
+                    // Initialize email as empty string
+                    $email = '';
+
+                    // Iterate through contact details to find email
+                    if (isset($guestData['contactDetails']) && is_array($guestData['contactDetails'])) {
+                        foreach ($guestData['contactDetails'] as $contactDetail) {
+                            if ($contactDetail['category'] === 'EMAIL' && isset($contactDetail['value'])) {
+                                $email = $contactDetail['value'];
+                                break; // Stop the l oop once email is found
+                            }
+                        }
+                    }
+
                     $contact = [
-                        'firstName' => $guestData['names'][0]['givenName'] ?? '',
-                        'lastName' => $guestData['names'][0]['surname'] ?? '',
-                        'title' => $guestData['names'][0]['title'] ?? '',
-                        'email' => '',
+                        'firstName' => $nameData['givenName'] ?? '',
+                        'lastName' => $nameData['surname'] ?? '',
+                        'title' => $nameData['title'] ?? '',
+                        'email' => $email, // Use the extracted email
                         'birthDate' => $guestData['dateOfBirth'] ?? null,
                         'languageCode' => $guestData['primaryLanguage']['code'] ?? '',
                         'languageFormat' => $guestData['primaryLanguage']['format'] ?? '',
@@ -952,18 +1033,7 @@ function createCUSTOMERcontact($array) {
                         'dataSource' => 'HAPI'
                     ];
 
-                    // Extract email if contact details are provided
-                    if (isset($guestData['contactDetails'])) {
-                        foreach ($guestData['contactDetails'] as $detail) {
-                            if ($detail['type'] === 'EMAIL' && isset($detail['value'])) {
-                                $contact['email'] = $detail['value'];
-                                break;
-                            }
-                        }
-                    }
-
-                    // Use a combination of name and email to check for uniqueness
-                    $uniqueId = $contact['firstName'] . '|' . $contact['lastName'] . '|' . $contact['email'];
+                    $uniqueId = $contact['firstName'] . '|' . $contact['lastName'] . '|' . $contact['extGuestId'];
                     if (!isset($uniqueCheck[$uniqueId])) {
                         $customerContacts[] = $contact;
                         $uniqueCheck[$uniqueId] = true;
@@ -989,9 +1059,86 @@ function createCUSTOMERcontact($array) {
     }
 }
 
+function createArrRESERVATIONstay(
+    $connection,
+    $normalizedData,
+    $arrRESERVATIONlibSource,
+    $arrRESERVATIONlibProperty
+) {
+    // Define the error log file path
+    $errorLogFile = dirname(__FILE__) . '/error_log.txt';
+
+    try {
+        $arrRESERVATIONStay = [];
+
+        // Create lookup arrays for source and property Ids
+        $sourceLookup = createLookup($connection, 'RESERVATIONlibSource', 'sourceName', 'sourceType');
+        $propertyLookup = createLookup($connection, 'RESERVATIONlibProperty', 'propertyCode', 'chainCode');
+
+        foreach ($normalizedData as $entry) {
+            // Previously handled fields
+            $createDateTime = $entry['createdDateTime'] ?? null;
+            $modifyDateTime = $entry['lastModifiedDateTime'] ?? null;
+
+            // New fields
+            $departureDate = $entry['departure'] ?? null;
+            $arrivalDate = $entry['arrival'] ?? null;
+            $createdBy = $entry['createdBy'] ?? null;
+            $extPMSConfNum = $entry['confirmation_number'] ?? null;
+            $extGuestId = $entry['extracted_guest_id'] ?? null;
+            $propertyCode = isset($entry['propertyDetails']['propertyCode']) ? $entry['propertyDetails']['propertyCode'] : 'UNKNOWN';
+            $chainCode = isset($entry['propertyDetails']['chainCode']) ? $entry['propertyDetails']['chainCode'] : 'UNKNOWN';
+            $sourceName = $entry['profiles'][0]['names'][0]['name'] ?? 'UNKNOWN';
+            $sourceType = $entry['profiles'][0]['type'] ?? 'UNKNOWN';
+
+            $dataSource = 'HAPI'; // assuming it's a constant value
+
+            // Populate libSourceId and libPropertyId based on lookup
+            $libSourceId = $sourceLookup[$sourceName][$sourceType] ?? null;
+            $libPropertyId = $propertyLookup[$entry['propertyDetails']['code']][$entry['propertyDetails']['chainCode']] ?? null;
+
+            $arrRESERVATIONStay[] = [
+                'createDateTime' => strtotime($createDateTime),
+                'modifyDateTime' => strtotime($modifyDateTime),
+                'startDate' => $arrivalDate,
+                'endDate' => $departureDate,
+                'createdBy' => $createdBy,
+                'metaData' => null, // Placeholder for future metadata inclusion
+                'extPMSConfNum' => $extPMSConfNum,
+                'extGuestId' => $extGuestId,
+                'dataSource' => $dataSource,
+                'libSourceId' => $libSourceId,
+                'libPropertyId' => $libPropertyId,
+                'propertyCode' => $propertyCode,
+                'chainCode' => $chainCode,
+                'sourceName' => $sourceName,
+                'sourceType' => $sourceType,
+            ];
+        }
+
+
+
+        // Log the success message
+        $errorTimestamp = date('Y-m-d H:i:s');
+        $successMessage = "[{$errorTimestamp}] Successfully processed ARR RESERVATION stay data";
+        error_log($successMessage, 3, $errorLogFile);
+
+        return $arrRESERVATIONStay;
+    } catch (Exception $e) {
+        // Log the exception
+        $errorTimestamp = date('Y-m-d H:i:s');
+        $errorLogMessage = "[{$errorTimestamp}] Error in createArrRESERVATIONstay: " . $e->getMessage() . PHP_EOL;
+        error_log($errorLogMessage, 3, $errorLogFile);
+
+        // Optionally rethrow the exception if further handling is required
+        throw $e;
+    }
+}
+
+
 
 //take table from relational database and convert it into an associative array. Using this method to get around how the
-//ID field is generated table-side and not easily predictable since it's generated at the server level instead of table
+//Id field is generated table-side and not easily predictable since it's generated at the server level instead of table
 //level
 function getTableAsAssociativeArray($connection, $tableName) {
     // Define the error log file path
@@ -1041,73 +1188,73 @@ function getTableAsAssociativeArray($connection, $tableName) {
 
 
 //create the arrRESERVATIONstay array by parsing from $myDataSemiParsed
-function createArrRESERVATIONstay(
-    $connection,
-    $myDataSemiParsed,
-    $arrRESERVATIONlibSource,
-    $arrRESERVATIONlibProperty
-) {
-    // Define the error log file path
-    $errorLogFile = dirname(__FILE__) . '/error_log.txt';
-
-    try {
-        $arrRESERVATIONStay = [];
-
-        // Create lookup arrays for source and property Ids
-        $sourceLookup = createLookup($connection, 'RESERVATIONlibSource', 'sourceName', 'sourceType');
-        $propertyLookup = createLookup($connection, 'RESERVATIONlibProperty', 'propertyCode', 'chainCode');
-
-        foreach ($myDataSemiParsed as $entry) {
-            $profiles = json_decode($entry['profiles'], true) ?? [];
-            $profileData = $profiles[0] ?? []; // Assuming the first profile is relevant
-            $sourceName = $profileData['names'][0]['name'] ?? 'UNKNOWN';
-            $sourceType = $profileData['type'] ?? 'UNKNOWN';
-            $propertyCode = $entry['extracted_property_code'] ?? 'UNKNOWN';
-            $chainCode = $entry['extracted_chain_code'] ?? 'UNKNOWN';
-
-            // Convert createdDateTime and lastModifiedDateTime to Unix timestamps
-            $createDateTime = isset($entry['createdDateTime']) ? $entry['createdDateTime'] : null;
-            $modifyDateTime = isset($entry['lastModifiedDateTime']) ? $entry['lastModifiedDateTime'] : null;
-
-            // Populate libSourceId and libPropertyId based on lookup
-            $libSourceId = $sourceLookup[$sourceName][$sourceType] ?? null;
-            $libPropertyId = $propertyLookup[$propertyCode][$chainCode] ?? null;
-
-            $arrRESERVATIONStay[] = [
-                'createDateTime' => strtotime($createDateTime),
-                'modifyDateTime' => strtotime($modifyDateTime),
-                'startDate' => $entry['arrival'] ?? null,
-                'endDate' => $entry['departure'] ?? null,
-                'createdBy' => $entry['createdBy'] ?? null,
-                'metaData' => null,
-                'extPMSConfNum' => $entry['confirmation_number'] ?? null,
-                'extGuestID' => $entry['extracted_guest_id'],
-                'dataSource' => 'HAPI',
-                'libSourceId' => $libSourceId,
-                'libPropertyId' => $libPropertyId,
-                'propertyCode' => $propertyCode,
-                'chainCode' => $chainCode,
-                'sourceName' => $sourceName,
-                'sourceType' => $sourceType,
-            ];
-        }
-
-        // Log the success message
-        $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully processed ARR RESERVATION stay data";
-        error_log($successMessage, 3, $errorLogFile);
-
-        return $arrRESERVATIONStay;
-    } catch (Exception $e) {
-        // Log the exception
-        $errorTimestamp = date('Y-m-d H:i:s');
-        $errorLogMessage = "[{$errorTimestamp}] Error in createArrRESERVATIONstay: " . $e->getMessage() . PHP_EOL;
-        error_log($errorLogMessage, 3, $errorLogFile);
-
-        // Optionally rethrow the exception if further handling is required
-        throw $e;
-    }
-}
+//function createArrRESERVATIONstay(
+//    $connection,
+//    $myDataSemiParsed,
+//    $arrRESERVATIONlibSource,
+//    $arrRESERVATIONlibProperty
+//) {
+//    // Define the error log file path
+//    $errorLogFile = dirname(__FILE__) . '/error_log.txt';
+//
+//    try {
+//        $arrRESERVATIONStay = [];
+//
+//        // Create lookup arrays for source and property Ids
+//        $sourceLookup = createLookup($connection, 'RESERVATIONlibSource', 'sourceName', 'sourceType');
+//        $propertyLookup = createLookup($connection, 'RESERVATIONlibProperty', 'propertyCode', 'chainCode');
+//
+//        foreach ($myDataSemiParsed as $entry) {
+////            $profiles = $entry['profiles']?? [];
+////            $profileData = $profiles[0] ?? []; // Assuming the first profile is relevant
+//            $sourceName = $profileData['names'][0]['name'] ?? 'UNKNOWN';
+//            $sourceType = $profileData['type'] ?? 'UNKNOWN';
+//            $propertyCode = $entry['extracted_property_code'] ?? 'UNKNOWN';
+//            $chainCode = $entry['extracted_chain_code'] ?? 'UNKNOWN';
+//
+//            // Convert createdDateTime and lastModifiedDateTime to Unix timestamps
+//            $createDateTime = isset($entry['createdDateTime']) ? $entry['createdDateTime'] : null;
+//            $modifyDateTime = isset($entry['lastModifiedDateTime']) ? $entry['lastModifiedDateTime'] : null;
+//
+//            // Populate libSourceId and libPropertyId based on lookup
+//            $libSourceId = $sourceLookup[$sourceName][$sourceType] ?? null;
+//            $libPropertyId = $propertyLookup[$propertyCode][$chainCode] ?? null;
+//
+//            $arrRESERVATIONStay[] = [
+//                'createDateTime' => strtotime($createDateTime),
+//                'modifyDateTime' => strtotime($modifyDateTime),
+//                'startDate' => $entry['arrival'] ?? null,
+//                'endDate' => $entry['departure'] ?? null,
+//                'createdBy' => $entry['createdBy'] ?? null,
+//                'metaData' => null,
+//                'extPMSConfNum' => $entry['confirmation_number'] ?? null,
+//                'extGuestId' => $entry['extracted_guest_id'],
+//                'dataSource' => 'HAPI',
+//                'libSourceId' => $libSourceId,
+//                'libPropertyId' => $libPropertyId,
+//                'propertyCode' => $propertyCode,
+//                'chainCode' => $chainCode,
+//                'sourceName' => $sourceName,
+//                'sourceType' => $sourceType,
+//            ];
+//        }
+//
+//        // Log the success message
+//        $errorTimestamp = date('Y-m-d H:i:s');
+//        $successMessage = "[{$errorTimestamp}] Successfully processed arrRESERVATION stay data";
+//        error_log($successMessage, 3, $errorLogFile);
+//
+//        return $arrRESERVATIONStay;
+//    } catch (Exception $e) {
+//        // Log the exception
+//        $errorTimestamp = date('Y-m-d H:i:s');
+//        $errorLogMessage = "[{$errorTimestamp}] Error in createArrRESERVATIONstay: " . $e->getMessage() . PHP_EOL;
+//        error_log($errorLogMessage, 3, $errorLogFile);
+//
+//        // Optionally rethrow the exception if further handling is required
+//        throw $e;
+//    }
+//}
 
 
 
@@ -1130,7 +1277,7 @@ function createArrCUSTOMERrelationship($myDataSemiParsed, $arrCUSTOMERlibContact
         // Create a lookup for contacts
         $contactLookup = [];
         foreach ($arrCUSTOMERcontact as $contact) {
-            $key = strtolower($contact['firstName'] . $contact['lastName'] . $contact['extGuestID']); // using lower case for case-insensitive comparison
+            $key = strtolower($contact['firstName'] . $contact['lastName'] . $contact['extGuestId']); // using lower case for case-insensitive comparison
             $contactLookup[$key] = $contact['id'];
         }
 
@@ -1235,7 +1382,7 @@ function createArrCUSTOMERmembership($myDataSemiParsed, $arrCUSTOMERlibLoyaltyPr
 
     try {
         $arrCUSTOMERmembership = [];
-        $defaultContactId = array_column($arrCUSTOMERcontact, 'id', 'extGuestID')['UNKNOWN'];
+        $defaultContactId = array_column($arrCUSTOMERcontact, 'id', 'extGuestId')['UNKNOWN'];
         $loyaltyProgramIdForFairmont = null;
 
         // Find the ID for 'Fairmont Banff Springs' from arrCUSTOMERlibLoyaltyProgram
@@ -1264,7 +1411,7 @@ function createArrCUSTOMERmembership($myDataSemiParsed, $arrCUSTOMERlibLoyaltyPr
 
                     $contactId = $defaultContactId;
                     foreach ($arrCUSTOMERcontact as $contact) {
-                        if ($contact['extGuestID'] === $extGuestId && $contact['firstName'] === $firstName && $contact['lastName'] === $lastName) {
+                        if ($contact['extGuestId'] === $extGuestId && $contact['firstName'] === $firstName && $contact['lastName'] === $lastName) {
                             $contactId = $contact['id'];
                             break;
                         }
@@ -1396,24 +1543,24 @@ function createArrRESERVATIONgroupStay($arrRESERVATIONstay, $arrRESERVATIONgroup
         foreach ($arrRESERVATIONstay as $item) {
             $groupStayData = [
                 'HAPI' => $item['dataSource'],
-                'stayID' => '', // To be populated from arrRESERVATIONstay
+                'stayId' => '', // To be populated from arrRESERVATIONstay
                 'startDate' => $item['arrival'],
                 'endDate' => $item['departure'],
                 'extPMSConfNum' => $item['extPMSConfNum'],
-                'groupID' => '', // To be populated from arrRESERVATIONgroup
+                'groupId' => '', // To be populated from arrRESERVATIONgroup
                 'groupName' => 'UNKNOWN',
                 'groupNumber' => 'UNKNOWN',
                 'groupStartDate' => null,
                 'groupEndDate' => null
             ];
 
-            // Look up stayID
+            // Look up stayId
             $stayKey = $item['startDate'] . '|' . $item['endDate'] . '|' . $item['extPMSConfNum'];
             if (isset($stayLookup[$stayKey])) {
-                $groupStayData['stayID'] = $stayLookup[$stayKey];
+                $groupStayData['stayId'] = $stayLookup[$stayKey];
             }
 
-            // Look up groupID
+            // Look up groupId
             foreach ($arrRESERVATIONgroup as $group) {
                 if (
                     $group['groupName'] === $groupStayData['groupName'] &&
@@ -1421,7 +1568,7 @@ function createArrRESERVATIONgroupStay($arrRESERVATIONstay, $arrRESERVATIONgroup
                     $group['groupStartDate'] === $groupStayData['groupStartDate'] &&
                     $group['groupEndDate'] === $groupStayData['groupEndDate']
                 ) {
-                    $groupStayData['groupID'] = $group['id'];
+                    $groupStayData['groupId'] = $group['id'];
                     break;
                 }
             }
@@ -1458,34 +1605,55 @@ function indexArrReservationStay($arrRESERVATIONstay) {
     return $indexedStays;
 }
 
-function createArrRESERVATIONstayStatusStay($myDataSemiParsed, $arrRESERVATIONstay, $arrRESERVATIONlibStayStatus) {
+function createArrRESERVATIONstayStatusStay($normalizedData, $arrRESERVATIONstay, $arrRESERVATIONlibStayStatus) {
     // Define the error log file path
     $errorLogFile = dirname(__FILE__) . '/error_log.txt';
 
     try {
         $arrRESERVATIONstayStatusStay = [];
 
-        // Indexing arrRESERVATIONstay for faster lookup
-        $indexArrReservationStay = [];
+//        // Indexing arrRESERVATIONstay for faster lookup
+//        $indexArrReservationStay = [];
+//        foreach ($arrRESERVATIONstay as $stay) {
+//            $indexKey = $stay['createDateTime'] . '|' . $stay['lastModifiedDateTime'] . '|' . $stay['startDate'] . '|' . $stay['endDate']  . '|' . $stay['extGuestId'] . '|' . $stay['extPMSConfNum'];
+//            $indexArrReservationStay[$indexKey] = $stay['id'];
+//        }
+
+        // Indexing reservation stays for fast lookup
+        $indexedReservationStays = [];
         foreach ($arrRESERVATIONstay as $stay) {
-            $indexKey = $stay['createDateTime'] . '_' . $stay['modifyDateTime'] . '_' . $stay['startDate'] . '_' . $stay['endDate'];
-            $indexArrReservationStay[$indexKey] = $stay['id'];
+            $index = $stay['createDateTime'] . '|' . $stay['modifyDateTime'] . '|' . $stay['startDate'] . '|' . $stay['endDate']  . '|' . $stay['extGuestId'] . '|' . $stay['extPMSConfNum'];
+            $indexedReservationStays[$index] = $stay['id'];
         }
 
-        foreach ($myDataSemiParsed as $entry) {
-            $createTimestamp = isset($entry['createdDateTime']) ? (string)strtotime($entry['createdDateTime']) : '0';
-            $modifyTimestamp = isset($entry['lastModifiedDateTime']) ? (string)strtotime($entry['lastModifiedDateTime']) : '0';
+        foreach ($normalizedData as $entry) {
+            $createDateTime = strval(strtotime($entry['createdDateTime'])) ?? null;
+            $modifyDateTime = strval(strtotime($entry['lastModifiedDateTime'])) ?? null;
 
-            $stayStatusID = null;
+            $stayStatusId = null;
             foreach ($arrRESERVATIONlibStayStatus as $status) {
                 if ($status['statusName'] === ($entry['ext_status'] ?? 'UNKNOWN')) {
-                    $stayStatusID = $status['id'];
+                    $stayStatusId = $status['id'];
                     break;
                 }
             }
 
-            $lookupKey = $createTimestamp . '_' . $modifyTimestamp . '_' . $entry['arrival'] . '_' . $entry['departure'];
-            $stayID = $indexArrReservationStay[$lookupKey] ?? null;
+            $startDate = $entry['arrival'] ?? null; // Assuming these are already in the correct format
+            $endDate = $entry['departure'] ?? null;
+            $extGuestId = $entry['extracted_guest_id'] ?? null;
+            $extPMSConfNum = $entry['confirmation_number'] ?? null;
+
+            // Create index for stay lookup
+            $stayIndex = $createDateTime . '|' . $modifyDateTime . '|' . $startDate . '|' . $endDate . '|' . $extGuestId . '|' . $extPMSConfNum;
+// Lookup for stayId using the index
+            if (isset($indexedReservationStays[$stayIndex])) {
+                $stayId = is_array($indexedReservationStays[$stayIndex])
+                    ? reset($indexedReservationStays[$stayIndex])
+                    : $indexedReservationStays[$stayIndex];
+            } else {
+                $stayId = null;
+            }
+
 
             $arrRESERVATIONstayStatusStay[] = [
                 'cancelledBy' => $entry['cancellationDetails']['cancelledBy'] ?? null,
@@ -1493,13 +1661,14 @@ function createArrRESERVATIONstayStatusStay($myDataSemiParsed, $arrRESERVATIONst
                 'cancellationReasonCode' => $entry['cancellationDetails']['cancellationReasonCode'] ?? null,
                 'cancellationReasonText' => $entry['Cancellation']['cancellationReasonText'] ?? null,
                 'dataSource' => 'HAPI',
-                'stayID' => $stayID,
-                'createDateTime' => $createTimestamp,
-                'modifyDateTime' => $modifyTimestamp,
-                'startDate' => $entry['arrival'] ?? null,
-                'endDate' => $entry['departure'] ?? null,
-                'extGuestID' => $entry['extracted_guest_id'],
-                'stayStatusID' => $stayStatusID,
+                'stayId' => $stayId,
+                'createDateTime' => $createDateTime,
+                'modifyDateTime' => $modifyDateTime,
+                'startDate' => $startDate,
+                'endDate' => $endDate,
+                'extGuestId' => $extGuestId,
+                'extPMSConfNum' => $extPMSConfNum,
+                'stayStatusId' => $stayStatusId,
                 'statusName' => $entry['ext_status'] ?? 'UNKNOWN'
             ];
         }
@@ -1523,14 +1692,144 @@ function createArrRESERVATIONstayStatusStay($myDataSemiParsed, $arrRESERVATIONst
 
 
 
-function createArrReservationRoomDetails($myDataSemiParsed, $arrCUSTOMERcontact, $arrRESERVATIONstay, $arrRESERVATIONlibRoomType, $arrRESERVATIONlibRoomClass, $arrRESERVATIONlibRoom) {
+//function createArrReservationRoomDetails($myDataSemiParsed, $arrCUSTOMERcontact, $arrRESERVATIONstay, $arrRESERVATIONlibRoomType, $arrRESERVATIONlibRoomClass, $arrRESERVATIONlibRoom) {
+//    // Define the error log file path
+//    $errorLogFile = dirname(__FILE__) . '/error_log.txt';
+//
+//    // Create indexed arrays for fast lookup
+//    $indexedContacts = [];
+//    foreach ($arrCUSTOMERcontact as $contact) {
+//        $index = $contact['firstName'] . '|' . $contact['lastName'] . '|' . $contact['extGuestId'];
+//        $indexedContacts[$index] = $contact['id'];
+//    }
+//
+//    $indexedStays = [];
+//    foreach ($arrRESERVATIONstay as $stay) {
+//        $index = $stay['createDateTime'] . '|' . $stay['modifyDateTime'] . '|' . $stay['startDate'] . '|' . $stay['endDate'];
+//        $indexedStays[$index] = $stay['id'];
+//    }
+//
+//    $indexedRoomTypes = [];
+//    foreach ($arrRESERVATIONlibRoomType as $roomType) {
+//        $indexedRoomTypes[$roomType['typeCode']] = $roomType['id'];
+//    }
+//
+//    // Find the default ID for 'UNKNOWN' room type
+//    $defaultLibRoomTypeId = null;
+//    foreach ($arrRESERVATIONlibRoomType as $roomType) {
+//        if ($roomType['typeCode'] === 'UNKNOWN' && $roomType['typeName'] === 'UNKNOWN') {
+//            $defaultLibRoomTypeId = $roomType['id'];
+//            break;
+//        }
+//    }
+//
+//    $indexedRoomClasses = [];
+//    foreach ($arrRESERVATIONlibRoomClass as $roomClass) {
+//        $indexedRoomClasses[$roomClass['className']] = $roomClass['id'];
+//    }
+//
+//    $indexedLibRooms = [];
+//    foreach ($arrRESERVATIONlibRoom as $room) {
+//        $indexedLibRooms[$room['roomNumber']] = $room['id'];
+//    }
+//
+//    try {
+//        $arrRESERVATIONroomDetails = [];
+//        foreach ($myDataSemiParsed as $entry) {
+//            // Existing logic to decode and extract guest details...
+//
+//            // New logic to decode and extract prices and ratePlans
+//            $pricesData = json_decode($entry['prices'], true);
+//            $ratePlansData = json_decode($entry['ratePlans'], true);
+//            $amount = (!empty($pricesData) && isset($pricesData[0]['amount'])) ? $pricesData[0]['amount'] : null;
+//            $ratePlanCode = (!empty($ratePlansData) && isset($ratePlansData[0]['code'])) ? $ratePlansData[0]['code'] : null;
+//
+//            // Decode and extract guest details
+//            $guestData = json_decode($entry['guests'], true);
+//            $guestDetails = $guestData[0]['guest'] ?? null;
+//
+//            // Extract room number and typeCode from occupiedUnits
+//            $occupiedUnits = json_decode($entry['occupiedUnits'], true);
+//            $roomNumber = $occupiedUnits[0]['unitId'] ?? 'UNKNOWN';
+//            $typeCode = $occupiedUnits[0]['unitTypeCode'] ?? 'UNKNOWN';
+//
+//            // Lookup libRoomId and libRoomTypeId based on roomNumber and typeCode
+//            $libRoomId = $indexedLibRooms[$roomNumber] ?? null;
+//            $libRoomTypeId = $indexedRoomTypes[$typeCode] ?? $defaultLibRoomTypeId;
+//
+//
+//            if ($guestDetails) {
+//                $givenName = $guestDetails['names'][0]['givenName'] ?? null;
+//                $surname = $guestDetails['names'][0]['surname'] ?? null;
+//                $contactIndex = $givenName . '|' . $surname . '|' . $entry['extracted_guest_id'];
+//                $contactId = $indexedContacts[$contactIndex] ?? null;
+//
+//                $createDateTime = strtotime($entry['createdDateTime']);
+//                $modifyDateTime = strtotime($entry['lastModifiedDateTime']);
+//                $stayIndex = $createDateTime . '|' . $modifyDateTime . '|' . $entry['arrival'] . '|' . $entry['departure'];
+//                $stayId = $indexedStays[$stayIndex] ?? null;
+//
+//                // Room type and class lookups
+//    //            $roomTypeCode = json_decode($entry['occupiedUnits'], true)[0]['unitTypeCode'] ?? null;
+//    //            $libRoomTypeId = $indexedRoomTypes[$roomTypeCode] ?? null;
+//                $className = 'UNKNOWN'; // Replace with actual logic to determine class name
+//                $libRoomClassId = $indexedRoomClasses[$className] ?? null;
+//
+//                // Continue building the details array
+//                $arrRESERVATIONroomDetails[] = [
+//                    'startDate' => $entry['arrival'] ?? null,
+//                    'endDate' => $entry['departure'] ?? null,
+//                    'amount' => $amount,
+//                    'ratePlanCode' => $ratePlanCode,
+//                    'isBlocked' => isset($entry['Blocks']) && !$entry['Blocks']['isempty'] ? 1 : 0,
+//                    'isComplimentary' => intval($entry['isComplimentary']) ?? null,
+//                    'isHouseUse' => $entry['isHouseUse'] ?? 0,
+//                    'contactId' => $contactId,
+//                    'firstName' => $givenName,
+//                    'lastName' => $surname,
+//                    'extGuestId' => $entry['extracted_guest_id'] ?? null,
+//                    'stayId' => $stayId,
+//                    'createDateTime' => ($timestamp = strtotime($entry['createdDateTime'])) ? strval($timestamp) : null,
+//                    'modifyDateTime' => ($timestamp = strtotime($entry['lastModifiedDateTime'])) ? strval($timestamp) : null,
+//                    'extPMSConfNum' => $entry['confirmation_number'] ?? null,
+//                    'dataSource' => 'HAPI',
+//                    'libRoomId' => $libRoomId,
+//                    'roomNumber' => $roomNumber,
+//                    'libRoomTypeId' => $libRoomTypeId,
+//                    'typeCode' => $typeCode,
+//                    'libRoomClassId' => $libRoomClassId,
+//                    'className' => 'UNKNOWN',
+//                ];
+//            }
+//        }
+//
+//        return $arrRESERVATIONroomDetails;
+//    } catch (Exception $e) {
+//        // Log the exception
+//        $errorTimestamp = date('Y-m-d H:i:s');
+//        $errorLogMessage = "[{$errorTimestamp}] Error in createArrReservationRoomDetails: " . $e->getMessage() . PHP_EOL;
+//        error_log($errorLogMessage, 3, $errorLogFile);
+//
+//        // Optionally rethrow the exception if further handling is required
+//        throw $e;
+//    }
+//}
+
+function createArrReservationRoomDetails(
+    $normalizedData,
+    $arrCUSTOMERcontact,
+    $arrRESERVATIONstay,
+    $arrRESERVATIONlibRoomType,
+    $arrRESERVATIONlibRoomClass,
+    $arrRESERVATIONlibRoom
+) {
     // Define the error log file path
     $errorLogFile = dirname(__FILE__) . '/error_log.txt';
 
     // Create indexed arrays for fast lookup
     $indexedContacts = [];
     foreach ($arrCUSTOMERcontact as $contact) {
-        $index = $contact['firstName'] . '|' . $contact['lastName'] . '|' . $contact['extGuestID'];
+        $index = $contact['firstName'] . '|' . $contact['lastName'] . '|' . $contact['extGuestId'];
         $indexedContacts[$index] = $contact['id'];
     }
 
@@ -1566,25 +1865,38 @@ function createArrReservationRoomDetails($myDataSemiParsed, $arrCUSTOMERcontact,
 
     try {
         $arrRESERVATIONroomDetails = [];
-        foreach ($myDataSemiParsed as $entry) {
+        foreach ($normalizedData as $entry) {
             // Existing logic to decode and extract guest details...
 
             // New logic to decode and extract prices and ratePlans
-            $pricesData = json_decode($entry['prices'], true);
-            $ratePlansData = json_decode($entry['ratePlans'], true);
+            $pricesData = $entry['prices'] ?? [];
+            $ratePlansData = $entry['ratePlans'] ?? [];
             $amount = (!empty($pricesData) && isset($pricesData[0]['amount'])) ? $pricesData[0]['amount'] : null;
             $ratePlanCode = (!empty($ratePlansData) && isset($ratePlansData[0]['code'])) ? $ratePlansData[0]['code'] : null;
 
             // Decode and extract guest details
-            $guestData = json_decode($entry['guests'], true);
-            $guestDetails = $guestData[0]['guest'] ?? null;
+            $guestDetails = $entry['guests'][0]['guest'] ?? null;
+
+            //            $occupiedUnits = json_decode($entry['occupiedUnits'], true);
+//            $roomNumber = $occupiedUnits[0]['unitId'] ?? 'UNKNOWN';
+
 
             // Extract room number and typeCode from occupiedUnits
-            $occupiedUnits = json_decode($entry['occupiedUnits'], true);
-            $roomNumber = $occupiedUnits[0]['unitId'] ?? 'UNKNOWN';
-            $typeCode = $occupiedUnits[0]['unitTypeCode'] ?? 'UNKNOWN';
+//            $occupiedUnits = $entry['occupiedUnits'] ??
+            if (isset($entry['occupiedUnits'][0]['unitId'])) {
+                $roomNumber = $entry['occupiedUnits'][0]['unitId'];
+            } else {
+                $roomNumber = 'UNKNOWN'; // Default value if unitId is not present
+            }
+            if (isset($entry['occupiedUnits'][0]['unitTypeCode'])) {
+                $typeCode = $entry['occupiedUnits'][0]['unitTypeCode'];
+            } else {
+                $typeCode = 'UNKNOWN'; // Default value if unitId is not present
+            }
+
 
             // Lookup libRoomId and libRoomTypeId based on roomNumber and typeCode
+
             $libRoomId = $indexedLibRooms[$roomNumber] ?? null;
             $libRoomTypeId = $indexedRoomTypes[$typeCode] ?? $defaultLibRoomTypeId;
 
@@ -1593,7 +1905,7 @@ function createArrReservationRoomDetails($myDataSemiParsed, $arrCUSTOMERcontact,
                 $givenName = $guestDetails['names'][0]['givenName'] ?? null;
                 $surname = $guestDetails['names'][0]['surname'] ?? null;
                 $contactIndex = $givenName . '|' . $surname . '|' . $entry['extracted_guest_id'];
-                $contactID = $indexedContacts[$contactIndex] ?? null;
+                $contactId = $indexedContacts[$contactIndex] ?? null;
 
                 $createDateTime = strtotime($entry['createdDateTime']);
                 $modifyDateTime = strtotime($entry['lastModifiedDateTime']);
@@ -1601,8 +1913,8 @@ function createArrReservationRoomDetails($myDataSemiParsed, $arrCUSTOMERcontact,
                 $stayId = $indexedStays[$stayIndex] ?? null;
 
                 // Room type and class lookups
-    //            $roomTypeCode = json_decode($entry['occupiedUnits'], true)[0]['unitTypeCode'] ?? null;
-    //            $libRoomTypeId = $indexedRoomTypes[$roomTypeCode] ?? null;
+//                $roomTypeCode = json_decode($entry['occupiedUnits'], true)[0]['unitTypeCode'] ?? null;
+//                $libRoomTypeId = $indexedRoomTypes[$roomTypeCode] ?? null;
                 $className = 'UNKNOWN'; // Replace with actual logic to determine class name
                 $libRoomClassId = $indexedRoomClasses[$className] ?? null;
 
@@ -1612,10 +1924,10 @@ function createArrReservationRoomDetails($myDataSemiParsed, $arrCUSTOMERcontact,
                     'endDate' => $entry['departure'] ?? null,
                     'amount' => $amount,
                     'ratePlanCode' => $ratePlanCode,
-                    'isBlocked' => isset($entry['Blocks']) && !$entry['Blocks']['isempty'] ? 1 : 0,
+                    'isBlocked' => isset($entry['blocks']) && !$entry['blocks']['isempty'] ? 1 : 0,
                     'isComplimentary' => intval($entry['isComplimentary']) ?? null,
                     'isHouseUse' => $entry['isHouseUse'] ?? 0,
-                    'contactID' => $contactID,
+                    'contactId' => $contactId,
                     'firstName' => $givenName,
                     'lastName' => $surname,
                     'extGuestId' => $entry['extracted_guest_id'] ?? null,
@@ -1647,7 +1959,6 @@ function createArrReservationRoomDetails($myDataSemiParsed, $arrCUSTOMERcontact,
 }
 
 
-
 function createArrSERVICESfolioOrders($normalizedData, $arrCUSTOMERcontact, $arrRESERVATIONstay, $arrSERVICESpayment, $arrSERVICESlibServiceItems, $arrSERVICESlibFolioOrdersType) {
     // Define the error log file path
     $errorLogFile = dirname(__FILE__) . '/error_log.txt';
@@ -1657,14 +1968,14 @@ function createArrSERVICESfolioOrders($normalizedData, $arrCUSTOMERcontact, $arr
         // Indexing customer contacts for fast lookup
         $indexedCustomerContacts = [];
         foreach ($arrCUSTOMERcontact as $contact) {
-            $index = $contact['firstName'] . '|' . $contact['lastName'] . '|' . $contact['extGuestID'];
+            $index = $contact['firstName'] . '|' . $contact['lastName'] . '|' . $contact['extGuestId'];
             $indexedCustomerContacts[$index] = $contact['id'];
         }
 
         // Indexing reservation stays for fast lookup
         $indexedReservationStays = [];
         foreach ($arrRESERVATIONstay as $stay) {
-            $index = $stay['createDateTime'] . '|' . $stay['modifyDateTime'] . '|' . $stay['startDate'] . '|' . $stay['endDate'];
+            $index = $stay['createDateTime'] . '|' . $stay['modifyDateTime'] . '|' . $stay['startDate'] . '|' . $stay['endDate']  . '|' . $stay['extGuestId'] . '|' . $stay['extPMSConfNum'];
             $indexedReservationStays[$index] = $stay['id'];
         }
 
@@ -1701,6 +2012,8 @@ function createArrSERVICESfolioOrders($normalizedData, $arrCUSTOMERcontact, $arr
             $modifyDateTime = strtotime($data['lastModifiedDateTime']) ?? null;
             $startDate = $data['arrival'] ?? null; // Assuming these are already in the correct format
             $endDate = $data['departure'] ?? null;
+            $createdBy = $data['createdBy'] ?? null;
+            $extPMSConfNum = $data['confirmation_number'] ?? null;
             $stayId = $indexedCustomerContacts[$extGuestId] ?? null; // Lookup for stayId
             // Populate libServiceItemsId using itemCode and ratePlanCode
             $itemCode = $data['services'][0]['code'] ?? 'UNKNOWN';
@@ -1719,11 +2032,17 @@ function createArrSERVICESfolioOrders($normalizedData, $arrCUSTOMERcontact, $arr
             // Create index for the contact id lookup
             $contactIndex = $firstName . '|' . $lastName . '|' . $extGuestId;
             // Lookup for stayId using the index
-            $customerId = $indexedCustomerContacts[$contactIndex] ?? null;
+            if (isset($indexedCustomerContacts[$contactIndex])) {
+                $contactId = is_array($indexedCustomerContacts[$contactIndex])
+                    ? reset($indexedCustomerContacts[$contactIndex])
+                    : $indexedCustomerContacts[$contactIndex];
+            } else {
+                $contactId = null;
+            }
 
 
             // Create index for stay lookup
-            $stayIndex = $createDateTime . '|' . $modifyDateTime . '|' . $startDate . '|' . $endDate;
+            $stayIndex = $createDateTime . '|' . $modifyDateTime . '|' . $startDate . '|' . $endDate . '|' . $extGuestId . '|' . $extPMSConfNum;
             // Lookup for stayId using the index
             if (isset($indexedReservationStays[$stayIndex])) {
                 $stayId = is_array($indexedReservationStays[$stayIndex])
@@ -1746,7 +2065,7 @@ function createArrSERVICESfolioOrders($normalizedData, $arrCUSTOMERcontact, $arr
             // Common fields for all folio orders
             $commonFields = [
                 'dataSource' => 'HAPI',
-                'contactId' => $customerId,
+                'contactId' => $contactId,
                 'firstName' => $firstName,
                 'lastName' => $lastName,
                 'extGuestId' => $extGuestId,
@@ -1827,7 +2146,7 @@ function createArrSERVICESfolioOrders($normalizedData, $arrCUSTOMERcontact, $arr
                     $otherOrder['fixedCost'] = ($otherOrder['unitCount'] ?? 0) * ($otherOrder['unitPrice'] ?? 0);
                     // Additional OTHER specific fields go here...
                     $otherOrder['amountBeforeTax'] = $data['prices'][0]['amount'] ?? null;
-                    $otherOrder['amountAfterTax'] = $data['prices'][0]['amount'] + $data['taxes'][0]['amount'] ?? null;
+                    $otherOrder['amountAfterTax'] = $data['prices'][0]['amount'] + $data['taxes'][0]['amount'] ?? 0;
                     $otherOrder['postingFrequency'] = $data['fixedCharges']['postingFrequency'] ?? null;
                     $otherOrder['startDate'] = $data['fixedCharges']['start'] ?? null;
                     $otherOrder['endDate']  = $data['fixedCharges']['end'] ?? null;
@@ -1947,7 +2266,8 @@ function removeDuplicateOrders($arrSERVICESfolioOrders) {
 
 
 
-function normalizeMyDataSemiParsed($myDataSemiParsed) {
+function normalizeMyDataSemiParsed($myDataSemiParsed)
+{
     // Define the error log file path
     $errorLogFile = dirname(__FILE__) . '/error_log.txt';
 
@@ -1973,14 +2293,14 @@ function normalizeMyDataSemiParsed($myDataSemiParsed) {
                 $normalizedData[$entryKey] = normalizeMyDataSemiParsed($entryValue);
             } else {
                 // Copy over the value directly if it's not a JSON string or an array
+                // This also includes copying the title field if it exists.
                 $normalizedData[$entryKey] = $entryValue;
             }
         }
-
-//        // Log the success message
-//        $errorTimestamp = date('Y-m-d H:i:s');
-//        $successMessage = "[{$errorTimestamp}] Successfully normalized semi-parsed data";
-//        error_log($successMessage, 3, $errorLogFile);
+        // Log the success message
+        $errorTimestamp = date('Y-m-d H:i:s');
+        $successMessage = "[{$errorTimestamp}] Successfully normalized semi-parsed data";
+        error_log($successMessage, 3, $errorLogFile);
 
         return $normalizedData;
     } catch (Exception $e) {
@@ -1993,7 +2313,6 @@ function normalizeMyDataSemiParsed($myDataSemiParsed) {
         throw $e;
     }
 }
-
 
 function isJson($string) {
     json_decode($string);

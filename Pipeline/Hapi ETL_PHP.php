@@ -1,4 +1,19 @@
 <?php
+//This script is designed to connect to the hapi_raw_reservations table which holds the raw api data from Fairmont's
+//Opera HAPI system (origin) and the pms_db oltp database (destination). It's designed to take the hapi_raw_reservations data,
+//organize it into associative arrays based on the end database tables, and upsert the data into the tables.
+//It then pulls the data from these tables into associative arrays in preparation for upserts into the next tables.
+// This is due to the primary key field of each table, id, being required for the foreign keys of other tables in the database.
+// The id field is generated at the database level via triggers.
+// Thus, the flow is hapi_raw_reservations -> associative array -> table -> associative array.
+//This happens in 3 main phases. First an insert of data into the parent tables, then an insert into the child table,
+//and then an insert into grandchild tables, with the child tables being dependent on the parent tables and the
+//grandchild tables being dependent on the child tables.
+
+
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 //libraries and helpers
 require_once 'config.php';
 include 'upsert_functions.php';
@@ -108,9 +123,28 @@ catch (Exception $e)
 //Parse out data from original data source array, $myDataSemiParsed, into arrays based on the final output tables
 //// CUSTOMER
 ///PARENT
-$arrCUSTOMERlibContactType = createCUSTOMERContactType();
-$arrCUSTOMERcontact = createCUSTOMERcontact($myDataSemiParsed);
-$arrCUSTOMERlibLoyaltyProgram = createCUSTOMERloyaltyProgram();
+try {
+    $arrCUSTOMERcontact = createArrCUSTOMERcontact($normalizedData);
+}
+catch (Exception $e)
+{
+    echo 'Error: ' . $e->getMessage();
+}
+ try {
+    $arrCUSTOMERlibContactType = createCUSTOMERContactType();
+}
+catch (Exception $e)
+{
+    echo 'Error: ' . $e->getMessage();
+}
+ try {
+    $arrCUSTOMERlibLoyaltyProgram = createCUSTOMERloyaltyProgram();
+}
+catch (Exception $e)
+{
+    echo 'Error: ' . $e->getMessage();
+}
+
 
 //print_r($myDataSemiParsed)
 /// CHILD
@@ -293,43 +327,30 @@ try {
 
 // Get Parent table associative arrays  with new primary keys to prepare for upsert of child tables
 // Update $arrCUSTOMERlibContactType
-// $arrCUSTOMERlibContactType = updateArrayWithIdsForSpecificField($destinationDBConnection, $arrCUSTOMERlibContactType, 'CUSTOMERlibContactType', 'type');
 $arrCUSTOMERlibContactType = getTableAsAssociativeArray($destinationDBConnection,'CUSTOMERlibContactType');
 // Update $arrCUSTOMERContact
-// $arrCUSTOMERContact = updateArrayWithIdsForMultipleFields($destinationDBConnection, $arrCUSTOMERContact, 'CUSTOMERcontact', ['firstName', 'lastName', 'extGuestId'],false);
 $arrCUSTOMERcontact = getTableAsAssociativeArray($destinationDBConnection,'CUSTOMERcontact');
 // Update $arrCUSTOMERlibLoyaltyProgram
-// $arrCUSTOMERlibLoyaltyProgram = updateArrayWithIdsForMultipleFields($destinationDBConnection, $arrCUSTOMERlibLoyaltyProgram, 'CUSTOMERlibLoyaltyProgram', ['Name', 'Source'],true);
 $arrCUSTOMERlibLoyaltyProgram = getTableAsAssociativeArray($destinationDBConnection,'CUSTOMERlibLoyaltyProgram');
 // Update $arrRESERVATIONlibRoom
-// $arrRESERVATIONlibRoom = updateArrayWithIdsForMultipleFields($destinationDBConnection, $arrRESERVATIONlibRoom, 'RESERVATIONlibRoom', ['roomNumber'],false);
 $arrRESERVATIONlibRoom = getTableAsAssociativeArray($destinationDBConnection,'RESERVATIONlibRoom');
-//// Update $arrRESERVATIONlibRoomType
-// $arrRESERVATIONlibRoomType = updateArrayWithIdsForMultipleFields($destinationDBConnection, $arrRESERVATIONlibRoomType, 'ReservationLibRoomType', ['typeCode'], true);
+// Update $arrRESERVATIONlibRoomType
 $arrRESERVATIONlibRoomType = getTableAsAssociativeArray($destinationDBConnection,'RESERVATIONLibRoomType');
 //// Update $arrRESERVATIONlibRoomClass
-// $arrRESERVATIONlibRoomClass = updateArrayWithIdsForMultipleFields($destinationDBConnection,  $arrRESERVATIONlibRoomClass,   'RESERVATIONlibRoomClass', ['className'],true);
 $arrRESERVATIONlibRoomClass = getTableAsAssociativeArray($destinationDBConnection,'RESERVATIONlibRoomClass');
 // Update $arrRESERVATIONlibProperty
-// $arrRESERVATIONlibProperty = updateArrayWithIdsForMultipleFields($destinationDBConnection, $arrRESERVATIONlibProperty, 'RESERVATIONlibProperty',['propertyCode','chainCode'], false);
 $arrRESERVATIONlibProperty = getTableAsAssociativeArray($destinationDBConnection,'RESERVATIONlibProperty');
 // Update $arrRESERVATIONGroup
-// $arrRESERVATIONGroup = updateArrayWithIdsForMultipleFields($destinationDBConnection, $arrRESERVATIONGroup, 'RESERVATIONgroup',['groupName', 'groupNumber'], true);
 $arrRESERVATIONGroup = getTableAsAssociativeArray($destinationDBConnection,'RESERVATIONgroup');
 // Update $arrRESERVATIONlibsource
-// $arrRESERVATIONlibSource = updateArrayWithIdsForMultipleFields($destinationDBConnection, $arrRESERVATIONlibSource, 'RESERVATIONlibsource',['sourceName', 'sourceType'], true);
 $arrRESERVATIONlibSource = getTableAsAssociativeArray($destinationDBConnection,'RESERVATIONlibsource');
 //// Update $arrRESERVATIONlibstaystatus
-// $arrRESERVATIONlibStayStatus = updateArrayWithIdsForMultipleFields($destinationDBConnection, $arrRESERVATIONlibStayStatus, 'RESERVATIONlibstaystatus',['statusName'], true);
 $arrRESERVATIONlibStayStatus = getTableAsAssociativeArray($destinationDBConnection,'RESERVATIONlibstaystatus');
 // Update $arrSERVICESlibtender
-// $arrSERVICESlibTender = updateArrayWithIdsForMultipleFields($destinationDBConnection, $arrSERVICESlibTender, 'SERVICESlibTender',['paymentMethod'], false);
 $arrSERVICESlibTender = getTableAsAssociativeArray($destinationDBConnection,'SERVICESlibTender');
 // Update $arrSERVICESlibFolioOrdersType
-// $arrSERVICESlibFolioOrdersType = updateArrayWithIdsForMultipleFields($destinationDBConnection, $arrSERVICESlibFolioOrdersType, 'SERVICESlibFolioOrdersType',['orderType'], true);
 $arrSERVICESlibFolioOrdersType = getTableAsAssociativeArray($destinationDBConnection,'SERVICESlibFolioOrdersType');
 // Update $arrRESERVATIONlibProperty
-// $arrSERVICESlibServiceItems = updateArrayWithIdsForMultipleFields($destinationDBConnection, $arrSERVICESlibServiceItems, 'SERVICESlibServiceItems',['itemName', 'itemCode', 'ratePlanCode'], false);
 $arrSERVICESlibServiceItems = getTableAsAssociativeArray($destinationDBConnection,'SERVICESlibServiceItems');
 
 
@@ -343,7 +364,7 @@ $arrSERVICESlibServiceItems = getTableAsAssociativeArray($destinationDBConnectio
 // 6) SERVICESpayment
 //Create child associative arrays using the populated parent tables and the raw data
 // 1) RESERVATIONstay
-$arrRESERVATIONstay = createArrReservationStay($destinationDBConnection,$myDataSemiParsed, $arrRESERVATIONlibSource, $arrRESERVATIONlibProperty);
+$arrRESERVATIONstay = createArrRESERVATIONstay($destinationDBConnection,$normalizedData, $arrRESERVATIONlibSource, $arrRESERVATIONlibProperty);
 // 2) CUSTOMERrelationship
 $arrCUSTOMERrelationship = createArrCUSTOMERrelationship($myDataSemiParsed, $arrCUSTOMERlibContactType, $arrCUSTOMERcontact);
 // 3) CUSTOMERmembership
@@ -395,19 +416,28 @@ $arrSERVICESpayment = getTableAsAssociativeArray($destinationDBConnection,'SERVI
 // 4) SERVICESfolioOrders
 //Create grandchild associative arrays using the populated parent tables
 // 1) RESERVATIONroomDetails
-$arrRESERVATIONroomDetails = createArrReservationRoomDetails($myDataSemiParsed, $arrCUSTOMERcontact, $arrRESERVATIONstay,$arrRESERVATIONlibRoomType, $arrRESERVATIONlibRoomClass, $arrRESERVATIONlibRoom);
+$arrRESERVATIONroomDetails = createArrReservationRoomDetails($normalizedData, $arrCUSTOMERcontact, $arrRESERVATIONstay,$arrRESERVATIONlibRoomType, $arrRESERVATIONlibRoomClass, $arrRESERVATIONlibRoom);
 // 2) RESERVATIONstayStatusStay
 // First, index $arrRESERVATIONstay
 $indexedArrRESERVATIONstay = indexArrReservationStay($arrRESERVATIONstay);
 
-$arrRESERVATIONstayStatusStay = createArrRESERVATIONstayStatusStay($myDataSemiParsed, $arrRESERVATIONstay, $arrRESERVATIONlibStayStatus);
+try {
+    $arrRESERVATIONstayStatusStay = createArrRESERVATIONstayStatusStay($normalizedData, $arrRESERVATIONstay, $arrRESERVATIONlibStayStatus);
+} catch (Exception $e) {
+}
 // 3) RESERVATIONgroupStay
 //May need to put this one on hold until we get actual group data from Hapi =/
 //$arrRESERVATIONgroupStay = create_arrRESERVATIONgroupStay($arrRESERVATIONstay, $arrRESERVATIONgroup);
 // 4) SERVICESfolioOrders
-$arrSERVICESfolioOrders = createArrSERVICESfolioOrders($normalizedData, $arrCUSTOMERcontact, $arrRESERVATIONstay, $arrSERVICESpayment, $arrSERVICESlibServiceItems, $arrSERVICESlibFolioOrdersType);
+try {
+    $arrSERVICESfolioOrders = createArrSERVICESfolioOrders($normalizedData, $arrCUSTOMERcontact, $arrRESERVATIONstay, $arrSERVICESpayment, $arrSERVICESlibServiceItems, $arrSERVICESlibFolioOrdersType);
+} catch (Exception $e) {
+}
 //remove duplicate records
-$arrSERVICESfolioOrders = removeDuplicateOrders($arrSERVICESfolioOrders);
+try {
+    $arrSERVICESfolioOrders = removeDuplicateOrders($arrSERVICESfolioOrders);
+} catch (Exception $e) {
+}
 //Populate grandchild tables
 // 1) RESERVATIONroomDetails
 try {
@@ -430,19 +460,35 @@ try {
 } catch (Exception $e) {
     echo 'Error: ' . $e->getMessage();
 }
-// Get Grandchild table associative arrays with new primary keys
-// 1) RESERVATIONroomDetails
-$arrRESERVATIONroomDetails = getTableAsAssociativeArray($destinationDBConnection,'RESERVATIONroomDetails');
-// 2) RESERVATIONstayStatusStay
-$arrRESERVATIONstayStatusStay = getTableAsAssociativeArray($destinationDBConnection,'RESERVATIONstayStatusStay');
-// 3) RESERVATIONgroupStay
-//skipped since HAPI is not offering any group data
-// 4) SERVICESfolioOrders
-$arrSERVICESfolioOrders = getTableAsAssociativeArray($destinationDBConnection,'SERVICESfolioOrders');
+//// Get Grandchild table associative arrays with new primary keys
+//// 1) RESERVATIONroomDetails
+try {
+    $arrRESERVATIONroomDetails = getTableAsAssociativeArray($destinationDBConnection, 'RESERVATIONroomDetails');
+} catch (Exception $e) {
+}
+//// 2) RESERVATIONstayStatusStay
+try {
+    $arrRESERVATIONstayStatusStay = getTableAsAssociativeArray($destinationDBConnection, 'RESERVATIONstayStatusStay');
+} catch (Exception $e) {
+}
+//// 3) RESERVATIONgroupStay
+////skipped since HAPI is not offering any group data
+//// 4) SERVICESfolioOrders
+try {
+    $arrSERVICESfolioOrders = getTableAsAssociativeArray($destinationDBConnection, 'SERVICESfolioOrders');
+} catch (Exception $e) {
+}
 
 //Populate grandchild tables
-//print('$arrCUSTOMERcontact:');
-//var_dump(array_slice($arrSERVICESfolioOrders, 0, 30, true));
+//var_dump(array_slice($arrRESERVATIONstay, 0, 10, true));
+//
+//var_dump(array_slice($arrRESERVATIONstayStatusStay, 0, 10, true));
+//print_r($normalizedData);
+//
+//$output = var_export(array_slice($normalizedData, 0, 10, true), true);
+//$filename = "normalizedData.txt";
+//file_put_contents($filename, $output);
+//var_dump(array_slice($arrSERVICESfolioOrders, 0, 10, true));
 
 
 try {
@@ -451,6 +497,5 @@ try {
     echo 'Error: ' . $e->getMessage();
 }
 
-print_r($arrSERVICESfolioOrders);
 
 ?>
