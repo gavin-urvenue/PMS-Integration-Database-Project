@@ -8,12 +8,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b609d737-ca15-4432-ade7-d7b0de94926d" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Hapi ETL_PHP.php" beforeDir="false" afterPath="$PROJECT_DIR$/Hapi ETL_PHP.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/array_functions.php" beforeDir="false" afterPath="$PROJECT_DIR$/array_functions.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/upsert_functions.php" beforeDir="false" afterPath="$PROJECT_DIR$/upsert_functions.php" afterDir="false" />
-    </list>
+    <list default="true" id="b609d737-ca15-4432-ade7-d7b0de94926d" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
