@@ -13,6 +13,9 @@
 
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 
 //libraries and helpers
 require_once 'config.php';
@@ -375,7 +378,7 @@ $arrSERVICESpayment = createArrSERVICESpayment($myDataSemiParsed, $arrSERVICESli
 // 1) RESERVATIONstay
 //Upsert into RESERVATIONstay table
 try {
-    upsertRESERVATIONstay($arrRESERVATIONstay, $destinationDBConnection);
+    upsertReservationStay($arrRESERVATIONstay, $destinationDBConnection);
 } catch (Exception $e) {
     echo 'Error: ' . $e->getMessage();
 }
@@ -484,6 +487,8 @@ try {
 //
 //var_dump(array_slice($arrRESERVATIONstayStatusStay, 0, 10, true));
 //print_r($normalizedData);
+//print_r($arrRESERVATIONstay);
+print_r($arrCUSTOMERcontact);
 //
 //$output = var_export(array_slice($normalizedData, 0, 10, true), true);
 //$filename = "normalizedData.txt";

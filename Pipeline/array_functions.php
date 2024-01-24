@@ -1,6 +1,13 @@
 <?php
 //These are all of the functions having to do with preparing the associative arrays for
-// upsert into the final OLTP database
+// upsert into the final OLTP database. There are functions to create associative arrays mimicking the table structure
+// of the final database, but also a function to mimick a MySQL table into an associative array, as primary key values
+// are generated at the MySQL Server level.
+
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 ////Function to remove duplicate records from an array based on 2 fields
 function removeDuplicateRows2D($data, $key1, $key2)
@@ -82,7 +89,8 @@ function fetchDataFromMySQLTable($tableName, $originDBConnection, $destinationDB
 
         // Log the number of records fetched
         $recordCount = count($data);
-        $successMessage = "Successfully fetched $recordCount records from $tableName";
+        $errorTimestamp = date('Y-m-d H:i:s'); // Format the date and time as you prefer
+        $successMessage = "[{$errorTimestamp}] Successfully fetched $recordCount records from $tableName" . PHP_EOL;
         error_log($successMessage, 3, 'error_log.txt');
 
         return $data;
@@ -126,7 +134,7 @@ function insertEtlTrackingInfo($destinationDBConnection, $insertCount, $updateCo
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully inserted tracking info into PMSDATABASEmisc for source: $etlSource";
+        $successMessage = "[{$errorTimestamp}] Successfully inserted tracking info into PMSDATABASEmisc for source: $etlSource" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
 
     } catch (Exception $e) {
@@ -179,7 +187,7 @@ function updateEtlDuration($destDBConnection)
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully updated ETL duration in PMSDATABASEmisc";
+        $successMessage = "[{$errorTimestamp}] Successfully updated ETL duration in PMSDATABASEmisc" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
 
     } catch (Exception $e) {
@@ -220,7 +228,7 @@ function getFirstNonNullImportCode($originDBConnection, $tableName)
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully retrieved first non-null import_code from $tableName";
+        $successMessage = "[{$errorTimestamp}] Successfully retrieved first non-null import_code from $tableName" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
 
     } catch (Exception $e) {
@@ -242,8 +250,17 @@ function createReservationLibProperty($reservations) {
     $errorLogFile = dirname(__FILE__) . '/error_log.txt';
 
     try {
-        $reservationLibProperty = [];
+        $reservationLibProperty[] = [
+            'chainCode' => 'UNKNOWN',
+            'propertyCode' => 'UNKNOWN',
+            'dataSource' => 'HAPI',
+        ];
         $seenCodes = [];
+        $uniqueChainCodes = [];
+        $uniquePropertyCodes = [];
+
+
+
 
         foreach ($reservations as $reservation) {
             // Validate if necessary fields exist in $reservation
@@ -253,6 +270,14 @@ function createReservationLibProperty($reservations) {
 
             $propertyCode = $reservation['extracted_property_code'];
             $chainCode = $reservation['extracted_chain_code'];
+
+            // Store unique propertyCode and chainCode
+            if ($propertyCode !== 'UNKNOWN') {
+                $uniquePropertyCodes[$propertyCode] = true;
+            }
+            if ($chainCode !== 'UNKNOWN') {
+                $uniqueChainCodes[$chainCode] = true;
+            }
 
             // Check for duplicate rows
             $codeCombo = $propertyCode . $chainCode;
@@ -271,17 +296,30 @@ function createReservationLibProperty($reservations) {
             $reservationLibProperty[] = $newRecord;
         }
 
-        // Add a row with unknown propertyCode
-        $unknownRow = [
-            'propertyCode' => 'UNKNOWN',
-            'chainCode' => 'UNKNOWN',
-            'dataSource' => 'HAPI',
-        ];
-        array_unshift($reservationLibProperty, $unknownRow);
+        // Add UNKNOWN propertyCode for each unique chainCode
+        foreach (array_keys($uniqueChainCodes) as $chainCode) {
+            $reservationLibProperty[] = [
+                'propertyCode' => 'UNKNOWN',
+                'chainCode' => $chainCode,
+                'dataSource' => 'HAPI',
+            ];
+        }
+
+        // Add UNKNOWN chainCode for each unique propertyCode
+        foreach (array_keys($uniquePropertyCodes) as $propertyCode) {
+            $reservationLibProperty[] = [
+                'propertyCode' => $propertyCode,
+                'chainCode' => 'UNKNOWN',
+                'dataSource' => 'HAPI',
+            ];
+        }
+
+        // Remove duplicates from the array
+        $reservationLibProperty = array_map("unserialize", array_unique(array_map("serialize", $reservationLibProperty)));
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully processed reservationLibProperty";
+        $successMessage = "[{$errorTimestamp}] Successfully processed reservationLibProperty" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
 
         return $reservationLibProperty;
@@ -297,6 +335,7 @@ function createReservationLibProperty($reservations) {
 
 
 
+
 ////Function to create and populate the ReservationlibSource Table Associative Array
 function createReservationLibSource($data) {
     // Define the error log file path
@@ -307,8 +346,6 @@ function createReservationLibSource($data) {
             throw new Exception("Invalid data array.");
         }
 
-
-        // Add initial row with Unknown values
         $result[] = [
             'RESERVATIONlibsource' => [
                 'sourceName' => 'UNKNOWN',
@@ -316,19 +353,32 @@ function createReservationLibSource($data) {
                 'dataSource' => 'HAPI',
             ],
         ];
+        $uniqueSourceNames = [];
+        $uniqueSourceTypes = [];
 
+        // Process each profile in the data
         foreach ($data as $profile) {
             if (!empty($profile['profiles'])) {
                 $profiles = json_decode($profile['profiles'], true);
 
                 foreach ($profiles as $profileData) {
+                    $sourceName = $profileData['names'][0]['name'] ?? "";
+                    $sourceType = $profileData['type'] ?? "";
+
+                    // Store unique sourceName and sourceType
+                    if ($sourceName !== 'UNKNOWN') {
+                        $uniqueSourceNames[$sourceName] = true;
+                    }
+                    if ($sourceType !== 'UNKNOWN') {
+                        $uniqueSourceTypes[$sourceType] = true;
+                    }
+
                     $reservationLibSource = [
                         'RESERVATIONlibsource' => [
-                            'sourceName' => $profileData['names'][0]['name'] ?? "",
-                            'sourceType' => $profileData['type'] ?? "",
+                            'sourceName' => $sourceName,
+                            'sourceType' => $sourceType,
                             'dataSource' => 'HAPI',
                         ],
-                        // Additional fields can be added here
                     ];
 
                     // Check for duplicate rows
@@ -339,9 +389,34 @@ function createReservationLibSource($data) {
             }
         }
 
+        // Add UNKNOWN sourceType for each unique sourceName
+        foreach (array_keys($uniqueSourceNames) as $sourceName) {
+            $result[] = [
+                'RESERVATIONlibsource' => [
+                    'sourceName' => $sourceName,
+                    'sourceType' => 'UNKNOWN',
+                    'dataSource' => 'HAPI',
+                ],
+            ];
+        }
+
+        // Add UNKNOWN sourceName for each unique sourceType
+        foreach (array_keys($uniqueSourceTypes) as $sourceType) {
+            $result[] = [
+                'RESERVATIONlibsource' => [
+                    'sourceName' => 'UNKNOWN',
+                    'sourceType' => $sourceType,
+                    'dataSource' => 'HAPI',
+                ],
+            ];
+        }
+
+        // Remove duplicates from the array
+        $result = array_map("unserialize", array_unique(array_map("serialize", $result)));
+
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully processed reservationLibSource";
+        $successMessage = "[{$errorTimestamp}] Successfully processed reservationLibSource" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
 
         return $result;
@@ -356,6 +431,7 @@ function createReservationLibSource($data) {
         throw $e;
     }
 }
+
 
 
 
@@ -511,7 +587,7 @@ function createReservationGroup($data) {
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully processed ReservationGroup";
+        $successMessage = "[{$errorTimestamp}] Successfully processed ReservationGroup" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
 
         return $result;
@@ -551,7 +627,7 @@ function createReservationLibRoomClass($data) {
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully processed ReservationLibRoomClass";
+        $successMessage = "[{$errorTimestamp}] Successfully processed ReservationLibRoomClass" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
 
         return $result;
@@ -611,7 +687,7 @@ function createReservationLibRoom($array) {
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully processed ReservationLibRoom";
+        $successMessage = "[{$errorTimestamp}] Successfully processed ReservationLibRoom" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
 
         return $reservationRooms;
@@ -655,7 +731,7 @@ function createCUSTOMERloyaltyProgram() {
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully created CUSTOMER loyalty program array";
+        $successMessage = "[{$errorTimestamp}] Successfully created CUSTOMER loyalty program array" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
 
         return $loyaltyProgramArray;
@@ -705,7 +781,7 @@ function createCUSTOMERContactType() {
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully created CUSTOMER contact type array";
+        $successMessage = "[{$errorTimestamp}] Successfully created CUSTOMER contact type array" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
 
         return $contactTypeArray;
@@ -750,7 +826,7 @@ function createSERVICESLibTender($data) {
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully processed SERVICES LibTender";
+        $successMessage = "[{$errorTimestamp}] Successfully processed SERVICES LibTender" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
 
         return $finalResult;
@@ -830,7 +906,7 @@ function createSERVICESlibserviceitems($array) {
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully processed SERVICES LibServiceItems";
+        $successMessage = "[{$errorTimestamp}] Successfully processed SERVICES LibServiceItems" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
 
         return $serviceItems;
@@ -882,7 +958,7 @@ function createSERVICESlibFolioOrderType() {
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully created SERVICES lib Folio Order Type array";
+        $successMessage = "[{$errorTimestamp}] Successfully processed SERVICES lib Folio Order Type array" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
 
         return $FolioOrderTypeArray;
@@ -963,7 +1039,7 @@ function createSERVICESlibFolioOrderType() {
 //
 //        // Log the success message
 //        $errorTimestamp = date('Y-m-d H:i:s');
-//        $successMessage = "[{$errorTimestamp}] Successfully processed CUSTOMER contacts";
+//        $successMessage = "[{$errorTimestamp}] Successfully processed CUSTOMER contacts" . PHP_EOL;
 //        error_log($successMessage, 3, $errorLogFile);
 //
 //        return $customerContacts;
@@ -1006,7 +1082,16 @@ function createArrCUSTOMERcontact($normalizedData) {
                     }
                     $guestData = $guest['guest'];
                     $nameData = $guestData['names'][0];
+                    //metaData
+                    $metaDataArray = [
+                        'addresses' => $guest['addresses'] ?? null,
+                        'createdBy' => $guest['createdBy'] ?? null,
+                        'createdDateTime' => $guest['createdDateTime_repo'] ?? null,
+                        'guest' => $guest['guest'],
+                        'contactDetails' => $guest['contactDetails']
 
+                    ];
+                    $metaDataJson = json_encode($metaDataArray);
                     // Initialize email as empty string
                     $email = '';
 
@@ -1020,6 +1105,7 @@ function createArrCUSTOMERcontact($normalizedData) {
                         }
                     }
 
+
                     $contact = [
                         'firstName' => $nameData['givenName'] ?? '',
                         'lastName' => $nameData['surname'] ?? '',
@@ -1030,6 +1116,7 @@ function createArrCUSTOMERcontact($normalizedData) {
                         'languageFormat' => $guestData['primaryLanguage']['format'] ?? '',
                         'extGuestId' => $item['extracted_guest_id'] ?? '',
                         'isPrimary' => $guest['isPrimary'] ?? '',
+                        'metaData' => $metaDataJson ?? '',
                         'dataSource' => 'HAPI'
                     ];
 
@@ -1044,7 +1131,7 @@ function createArrCUSTOMERcontact($normalizedData) {
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully processed CUSTOMER contacts";
+        $successMessage = "[{$errorTimestamp}] Successfully processed CUSTOMER contacts" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
 
         return $customerContacts;
@@ -1071,14 +1158,74 @@ function createArrRESERVATIONstay(
     try {
         $arrRESERVATIONStay = [];
 
-        // Create lookup arrays for source and property Ids
-        $sourceLookup = createLookup($connection, 'RESERVATIONlibSource', 'sourceName', 'sourceType');
-        $propertyLookup = createLookup($connection, 'RESERVATIONlibProperty', 'propertyCode', 'chainCode');
+        // Create lookups directly within the function
+        $sourceLookup = [];
+        $propertyLookup = [];
+
+
+        // Fetch and populate sourceLookup
+        $sourceQuery = "SELECT id, sourceName, sourceType FROM RESERVATIONlibSource";
+        $sourceResult = $connection->query($sourceQuery);
+        if (!$sourceResult) {
+            throw new Exception("Query failed for source lookup: " . $connection->error);
+        }
+        while ($row = $sourceResult->fetch_assoc()) {
+            $sourceName = $row['sourceName'] ?? 'UNKNOWN';
+            $sourceType = $row['sourceType'] ?? 'UNKNOWN';
+            $sourceLookup[$sourceName][$sourceType] = $row['id'];
+        }
+        $sourceResult->free();
+
+        // Fetch and populate propertyLookup
+        $propertyQuery = "SELECT id, propertyCode, chainCode FROM RESERVATIONlibProperty";
+        $propertyResult = $connection->query($propertyQuery);
+        if (!$propertyResult) {
+            throw new Exception("Query failed for property lookup: " . $connection->error);
+        }
+        while ($row = $propertyResult->fetch_assoc()) {
+            $propertyCode = $row['propertyCode'] ?? 'UNKNOWN';
+            $chainCode = $row['chainCode'] ?? 'UNKNOWN';
+            $propertyLookup[$propertyCode][$chainCode] = $row['id'];
+        }
+        $propertyResult->free();
 
         foreach ($normalizedData as $entry) {
             // Previously handled fields
             $createDateTime = $entry['createdDateTime'] ?? null;
             $modifyDateTime = $entry['lastModifiedDateTime'] ?? null;
+
+            //metaData
+            $metaDataArray = [
+                'created_by' => $entry['createdBy'] ?? null,
+                'created_datetime' => $entry['createdDateTime'] ?? null,
+                'created_datetime_repo' => $entry['createdDateTime_repo'] ?? null,
+                'departure' => $entry['departure'],
+                'doNotDisplayPrice' => $entry['doNotDisplayPrice'],
+                'estimatedDateTimeOfArrival' => $entry['estimatedDateTimeOfArrival'],
+                'estimatedDateTimeOfDeparture' => $entry['estimatedDateTimeOfDeparture'],
+                'ext_id' => $entry['ext_id'],
+                'ext_status' => $entry['ext_status'],
+                'confirmation_number' => $entry['confirmation_number'],
+                'reservation_id' => $entry['reservation_id'],
+                'referenceIds' => $entry['referenceIds'],
+                'paymentMethod' => $entry['paymentMethod'],
+                'prices' => $entry['prices'],
+                'processtStamp' => $entry['procesststamp'],
+                'promotionCode' => $entry['promotionCode'],
+                'purposeOfStay' => $entry['purposeOfStay'],
+                'ratePlans' => $entry['ratePlans'],
+                'receivedDateTime' => $entry['receivedDateTime'],
+                'command_id' => $entry['command_id'],
+                'additionalData' => $entry['additionalData'],
+                'forecastRevenue' => $entry['forecastRevenue'],
+                'comments' => $entry['comments'],
+                'sharerIds' => $entry['sharerIds'],
+                'requestedDeposits' => $entry['requestedDeposits'],
+                'alerts' => $entry['alerts'],
+                'contacts' => $entry['contacts'],
+                'segmentations' => $entry['segmentations']
+            ];
+            $metaDataJson = json_encode($metaDataArray);
 
             // New fields
             $departureDate = $entry['departure'] ?? null;
@@ -1093,9 +1240,9 @@ function createArrRESERVATIONstay(
 
             $dataSource = 'HAPI'; // assuming it's a constant value
 
-            // Populate libSourceId and libPropertyId based on lookup
+            // Utilize the lookups for libSourceId and libPropertyId
             $libSourceId = $sourceLookup[$sourceName][$sourceType] ?? null;
-            $libPropertyId = $propertyLookup[$entry['propertyDetails']['code']][$entry['propertyDetails']['chainCode']] ?? null;
+            $libPropertyId = $propertyLookup[$propertyCode][$chainCode] ?? null;
 
             $arrRESERVATIONStay[] = [
                 'createDateTime' => strtotime($createDateTime),
@@ -1103,7 +1250,7 @@ function createArrRESERVATIONstay(
                 'startDate' => $arrivalDate,
                 'endDate' => $departureDate,
                 'createdBy' => $createdBy,
-                'metaData' => null, // Placeholder for future metadata inclusion
+                'metaData' => $metaDataJson, // Placeholder for future metadata inclusion
                 'extPMSConfNum' => $extPMSConfNum,
                 'extGuestId' => $extGuestId,
                 'dataSource' => $dataSource,
@@ -1120,7 +1267,7 @@ function createArrRESERVATIONstay(
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully processed ARR RESERVATION stay data";
+        $successMessage = "[{$errorTimestamp}] Successfully processed ARR RESERVATION stay data" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
 
         return $arrRESERVATIONStay;
@@ -1170,7 +1317,7 @@ function getTableAsAssociativeArray($connection, $tableName) {
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully fetched data from `$tableName`";
+        $successMessage = "[{$errorTimestamp}] Successfully fetched data from `$tableName`" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
 
         return $tableData;
@@ -1241,7 +1388,7 @@ function getTableAsAssociativeArray($connection, $tableName) {
 //
 //        // Log the success message
 //        $errorTimestamp = date('Y-m-d H:i:s');
-//        $successMessage = "[{$errorTimestamp}] Successfully processed arrRESERVATION stay data";
+//        $successMessage = "[{$errorTimestamp}] Successfully processed arrRESERVATION stay data" . PHP_EOL;
 //        error_log($successMessage, 3, $errorLogFile);
 //
 //        return $arrRESERVATIONStay;
@@ -1314,7 +1461,7 @@ function createArrCUSTOMERrelationship($myDataSemiParsed, $arrCUSTOMERlibContact
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully processed CUSTOMER relationship data";
+        $successMessage = "[{$errorTimestamp}] Successfully processed CUSTOMER relationship data" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
 
         return $arrCUSTOMERrelationship;
@@ -1354,7 +1501,7 @@ function createLookup($mysqli, $tableName, $keyField1, $keyField2) {
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully created lookup for $tableName";
+        $successMessage = "[{$errorTimestamp}] Successfully created lookup for $tableName" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
 
         return $lookup;
@@ -1435,7 +1582,7 @@ function createArrCUSTOMERmembership($myDataSemiParsed, $arrCUSTOMERlibLoyaltyPr
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully processed CUSTOMER membership data";
+        $successMessage = "[{$errorTimestamp}] Successfully processed CUSTOMER membership data" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
 
         return $arrCUSTOMERmembership;
@@ -1503,7 +1650,7 @@ function createArrSERVICESpayment($myDataSemiParsed, $arrSERVICESlibTender) {
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully processed SERVICES payment data";
+        $successMessage = "[{$errorTimestamp}] Successfully processed SERVICES payment data" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
 
         return $arrSERVICESpayment;
@@ -1579,7 +1726,7 @@ function createArrRESERVATIONgroupStay($arrRESERVATIONstay, $arrRESERVATIONgroup
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully processed RESERVATION group stay data";
+        $successMessage = "[{$errorTimestamp}] Successfully processed RESERVATION group stay data" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
 
         return $arrRESERVATIONgroupStay;
@@ -1675,7 +1822,7 @@ function createArrRESERVATIONstayStatusStay($normalizedData, $arrRESERVATIONstay
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully processed RESERVATION stay status data";
+        $successMessage = "[{$errorTimestamp}] Successfully processed RESERVATION stay status data" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
 
         return $arrRESERVATIONstayStatusStay;
@@ -2024,6 +2171,21 @@ function createArrSERVICESfolioOrders($normalizedData, $arrCUSTOMERcontact, $arr
             // Determine the folioOrderType here
             $folioOrderType = null;
 
+            //metaData
+            $metaDataArray = [
+                'id' => $data['id'] ?? null,
+                'import_code' => $data['import_code'] ?? null,
+                'lastModifiedBy' => $data['lastModifiedBy'] ?? null,
+                'lastModifiedDateTime' => $data['lastModifiedDateTime'] ?? null,
+                'lastModifiedDateTime_repo' => $data['lastModifiedDateTime_repo'] ?? null,
+                'notificationType' => $data['import_code'] ?? null,
+                'occupancyDetails' => $data['lastModifiedDateTime_repo'] ?? null,
+                'blocks' => $data['lastModifiedDateTime_repo'] ?? null,
+                'profiles' => $data['import_code'] ?? null
+
+            ];
+            $metaDataJson = json_encode($metaDataArray);
+
 
             // Now use the determined folioOrderType for the lookup
             $libFolioOrdersTypeId = isset($indexedLibFolioOrdersType[$folioOrderType]) ? $indexedLibFolioOrdersType[$folioOrderType] : null;
@@ -2082,6 +2244,7 @@ function createArrSERVICESfolioOrders($normalizedData, $arrCUSTOMERcontact, $arr
                 'itemCode' => $data['services'][0]['code'] ?? 'UNKNOWN',
                 'ratePlanCode' => $data['prices'][0]['ratePlanCode'] ?? 'UNKNOWN',
                 'libFolioOrdersTypeId' => $libFolioOrdersTypeId,
+                'metaData' => $metaDataJson
 
             ];
 
@@ -2176,7 +2339,7 @@ function createArrSERVICESfolioOrders($normalizedData, $arrCUSTOMERcontact, $arr
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully created SERVICES folio orders";
+        $successMessage = "[{$errorTimestamp}] Successfully processed SERVICES folio orders" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
 
         return $arrSERVICESfolioOrders;
@@ -2216,7 +2379,7 @@ function populateLibFolioOrdersTypeId(&$arrSERVICESfolioOrders, $arrSERVICESlibF
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully populated libFolioOrdersTypeId in folio orders";
+        $successMessage = "[{$errorTimestamp}] Successfully populated libFolioOrdersTypeId in folio orders" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
     } catch (Exception $e) {
         // Log the exception
@@ -2247,7 +2410,7 @@ function removeDuplicateOrders($arrSERVICESfolioOrders) {
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully removed duplicate folio orders";
+        $successMessage = "[{$errorTimestamp}] Successfully removed duplicate folio orders" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
 
         return $uniqueOrders;
@@ -2298,9 +2461,9 @@ function normalizeMyDataSemiParsed($myDataSemiParsed)
             }
         }
         // Log the success message
-        $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully normalized semi-parsed data";
-        error_log($successMessage, 3, $errorLogFile);
+//        $errorTimestamp = date('Y-m-d H:i:s');
+//        $successMessage = "[{$errorTimestamp}] Successfully normalized semi-parsed data" . PHP_EOL;
+//        error_log($successMessage, 3, $errorLogFile);
 
         return $normalizedData;
     } catch (Exception $e) {

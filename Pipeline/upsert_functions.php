@@ -2,6 +2,11 @@
 //These are all of the functions having to do with the upsert of data into the
 //various tables of the end OLTP database
 
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 function upsertCustomerContactType($data, $dbConnection) {
     // Define the error log file path
     $errorLogFile = dirname(__FILE__) . '/error_log.txt';
@@ -866,6 +871,7 @@ function upsertReservationStay($data, $dbConnection) {
             $startDate = $element['startDate'] ?? null;
             $endDate = $element['endDate'] ?? null;
             $createdBy = $element['createdBy'] ?? null;
+            $metaData = $element['metaData'] ?? null;
             $extPMSConfNum = $element['extPMSConfNum'] ?? null;
             $extGuestId = $element['extGuestId'] ?? null;
             $dataSource = $element['dataSource'] ?? null;
@@ -875,39 +881,39 @@ function upsertReservationStay($data, $dbConnection) {
             $dbConnection->begin_transaction();
 
             // Check if a record with this combination already exists
-            $checkQuery = "SELECT `id` FROM `$tableName` WHERE `createDateTime` = ? AND `modifyDateTime` = ? AND `startDate` = ? AND `endDate` = ? AND `extPMSConfNum` = ?";
+            $checkQuery = "SELECT `id` FROM `$tableName` WHERE `createDateTime` = ? AND `modifyDateTime` = ? AND `startDate` = ? AND `endDate` = ? AND `extGuestId` = ? AND `extPMSConfNum` = ?";
             $stmt = $dbConnection->prepare($checkQuery);
             if (!$stmt) {
                 throw new Exception("Prepare failed: " . $dbConnection->error);
             }
 
-            $stmt->bind_param("iisss", $createDateTime, $modifyDateTime, $startDate, $endDate, $extPMSConfNum);
+            $stmt->bind_param("iissis", $createDateTime, $modifyDateTime, $startDate, $endDate, $extGuestId, $extPMSConfNum);
             $stmt->execute();
             $result = $stmt->get_result();
             $exists = $result->fetch_assoc();
 
             if ($exists) {
                 // Update
-                $updateQuery = "UPDATE `$tableName` SET `extPMSConfNum` = ?, `dataSource` = ?, `libSourceId` = ?, `libPropertyId` = ?, `createdBy` = ? WHERE `createDateTime` = ? AND `modifyDateTime` = ? AND `startDate` = ? AND `endDate` = ?";
+                $updateQuery = "UPDATE `$tableName` SET `metaData` = ?,`extPMSConfNum` = ?, `dataSource` = ?, `libSourceId` = ?, `libPropertyId` = ?, `createdBy` = ? WHERE `createDateTime` = ? AND `modifyDateTime` = ? AND `startDate` = ? AND `endDate` = ?";
                 $updateStmt = $dbConnection->prepare($updateQuery);
                 if (!$updateStmt) {
                     throw new Exception("Prepare failed: " . $dbConnection->error);
                 }
 
-                $updateStmt->bind_param("ssiisssss", $extPMSConfNum, $dataSource, $libSourceId, $libPropertyId, $createdBy, $createDateTime, $modifyDateTime, $startDate, $endDate);
+                $updateStmt->bind_param("sssiisssss", $metaData, $dataSource, $libSourceId, $libPropertyId, $createdBy, $createDateTime, $modifyDateTime, $startDate, $endDate);
                 $updateStmt->execute();
                 if ($updateStmt->error) {
-                    throw new Exception("Error in update operation: " . $updateStmt->error);
+                    throw new Exception("Error in update operation: " . $updateStmt ->error);
                 }
             } else {
                 // Insert
-                $insertQuery = "INSERT INTO `$tableName` (`createDateTime`, `modifyDateTime`, `startDate`, `endDate`, `extPMSConfNum`, `dataSource`, `libSourceId`, `libPropertyId`, `createdBy`, `extGuestId`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                $insertQuery = "INSERT INTO `$tableName` (`createDateTime`, `metaData`, `modifyDateTime`, `startDate`, `endDate`, `extPMSConfNum`, `dataSource`, `libSourceId`, `libPropertyId`, `createdBy`, `extGuestId`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                 $insertStmt = $dbConnection->prepare($insertQuery);
                 if (!$insertStmt) {
                     throw new Exception("Prepare failed: " . $dbConnection->error);
                 }
 
-                $insertStmt->bind_param("iissssiiss", $createDateTime, $modifyDateTime, $startDate, $endDate, $extPMSConfNum, $dataSource, $libSourceId, $libPropertyId, $createdBy, $extGuestId);
+                $insertStmt->bind_param("isissssiiss", $createDateTime, $metaData, $modifyDateTime, $startDate, $endDate, $extPMSConfNum, $dataSource, $libSourceId, $libPropertyId, $createdBy, $extGuestId);
                 $insertStmt->execute();
                 if ($insertStmt->error) {
                     throw new Exception("Error in insert operation: " . $insertStmt->error);
@@ -1181,6 +1187,11 @@ function upsertCustomerContact($data, $dbConnection) {
                 }
             }
 
+            // Log the success message
+            $errorTimestamp = date('Y-m-d H:i:s');
+            $successMessage = "[{$errorTimestamp}] Successfully upserted CUSTOMER contacts" . PHP_EOL;
+            error_log($successMessage, 3, $errorLogFile);
+
             // Commit the transaction
             $dbConnection->commit();
 
@@ -1383,6 +1394,7 @@ function upsertSERVICESfolioOrders($arrSERVICESfolioOrders, $dbConnection) {
         $paymentId = $order['paymentId'];
         $libServiceItemsId = $order['libServiceItemsId'];
         $libFolioOrdersTypeId = $order['libFolioOrdersTypeId'];
+        $metaData = $order['metaData'];
         // ... Other fields as necessary
 
         $dbConnection->begin_transaction();
@@ -1462,15 +1474,17 @@ function upsertSERVICESfolioOrders($arrSERVICESfolioOrders, $dbConnection) {
                     `transferOnArrival`, 
                     `isIncluded`,
                     `dataSource`,
+                    `metaData`,
                     `contactId`, 
                     `stayId`, 
                     `paymentId`, 
                     `libServiceItemsId`, 
                     `libFolioOrdersTypeId`
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
                 $insertStmt = $dbConnection->prepare($insertQuery);
-                $insertStmt->bind_param("siddsssdisssiisiiiii",
+                $insertStmt->bind_param("siddsssdisssiissiiiii",
                     $order['folioOrderType'],
                     $order['unitCount'],
                     $order['unitPrice'],
@@ -1486,6 +1500,7 @@ function upsertSERVICESfolioOrders($arrSERVICESfolioOrders, $dbConnection) {
                     $order['transferOnArrival'],
                     $order['isIncluded'],
                     $order['dataSource'],
+                    $order['metaData'],
                     // Inserted values
                     $contactId,
                     $stayId,
