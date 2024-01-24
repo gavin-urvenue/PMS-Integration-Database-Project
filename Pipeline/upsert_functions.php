@@ -7,7 +7,7 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-function upsertCustomerContactType($data, $dbConnection) {
+function upsertCustomerContactType($data, $dbConnection, &$errorCount) {
     // Define the error log file path
     $errorLogFile = dirname(__FILE__) . '/error_log.txt';
 
@@ -60,6 +60,9 @@ function upsertCustomerContactType($data, $dbConnection) {
                 throw new Exception("Invalid data structure.");
             }
         } catch (Exception $e) {
+            // Increment error counter
+            $errorCount++;
+
             // Rollback the transaction and log the error
             $dbConnection->rollback();
             $errorTimestamp = date('Y-m-d H:i:s');
@@ -76,7 +79,7 @@ function upsertCustomerContactType($data, $dbConnection) {
 
 
 
-function upsertReservationLibRoom($data, $dbConnection) {
+function upsertReservationLibRoom($data, $dbConnection, &$errorCount) {
     // Define the error log file path
     $errorLogFile = dirname(__FILE__) . '/error_log.txt';
 
@@ -133,6 +136,9 @@ function upsertReservationLibRoom($data, $dbConnection) {
             // Commit the transaction
             $dbConnection->commit();
         } catch (Exception $e) {
+            // Increment error counter
+            $errorCount++;
+
             // Rollback the transaction and log the error
             $dbConnection->rollback();
             $errorTimestamp = date('Y-m-d H:i:s');
@@ -146,7 +152,7 @@ function upsertReservationLibRoom($data, $dbConnection) {
 }
 
 
-function upsertReservationLibSource($data, $dbConnection) {
+function upsertReservationLibSource($data, $dbConnection, &$errorCount) {
     // Define the error log file path
     $errorLogFile = 'error_log.txt';
 
@@ -206,6 +212,9 @@ function upsertReservationLibSource($data, $dbConnection) {
                 throw new Exception("Invalid data structure.");
             }
         } catch (Exception $e) {
+            // Increment error counter
+            $errorCount++;
+
             $dbConnection->rollback();
 
             // Log the error
@@ -220,7 +229,7 @@ function upsertReservationLibSource($data, $dbConnection) {
 
 
 
-function upsertReservationLibProperty($data, $dbConnection) {
+function upsertReservationLibProperty($data, $dbConnection, &$errorCount) {
     $tableName = 'RESERVATIONlibProperty';
     $errorLogFile = 'error_log.txt'; // Define the error log file path
 
@@ -273,6 +282,9 @@ function upsertReservationLibProperty($data, $dbConnection) {
             $dbConnection->commit();
 
         } catch (Exception $e) {
+            // Increment error counter
+            $errorCount++;
+
             $dbConnection->rollback();
 
             // Log the error
@@ -286,7 +298,7 @@ function upsertReservationLibProperty($data, $dbConnection) {
 }
 
 
-function upsertCustomerLibLoyaltyProgram($data, $dbConnection) {
+function upsertCustomerLibLoyaltyProgram($data, $dbConnection, &$errorCount) {
     $tableName = 'CUSTOMERlibLoyaltyProgram';
     $errorLogFile = 'error_log.txt'; // Define the error log file path
 
@@ -345,6 +357,9 @@ function upsertCustomerLibLoyaltyProgram($data, $dbConnection) {
                 throw new Exception("Invalid data structure.");
             }
         } catch (Exception $e) {
+            // Increment error counter
+            $errorCount++;
+
             $dbConnection->rollback();
 
             // Log the error
@@ -358,7 +373,7 @@ function upsertCustomerLibLoyaltyProgram($data, $dbConnection) {
 }
 
 
-function upsertServicesLibTender($data, $dbConnection) {
+function upsertServicesLibTender($data, $dbConnection, &$errorCount) {
     $tableName = 'SERVICESlibTender';
     $errorLogFile = 'error_log.txt'; // Define the error log file path
 
@@ -410,6 +425,9 @@ function upsertServicesLibTender($data, $dbConnection) {
             $dbConnection->commit();
 
         } catch (Exception $e) {
+            // Increment error counter
+            $errorCount++;
+
             $dbConnection->rollback();
 
             // Log the error
@@ -423,7 +441,7 @@ function upsertServicesLibTender($data, $dbConnection) {
 }
 
 
-function upsertServicesLibServiceItems($data, $dbConnection) {
+function upsertServicesLibServiceItems($data, $dbConnection, &$errorCount) {
     $tableName = 'SERVICESlibServiceItems';
     $errorLogFile = 'error_log.txt'; // Define the error log file path
 
@@ -477,6 +495,9 @@ function upsertServicesLibServiceItems($data, $dbConnection) {
             $dbConnection->commit();
 
         } catch (Exception $e) {
+            // Increment error counter
+            $errorCount++;
+
             $dbConnection->rollback();
 
             // Log the error
@@ -490,82 +511,85 @@ function upsertServicesLibServiceItems($data, $dbConnection) {
 }
 
 
-function upsertServicesLibFolioOrdersType($data, $dbConnection) {
-    $tableName = 'SERVICESlibFolioOrdersType';
-    $errorLogFile = 'error_log.txt'; // Define the error log file path
+//function upsertServicesLibFolioOrdersType($data, $dbConnection, &$errorCount) {
+//    $tableName = 'SERVICESlibFolioOrdersType';
+//    $errorLogFile = 'error_log.txt'; // Define the error log file path
+//
+//    foreach ($data as $element) {
+//        try {
+//            if (isset($element[$tableName])) {
+//                $record = $element[$tableName];
+//
+//                $orderType = $record['orderType'] ?? null;
+//                if ($orderType === null || $orderType === '') {
+//                    error_log("Skipped a record due to missing orderType", 3, $errorLogFile);
+//                    continue; // Skip this record if orderType is not set or is an empty string
+//                }
+//
+//                $metaData = json_encode($record['metaData'] ?? []); // Convert metaData array to JSON string
+//
+//                $dbConnection->begin_transaction();
+//
+//                $checkQuery = "SELECT `id` FROM `$tableName` WHERE `orderType` = ?";
+//                $stmt = $dbConnection->prepare($checkQuery);
+//                if (!$stmt) {
+//                    throw new Exception("Failed to prepare statement: " . $dbConnection->error);
+//                }
+//
+//                $stmt->bind_param("s", $orderType);
+//                $stmt->execute();
+//                $result = $stmt->get_result();
+//                $exists = $result->fetch_assoc();
+//
+//                if ($exists) {
+//                    $updateQuery = "UPDATE `$tableName` SET `metaData` = ? WHERE `orderType` = ?";
+//                    $updateStmt = $dbConnection->prepare($updateQuery);
+//                    if (!$updateStmt) {
+//                        throw new Exception("Failed to prepare update statement: " . $dbConnection->error);
+//                    }
+//
+//                    $updateStmt->bind_param("ss", $metaData, $orderType);
+//                    $updateStmt->execute();
+//                    if ($updateStmt->error) {
+//                        throw new Exception("Error in update operation: " . $updateStmt->error);
+//                    }
+//                } else {
+//                    $insertQuery = "INSERT INTO `$tableName` (`orderType`, `metaData`) VALUES (?, ?)";
+//                    $insertStmt = $dbConnection->prepare($insertQuery);
+//                    if (!$insertStmt) {
+//                        throw new Exception("Failed to prepare insert statement: " . $dbConnection->error);
+//                    }
+//
+//                    $insertStmt->bind_param("ss", $orderType, $metaData);
+//                    $insertStmt->execute();
+//                    if ($insertStmt->error) {
+//                        throw new Exception("Error in insert operation: " . $insertStmt->error);
+//                    }
+//                }
+//
+//                $dbConnection->commit();
+//
+//            } else {
+//                throw new Exception("Invalid data structure.");
+//            }
+//        } catch (Exception $e) {
+//            // Increment error counter
+//            $errorCount++;
+//
+//            $dbConnection->rollback();
+//
+//            // Log the error
+//            $errorTimestamp = date('Y-m-d H:i:s');
+//            $errorLogMessage = "[{$errorTimestamp}] Error in upsertServicesLibFolioOrdersType: " . $e->getMessage() . PHP_EOL;
+//            error_log($errorLogMessage, 3, $errorLogFile);
+//
+//            throw $e;
+//        }
+//    }
+//}
 
-    foreach ($data as $element) {
-        try {
-            if (isset($element[$tableName])) {
-                $record = $element[$tableName];
 
-                $orderType = $record['orderType'] ?? null;
-                if ($orderType === null || $orderType === '') {
-                    error_log("Skipped a record due to missing orderType", 3, $errorLogFile);
-                    continue; // Skip this record if orderType is not set or is an empty string
-                }
-
-                $metaData = json_encode($record['metaData'] ?? []); // Convert metaData array to JSON string
-
-                $dbConnection->begin_transaction();
-
-                $checkQuery = "SELECT `id` FROM `$tableName` WHERE `orderType` = ?";
-                $stmt = $dbConnection->prepare($checkQuery);
-                if (!$stmt) {
-                    throw new Exception("Failed to prepare statement: " . $dbConnection->error);
-                }
-
-                $stmt->bind_param("s", $orderType);
-                $stmt->execute();
-                $result = $stmt->get_result();
-                $exists = $result->fetch_assoc();
-
-                if ($exists) {
-                    $updateQuery = "UPDATE `$tableName` SET `metaData` = ? WHERE `orderType` = ?";
-                    $updateStmt = $dbConnection->prepare($updateQuery);
-                    if (!$updateStmt) {
-                        throw new Exception("Failed to prepare update statement: " . $dbConnection->error);
-                    }
-
-                    $updateStmt->bind_param("ss", $metaData, $orderType);
-                    $updateStmt->execute();
-                    if ($updateStmt->error) {
-                        throw new Exception("Error in update operation: " . $updateStmt->error);
-                    }
-                } else {
-                    $insertQuery = "INSERT INTO `$tableName` (`orderType`, `metaData`) VALUES (?, ?)";
-                    $insertStmt = $dbConnection->prepare($insertQuery);
-                    if (!$insertStmt) {
-                        throw new Exception("Failed to prepare insert statement: " . $dbConnection->error);
-                    }
-
-                    $insertStmt->bind_param("ss", $orderType, $metaData);
-                    $insertStmt->execute();
-                    if ($insertStmt->error) {
-                        throw new Exception("Error in insert operation: " . $insertStmt->error);
-                    }
-                }
-
-                $dbConnection->commit();
-
-            } else {
-                throw new Exception("Invalid data structure.");
-            }
-        } catch (Exception $e) {
-            $dbConnection->rollback();
-
-            // Log the error
-            $errorTimestamp = date('Y-m-d H:i:s');
-            $errorLogMessage = "[{$errorTimestamp}] Error in upsertServicesLibFolioOrdersType: " . $e->getMessage() . PHP_EOL;
-            error_log($errorLogMessage, 3, $errorLogFile);
-
-            throw $e;
-        }
-    }
-}
-
-
-function upsertReservationGroup($data, $dbConnection) {
+function upsertReservationGroup($data, $dbConnection, &$errorCount) {
     $tableName = 'RESERVATIONgroup';
     $errorLogFile = 'error_log.txt'; // Define the error log file path
 
@@ -626,6 +650,9 @@ function upsertReservationGroup($data, $dbConnection) {
                 throw new Exception("Invalid data structure.");
             }
         } catch (Exception $e) {
+            // Increment error counter
+            $errorCount++;
+
             $dbConnection->rollback();
 
             // Log the error
@@ -640,7 +667,7 @@ function upsertReservationGroup($data, $dbConnection) {
 
 
 
-function upsertReservationLibStayStatus($data, $dbConnection) {
+function upsertReservationLibStayStatus($data, $dbConnection, &$errorCount) {
     $tableName = 'RESERVATIONlibStayStatus';
     $errorLogFile = 'error_log.txt'; // Define the error log file path
 
@@ -700,6 +727,9 @@ function upsertReservationLibStayStatus($data, $dbConnection) {
                 throw new Exception("Invalid data structure.");
             }
         } catch (Exception $e) {
+            // Increment error counter
+            $errorCount++;
+
             $dbConnection->rollback();
 
             // Log the error
@@ -713,7 +743,7 @@ function upsertReservationLibStayStatus($data, $dbConnection) {
 }
 
 
-function upsertReservationLibRoomType($data, $dbConnection) {
+function upsertReservationLibRoomType($data, $dbConnection, &$errorCount) {
     $tableName = 'RESERVATIONlibRoomType';
     $errorLogFile = 'error_log.txt'; // Define the error log file path
 
@@ -774,6 +804,9 @@ function upsertReservationLibRoomType($data, $dbConnection) {
                 throw new Exception("Invalid data structure.");
             }
         } catch (Exception $e) {
+            // Increment error counter
+            $errorCount++;
+
             $dbConnection->rollback();
 
             // Log the error
@@ -787,7 +820,7 @@ function upsertReservationLibRoomType($data, $dbConnection) {
 }
 
 
-function upsertReservationLibRoomClass($data, $dbConnection) {
+function upsertReservationLibRoomClass($data, $dbConnection, &$errorCount) {
     $tableName = 'RESERVATIONlibRoomClass';
     $errorLogFile = 'error_log.txt'; // Define the error log file path
 
@@ -847,6 +880,9 @@ function upsertReservationLibRoomClass($data, $dbConnection) {
                 throw new Exception("Invalid data structure.");
             }
         } catch (Exception $e) {
+            // Increment error counter
+            $errorCount++;
+
             $dbConnection->rollback();
 
             // Log the error
@@ -860,7 +896,7 @@ function upsertReservationLibRoomClass($data, $dbConnection) {
 }
 
 
-function upsertReservationStay($data, $dbConnection) {
+function upsertReservationStay($data, $dbConnection, &$errorCount) {
     $tableName = 'RESERVATIONstay';
     $errorLogFile = 'error_log.txt'; // Define the error log file path
 
@@ -923,6 +959,9 @@ function upsertReservationStay($data, $dbConnection) {
             $dbConnection->commit();
 
         } catch (Exception $e) {
+            // Increment error counter
+            $errorCount++;
+
             $dbConnection->rollback();
 
             // Log the error
@@ -938,7 +977,7 @@ function upsertReservationStay($data, $dbConnection) {
 
 
 
-function upsertCustomerRelationship($data, $dbConnection) {
+function upsertCustomerRelationship($data, $dbConnection, &$errorCount) {
     $tableName = 'CUSTOMERrelationship';
     $errorLogFile = 'error_log.txt'; // Define the error log file path
 
@@ -991,6 +1030,9 @@ function upsertCustomerRelationship($data, $dbConnection) {
             $dbConnection->commit();
 
         } catch (Exception $e) {
+            // Increment error counter
+            $errorCount++;
+
             $dbConnection->rollback();
 
             // Log the error
@@ -1003,7 +1045,7 @@ function upsertCustomerRelationship($data, $dbConnection) {
     }
 }
 
-function upsertCustomerMembership($data, $dbConnection) {
+function upsertCustomerMembership($data, $dbConnection, &$errorCount) {
     $tableName = 'CUSTOMERmembership';
     $errorLogFile = 'error_log.txt'; // Define the error log file path
 
@@ -1058,6 +1100,9 @@ function upsertCustomerMembership($data, $dbConnection) {
             $dbConnection->commit();
 
         } catch (Exception $e) {
+            // Increment error counter
+            $errorCount++;
+
             $dbConnection->rollback();
 
             // Log the error
@@ -1070,7 +1115,7 @@ function upsertCustomerMembership($data, $dbConnection) {
     }
 }
 
-function upsertServicesPayment($data, $dbConnection) {
+function upsertServicesPayment($data, $dbConnection, &$errorCount) {
     $tableName = 'SERVICESpayment';
     $errorLogFile = 'error_log.txt'; // Define the error log file path
 
@@ -1117,6 +1162,9 @@ function upsertServicesPayment($data, $dbConnection) {
             $dbConnection->commit();
 
         } catch (Exception $e) {
+            // Increment error counter
+            $errorCount++;
+
             $dbConnection->rollback();
 
             // Log the error
@@ -1130,7 +1178,7 @@ function upsertServicesPayment($data, $dbConnection) {
 }
 
 
-function upsertCustomerContact($data, $dbConnection) {
+function upsertCustomerContact($data, $dbConnection, &$errorCount) {
     $tableName = 'CUSTOMERcontact';
     $errorLogFile = 'error_log.txt'; // Define the error log file path
 
@@ -1196,6 +1244,9 @@ function upsertCustomerContact($data, $dbConnection) {
             $dbConnection->commit();
 
         } catch (Exception $e) {
+            // Increment error counter
+            $errorCount++;
+
             // Rollback the transaction on error
             $dbConnection->rollback();
 
@@ -1210,7 +1261,7 @@ function upsertCustomerContact($data, $dbConnection) {
 }
 
 
-function upsertReservationStayStatusStay($data, $dbConnection) {
+function upsertReservationStayStatusStay($data, $dbConnection, &$errorCount) {
     $tableName = 'RESERVATIONstayStatusStay';
     $errorLogFile = 'error_log.txt'; // Define the error log file path
 
@@ -1278,6 +1329,9 @@ function upsertReservationStayStatusStay($data, $dbConnection) {
             $dbConnection->commit();
 
         } catch (Exception $e) {
+            // Increment error counter
+            $errorCount++;
+
             // Rollback the transaction on error
             $dbConnection->rollback();
 
@@ -1294,7 +1348,7 @@ function upsertReservationStayStatusStay($data, $dbConnection) {
 
 
 
-function upsertReservationRoomDetails($arrRESERVATIONroomDetails, $dbConnection) {
+function upsertReservationRoomDetails($arrRESERVATIONroomDetails, $dbConnection, &$errorCount) {
     $tableName = 'RESERVATIONroomDetails';
     $errorLogFile = 'error_log.txt'; // Define the error log file path
 
@@ -1368,6 +1422,9 @@ function upsertReservationRoomDetails($arrRESERVATIONroomDetails, $dbConnection)
             $dbConnection->commit();
 
         } catch (Exception $e) {
+            // Increment error counter
+            $errorCount++;
+
             // Rollback the transaction on error
             $dbConnection->rollback();
 
@@ -1381,7 +1438,7 @@ function upsertReservationRoomDetails($arrRESERVATIONroomDetails, $dbConnection)
     }
 }
 
-function upsertSERVICESfolioOrders($arrSERVICESfolioOrders, $dbConnection) {
+function upsertSERVICESfolioOrders($arrSERVICESfolioOrders, $dbConnection, &$errorCount) {
     $tableName = 'SERVICESfolioOrders';
     $errorLogFile = 'error_log.txt'; // Define the error log file path
 
@@ -1393,20 +1450,20 @@ function upsertSERVICESfolioOrders($arrSERVICESfolioOrders, $dbConnection) {
         $stayId = $order['stayId'];
         $paymentId = $order['paymentId'];
         $libServiceItemsId = $order['libServiceItemsId'];
-        $libFolioOrdersTypeId = $order['libFolioOrdersTypeId'];
+//        $libFolioOrdersTypeId = $order['libFolioOrdersTypeId'];
         $metaData = $order['metaData'];
         // ... Other fields as necessary
 
         $dbConnection->begin_transaction();
         try {
             // Check if a record with this combination already exists
-            $checkQuery = "SELECT `id` FROM `$tableName` WHERE `contactId` = ? AND `stayId` = ? AND `paymentId` = ? AND `libServiceItemsId` = ? AND `libFolioOrdersTypeId` = ?";
+            $checkQuery = "SELECT `id` FROM `$tableName` WHERE `contactId` = ? AND `stayId` = ? AND `paymentId` = ? AND `libServiceItemsId` = ?";
             $stmt = $dbConnection->prepare($checkQuery);
             if (!$stmt) {
                 throw new Exception("Prepare failed: " . $dbConnection->error);
             }
 
-            $stmt->bind_param("iiiii", $contactId, $stayId, $paymentId, $libServiceItemsId, $libFolioOrdersTypeId);
+            $stmt->bind_param("iiii", $contactId, $stayId, $paymentId, $libServiceItemsId);
             $stmt->execute();
             $result = $stmt->get_result();
             $exists = $result->fetch_assoc();
@@ -1429,10 +1486,10 @@ function upsertSERVICESfolioOrders($arrSERVICESfolioOrders, $dbConnection) {
                     `transferOnArrival` = ?,
                     `isIncluded` = ?,
                     `dataSource` = ?
-                WHERE `contactId` = ? AND `stayId` = ? AND `paymentId` = ? AND `libServiceItemsId` = ? AND `libFolioOrdersTypeId` = ?";
+                WHERE `contactId` = ? AND `stayId` = ? AND `paymentId` = ? AND `libServiceItemsId` = ?";
 
                 $updateStmt = $dbConnection->prepare($updateQuery);
-                $updateStmt->bind_param("siddsssdisssiisiiiii",
+                $updateStmt->bind_param("siddsssdisssiisiiii",
                     $order['folioOrderType'],
                     $order['unitCount'],
                     $order['unitPrice'],
@@ -1452,8 +1509,7 @@ function upsertSERVICESfolioOrders($arrSERVICESfolioOrders, $dbConnection) {
                     $contactId,
                     $stayId,
                     $paymentId,
-                    $libServiceItemsId,
-                    $libFolioOrdersTypeId
+                    $libServiceItemsId
                 );
                 $updateStmt->execute();
             } else {
@@ -1478,13 +1534,12 @@ function upsertSERVICESfolioOrders($arrSERVICESfolioOrders, $dbConnection) {
                     `contactId`, 
                     `stayId`, 
                     `paymentId`, 
-                    `libServiceItemsId`, 
-                    `libFolioOrdersTypeId`
+                    `libServiceItemsId`
 
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
                 $insertStmt = $dbConnection->prepare($insertQuery);
-                $insertStmt->bind_param("siddsssdisssiissiiiii",
+                $insertStmt->bind_param("siddsssdisssiissiiii",
                     $order['folioOrderType'],
                     $order['unitCount'],
                     $order['unitPrice'],
@@ -1505,8 +1560,7 @@ function upsertSERVICESfolioOrders($arrSERVICESfolioOrders, $dbConnection) {
                     $contactId,
                     $stayId,
                     $paymentId,
-                    $libServiceItemsId,
-                    $libFolioOrdersTypeId
+                    $libServiceItemsId
                 );
                 $insertStmt->execute();
             }
@@ -1515,6 +1569,9 @@ function upsertSERVICESfolioOrders($arrSERVICESfolioOrders, $dbConnection) {
             $dbConnection->commit();
 
         } catch (Exception $e) {
+            // Increment error counter
+            $errorCount++;
+
             // Rollback the transaction on error
             $dbConnection->rollback();
 

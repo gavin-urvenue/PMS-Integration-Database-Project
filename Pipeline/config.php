@@ -1,8 +1,8 @@
 <?php
 
-//Consstands
+//Constants
     //schema aversion
-define('SCHEMA_VERSION', '1.39');
+define('SCHEMA_VERSION', '1.40');
 // Database Connections:
     //origin
 define('ORIGIN_TABLE_NAME', 'hapi_raw_reservations');
