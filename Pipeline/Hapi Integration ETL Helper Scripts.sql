@@ -1,53 +1,33 @@
 
+
 -- delete grandchild records
 delete from RESERVATIONgroupStay ;
-
 delete from RESERVATIONstayStatusStay ;
-
 delete from RESERVATIONroomDetails ;
-
 delete from SERVICESfolioOrders ;
 
 -- delete child records
 delete from CUSTOMERrelationship ;
-
 delete from RESERVATIONstay;
-
 delete from CUSTOMERmembership ;
-
 delete from SERVICESpayment ;
 
 
 -- delete parent records
 delete from CUSTOMERlibContactType;
-
 delete from CUSTOMERcontact;
-
 delete from RESERVATIONlibRoom;
-
 delete from RESERVATIONlibSource;
-
 delete from RESERVATIONlibProperty;
-
 delete from CUSTOMERlibLoyaltyProgram;
-
 delete from SERVICESlibTender;
-
 delete from SERVICESlibServiceItems;
-
-
 delete from RESERVATIONgroup;
-
 delete from RESERVATIONlibStayStatus;
-
 delete from RESERVATIONgroup;
-
 delete from RESERVATIONlibRoom;
-
 delete from RESERVATIONlibRoomType;
-
 delete from RESERVATIONlibRoomClass;
-
 delete from PMSDATABASEmisc ;
 
 -- Stored procedure that completes all of the deletes above
@@ -99,15 +79,16 @@ select count(*), 'PMSDATABASEmisc' from PMSDATABASEmisc p
 
 select * from pms_db.PMSDATABASEmisc p 
 
-
+select * from pms_db.RESERVATIONstay_audit ra 
 
 -- update system user to be able to run many queries for pipeline process
 
 UPDATE mysql.user
 SET max_questions = 0
-where User = urvenue
+where User = 'urvenue'
 
 FLUSH PRIVILEGES;
+
 
 
 

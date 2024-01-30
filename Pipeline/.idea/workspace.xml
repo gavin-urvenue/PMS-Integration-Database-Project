@@ -9,13 +9,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b609d737-ca15-4432-ade7-d7b0de94926d" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../Database Creation Files/Hospitality v1.42.mwb" beforeDir="false" afterPath="$PROJECT_DIR$/../Database Creation Files/Hospitality v1.42.mwb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Database Creation Files/Hospitality v1.42.png" beforeDir="false" afterPath="$PROJECT_DIR$/../Database Creation Files/Hospitality v1.42.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Database Creation Files/Hospitality v1.42.sql" beforeDir="false" afterPath="$PROJECT_DIR$/../Database Creation Files/Hospitality v1.42.sql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Hapi ETL_PHP.php" beforeDir="false" afterPath="$PROJECT_DIR$/Hapi ETL_PHP.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Hapi Integration ETL Helper Scripts.sql" beforeDir="false" afterPath="$PROJECT_DIR$/Hapi Integration ETL Helper Scripts.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/array_functions.php" beforeDir="false" afterPath="$PROJECT_DIR$/array_functions.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config.php" beforeDir="false" afterPath="$PROJECT_DIR$/config.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Preview attachment usp_clear_all_tables.txtusp_clear_all_tables.txt1 KB.webloc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/action_log.txt" beforeDir="false" afterPath="$PROJECT_DIR$/action_log.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/arrSERVICESfolioOrders.csv" beforeDir="false" afterPath="$PROJECT_DIR$/arrSERVICESfolioOrders.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/error_log.txt" beforeDir="false" afterPath="$PROJECT_DIR$/error_log.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/upsert_functions.php" beforeDir="false" afterPath="$PROJECT_DIR$/upsert_functions.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/extGuestID_query_&amp;_populate_insert.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/usp_clear_all_tables.txt" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
