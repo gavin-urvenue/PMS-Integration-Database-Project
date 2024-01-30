@@ -1204,6 +1204,7 @@ function createArrRESERVATIONstay(
             $arrivalDate = $entry['arrival'] ?? null;
             $createdBy = $entry['createdBy'] ?? null;
             $extPMSConfNum = $entry['confirmation_number'] ?? null;
+            $extReservationId = $entry['reservation_id'] ?? null;
             $extGuestId = $entry['extracted_guest_id'] ?? null;
             $propertyCode = isset($entry['propertyDetails']['propertyCode']) ? $entry['propertyDetails']['propertyCode'] : 'UNKNOWN';
             $chainCode = isset($entry['propertyDetails']['chainCode']) ? $entry['propertyDetails']['chainCode'] : 'UNKNOWN';
@@ -1224,6 +1225,7 @@ function createArrRESERVATIONstay(
                 'createdBy' => $createdBy,
                 'metaData' => $metaDataJson, // Placeholder for future metadata inclusion
                 'extPMSConfNum' => $extPMSConfNum,
+                'extReservationId' => $extReservationId,
                 'extGuestId' => $extGuestId,
                 'dataSource' => $dataSource,
                 'libSourceId' => $libSourceId,
@@ -1701,7 +1703,7 @@ function createArrRESERVATIONstayStatusStay($normalizedData, $arrRESERVATIONstay
 
             // Create index for stay lookup
             $stayIndex = $createDateTime . '|' . $modifyDateTime . '|' . $startDate . '|' . $endDate . '|' . $extGuestId . '|' . $extPMSConfNum;
-// Lookup for stayId using the index
+            // Lookup for stayId using the index
             if (isset($indexedReservationStays[$stayIndex])) {
                 $stayId = is_array($indexedReservationStays[$stayIndex])
                     ? reset($indexedReservationStays[$stayIndex])
@@ -2035,7 +2037,6 @@ function createArrSERVICESfolioOrders($normalizedData, $arrCUSTOMERcontact, $arr
                 'libServiceItemsId' => $libServiceItemsId,
                 'itemCode' => $data['services'][0]['code'] ?? 'UNKNOWN',
                 'ratePlanCode' => $data['prices'][0]['ratePlanCode'] ?? 'UNKNOWN',
-                'libFolioOrdersTypeId' => $libFolioOrdersTypeId,
                 'metaData' => $metaDataJson
 
             ];

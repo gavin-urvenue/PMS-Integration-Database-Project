@@ -7,9 +7,11 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+
 function upsertCustomerContactType($data, $dbConnection, &$errorCount) {
-    // Define the error log file path
+    // Define the error log file path and action log file path
     $errorLogFile = dirname(__FILE__) . '/error_log.txt';
+    $actionLogFile = dirname(__FILE__) . '/action_log.txt';
 
     $tableName = 'CUSTOMERlibContactType';
 
@@ -23,18 +25,26 @@ function upsertCustomerContactType($data, $dbConnection, &$errorCount) {
                 $dbConnection->begin_transaction();
 
                 // Prepare the check query
-                $checkQuery = "SELECT `id` FROM `$tableName` WHERE `type` = ?";
+                $checkQuery = "SELECT `id`, `dataSource` FROM `$tableName` WHERE `type` = ?";
                 $stmt = $dbConnection->prepare($checkQuery);
                 if (!$stmt) {
-                    throw new Exception("Failed to prepare statement: " . $dbConnection->error);
+                    throw new Exception(" (".__FUNCTION__.") Failed to prepare statement: " . $dbConnection->error);
                 }
                 $stmt->bind_param("s", $type);
                 $stmt->execute();
                 $result = $stmt->get_result();
-                $exists = $result->fetch_assoc();
+                $existingRecord = $result->fetch_assoc();
 
-                // Upsert query
-                if ($exists) {
+                // Initialize action variable
+                $action = '';
+                $rowsAffected = 0;
+                $beforeState = null;
+                $afterState = null;
+
+                if ($existingRecord) {
+                    // Save before state
+                    $beforeState = json_encode($existingRecord);
+
                     // Update existing record
                     $updateQuery = "UPDATE `$tableName` SET `dataSource` = ? WHERE `type` = ?";
                     $updateStmt = $dbConnection->prepare($updateQuery);
@@ -43,21 +53,41 @@ function upsertCustomerContactType($data, $dbConnection, &$errorCount) {
                     }
                     $updateStmt->bind_param("ss", $dataSource, $type);
                     $updateStmt->execute();
+
+                    // Set action to update and get affected rows
+                    $action = 'UPDATE';
+                    $rowsAffected = $updateStmt->affected_rows;
+
+                    // Save after state
+                    $afterState = json_encode(['dataSource' => $dataSource]);
                 } else {
                     // Insert new record
                     $insertQuery = "INSERT INTO `$tableName` (`type`, `dataSource`) VALUES (?, ?)";
                     $insertStmt = $dbConnection->prepare($insertQuery);
                     if (!$insertStmt) {
-                        throw new Exception("Failed to prepare insert statement: " . $dbConnection->error);
+                        throw new Exception(" (".__FUNCTION__.") Failed to prepare insert statement: " . $dbConnection->error);
                     }
                     $insertStmt->bind_param("ss", $type, $dataSource);
                     $insertStmt->execute();
+
+                    // Set action to insert and get affected rows
+                    $action = 'INSERT';
+                    $rowsAffected = $insertStmt->affected_rows;
+
+                    // Save after state for insert
+                    $afterState = json_encode(['type' => $type, 'dataSource' => $dataSource]);
                 }
+
+                // Log the action with record identifier and rows affected
+                $actionTimestamp = date('Y-m-d H:i:s');
+                $recordIdentifier = $existingRecord ? $existingRecord['id'] : 'N/A'; // Use 'N/A' for new records
+                $actionLogMessage = "[{$actionTimestamp}] (" . __FUNCTION__ . ") ACTION: $action, Record: $recordIdentifier, Rows Affected: $rowsAffected, Before: $beforeState, After: $afterState" . PHP_EOL;
+                error_log($actionLogMessage, 3, $actionLogFile);
 
                 // Commit the transaction
                 $dbConnection->commit();
             } else {
-                throw new Exception("Invalid data structure.");
+                throw new Exception(" (".__FUNCTION__.") Invalid data structure.");
             }
         } catch (Exception $e) {
             // Increment error counter
@@ -66,7 +96,7 @@ function upsertCustomerContactType($data, $dbConnection, &$errorCount) {
             // Rollback the transaction and log the error
             $dbConnection->rollback();
             $errorTimestamp = date('Y-m-d H:i:s');
-            $errorLogMessage = "[{$errorTimestamp}] Error in upsertCustomerContactType: " . $e->getMessage() . PHP_EOL;
+            $errorLogMessage = "[{$errorTimestamp}]  (" . __FUNCTION__ . ") " . $e->getMessage() . PHP_EOL;
             error_log($errorLogMessage, 3, $errorLogFile);
 
             // Re-throw the exception for further handling
@@ -79,9 +109,11 @@ function upsertCustomerContactType($data, $dbConnection, &$errorCount) {
 
 
 
+
 function upsertReservationLibRoom($data, $dbConnection, &$errorCount) {
-    // Define the error log file path
+    // Define the error log file path and action log file path
     $errorLogFile = dirname(__FILE__) . '/error_log.txt';
+    $actionLogFile = dirname(__FILE__) . '/action_log.txt';
 
     $tableName = 'RESERVATIONlibRoom';
 
@@ -92,69 +124,92 @@ function upsertReservationLibRoom($data, $dbConnection, &$errorCount) {
             $dataSource = $record['dataSource'] ?? null;
             $metaData = json_encode($record['metaData'] ?? []); // Convert metaData array to JSON string
 
-            // Start a transaction
             $dbConnection->begin_transaction();
 
-            // Prepare the check query
-            $checkQuery = "SELECT COUNT(*) FROM `$tableName` WHERE `roomNumber` = ?";
+            // Check for existing record
+            $checkQuery = "SELECT `id`, `dataSource`, `metaData` FROM `$tableName` WHERE `roomNumber` = ?";
             $stmt = $dbConnection->prepare($checkQuery);
             if (!$stmt) {
-                throw new Exception("Failed to prepare statement: " . $dbConnection->error);
+                throw new Exception(" (".__FUNCTION__.") Failed to prepare statement: " . $dbConnection->error);
             }
             $stmt->bind_param("s", $roomNumber);
             $stmt->execute();
             $result = $stmt->get_result();
-            $exists = $result->fetch_row()[0] > 0;
+            $existingRecord = $result->fetch_assoc();
 
-            // Upsert query
-            if ($exists) {
+            // Initialize action variable
+            $action = '';
+            $rowsAffected = 0;
+            $beforeState = null;
+            $afterState = null;
+
+            if ($existingRecord) {
+                // Save before state
+                $beforeState = json_encode($existingRecord);
+
                 // Update existing record
                 $updateQuery = "UPDATE `$tableName` SET `metaData` = ?, `dataSource` = ? WHERE `roomNumber` = ?";
                 $updateStmt = $dbConnection->prepare($updateQuery);
                 if (!$updateStmt) {
-                    throw new Exception("Failed to prepare update statement: " . $dbConnection->error);
+                    throw new Exception(" (".__FUNCTION__.") Failed to prepare update statement: " . $dbConnection->error);
                 }
                 $updateStmt->bind_param("sss", $metaData, $dataSource, $roomNumber);
                 $updateStmt->execute();
-                if ($updateStmt->error) {
-                    throw new Exception("Error in update operation: " . $updateStmt->error);
-                }
+
+                // Set action to update and get affected rows
+                $action = 'UPDATE';
+                $rowsAffected = $updateStmt->affected_rows;
+
+                // Save after state
+                $afterState = json_encode(['metaData' => $metaData, 'dataSource' => $dataSource]);
             } else {
                 // Insert new record
                 $insertQuery = "INSERT INTO `$tableName` (`roomNumber`, `metaData`, `dataSource`) VALUES (?, ?, ?)";
                 $insertStmt = $dbConnection->prepare($insertQuery);
                 if (!$insertStmt) {
-                    throw new Exception("Failed to prepare insert statement: " . $dbConnection->error);
+                    throw new Exception(" (".__FUNCTION__.") Failed to prepare insert statement: " . $dbConnection->error);
                 }
                 $insertStmt->bind_param("sss", $roomNumber, $metaData, $dataSource);
                 $insertStmt->execute();
-                if ($insertStmt->error) {
-                    throw new Exception("Error in insert operation: " . $insertStmt->error);
-                }
+
+                // Set action to insert and get affected rows
+                $action = 'INSERT';
+                $rowsAffected = $insertStmt->affected_rows;
+
+                // Save after state for insert
+                $afterState = json_encode(['roomNumber' => $roomNumber, 'metaData' => $metaData, 'dataSource' => $dataSource]);
             }
 
-            // Commit the transaction
+            // Log the action with record identifier and rows affected
+            $actionTimestamp = date('Y-m-d H:i:s');
+            $recordIdentifier = $existingRecord ? $existingRecord['id'] : 'N/A';
+            $actionLogMessage = "[{$actionTimestamp}] (" . __FUNCTION__ . ") ACTION: $action, Record: $recordIdentifier, Rows Affected: $rowsAffected, Before: $beforeState, After: $afterState" . PHP_EOL;
+            error_log($actionLogMessage, 3, $actionLogFile);
+
             $dbConnection->commit();
         } catch (Exception $e) {
             // Increment error counter
             $errorCount++;
 
-            // Rollback the transaction and log the error
             $dbConnection->rollback();
+
+            // Log the error
             $errorTimestamp = date('Y-m-d H:i:s');
-            $errorLogMessage = "[{$errorTimestamp}] Error in upsertReservationLibRoom: " . $e->getMessage() . PHP_EOL;
+            $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.")  " . $e->getMessage() . PHP_EOL;
             error_log($errorLogMessage, 3, $errorLogFile);
 
-            // Re-throw the exception for further handling
             throw $e;
         }
     }
 }
 
 
+
+
 function upsertReservationLibSource($data, $dbConnection, &$errorCount) {
-    // Define the error log file path
-    $errorLogFile = 'error_log.txt';
+    // Define the error log file path and action log file path
+    $errorLogFile = dirname(__FILE__) . '/error_log.txt';
+    $actionLogFile = dirname(__FILE__) . '/action_log.txt';
 
     $tableName = 'RESERVATIONlibSource';
 
@@ -170,46 +225,69 @@ function upsertReservationLibSource($data, $dbConnection, &$errorCount) {
 
                 $dbConnection->begin_transaction();
 
-                $checkQuery = "SELECT COUNT(*) FROM `$tableName` WHERE `sourceName` = ? AND `sourceType` = ?";
+                $checkQuery = "SELECT `id`, `dataSource`, `metaData` FROM `$tableName` WHERE `sourceName` = ? AND `sourceType` = ?";
                 $stmt = $dbConnection->prepare($checkQuery);
                 if (!$stmt) {
-                    throw new Exception("Failed to prepare statement: " . $dbConnection->error);
+                    throw new Exception(" (".__FUNCTION__.") Failed to prepare statement: " . $dbConnection->error);
                 }
 
                 $stmt->bind_param("ss", $sourceName, $sourceType);
                 $stmt->execute();
                 $result = $stmt->get_result();
-                $exists = $result->fetch_row()[0] > 0;
+                $existingRecord = $result->fetch_assoc();
 
-                if ($exists) {
+                // Initialize action variable
+                $action = '';
+                $rowsAffected = 0;
+                $beforeState = null;
+                $afterState = null;
+
+                if ($existingRecord) {
+                    // Save before state
+                    $beforeState = json_encode($existingRecord);
+
                     $updateQuery = "UPDATE `$tableName` SET `dataSource` = ?, `metaData` = ? WHERE `sourceName` = ? AND `sourceType` = ?";
                     $updateStmt = $dbConnection->prepare($updateQuery);
                     if (!$updateStmt) {
-                        throw new Exception("Failed to prepare update statement: " . $dbConnection->error);
+                        throw new Exception(" (".__FUNCTION__.") Failed to prepare update statement: " . $dbConnection->error);
                     }
 
                     $updateStmt->bind_param("ssss", $dataSource, $metaData, $sourceName, $sourceType);
                     $updateStmt->execute();
-                    if ($updateStmt->error) {
-                        throw new Exception("Error in update operation: " . $updateStmt->error);
-                    }
+
+                    // Set action to update and get affected rows
+                    $action = 'UPDATE';
+                    $rowsAffected = $updateStmt->affected_rows;
+
+                    // Save after state
+                    $afterState = json_encode(['dataSource' => $dataSource, 'metaData' => $metaData]);
                 } else {
                     $insertQuery = "INSERT INTO `$tableName` (`sourceName`, `sourceType`, `dataSource`, `metaData`) VALUES (?, ?, ?, ?)";
                     $insertStmt = $dbConnection->prepare($insertQuery);
                     if (!$insertStmt) {
-                        throw new Exception("Failed to prepare insert statement: " . $dbConnection->error);
+                        throw new Exception(" (".__FUNCTION__.") Failed to prepare insert statement: " . $dbConnection->error);
                     }
 
                     $insertStmt->bind_param("ssss", $sourceName, $sourceType, $dataSource, $metaData);
                     $insertStmt->execute();
-                    if ($insertStmt->error) {
-                        throw new Exception("Error in insert operation: " . $insertStmt->error);
-                    }
+
+                    // Set action to insert and get affected rows
+                    $action = 'INSERT';
+                    $rowsAffected = $insertStmt->affected_rows;
+
+                    // Save after state for insert
+                    $afterState = json_encode(['sourceName' => $sourceName, 'sourceType' => $sourceType, 'dataSource' => $dataSource, 'metaData' => $metaData]);
                 }
+
+                // Log the action with record identifier and rows affected
+                $actionTimestamp = date('Y-m-d H:i:s');
+                $recordIdentifier = $existingRecord ? $existingRecord['id'] : 'N/A';
+                $actionLogMessage = "[{$actionTimestamp}] (" . __FUNCTION__ . ") ACTION: $action, Record: $recordIdentifier, Rows Affected: $rowsAffected, Before: $beforeState, After: $afterState" . PHP_EOL;
+                error_log($actionLogMessage, 3, $actionLogFile);
 
                 $dbConnection->commit();
             } else {
-                throw new Exception("Invalid data structure.");
+                throw new Exception(" (".__FUNCTION__.") Invalid data structure.");
             }
         } catch (Exception $e) {
             // Increment error counter
@@ -219,7 +297,7 @@ function upsertReservationLibSource($data, $dbConnection, &$errorCount) {
 
             // Log the error
             $errorTimestamp = date('Y-m-d H:i:s');
-            $errorLogMessage = "[{$errorTimestamp}] Error in upsertReservationLibSource: " . $e->getMessage() . PHP_EOL;
+            $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.")  " . $e->getMessage() . PHP_EOL;
             error_log($errorLogMessage, 3, $errorLogFile);
 
             throw $e;
@@ -229,9 +307,12 @@ function upsertReservationLibSource($data, $dbConnection, &$errorCount) {
 
 
 
+
 function upsertReservationLibProperty($data, $dbConnection, &$errorCount) {
     $tableName = 'RESERVATIONlibProperty';
-    $errorLogFile = 'error_log.txt'; // Define the error log file path
+    // Define the error log file path and action log file path
+    $errorLogFile = dirname(__FILE__) . '/error_log.txt';
+    $actionLogFile = dirname(__FILE__) . '/action_log.txt';
 
     foreach ($data as $record) {
         try {
@@ -242,42 +323,65 @@ function upsertReservationLibProperty($data, $dbConnection, &$errorCount) {
 
             $dbConnection->begin_transaction();
 
-            $checkQuery = "SELECT COUNT(*) FROM `$tableName` WHERE `propertyCode` = ? AND `chainCode` = ?";
+            $checkQuery = "SELECT `id`, `dataSource`, `metaData` FROM `$tableName` WHERE `propertyCode` = ? AND `chainCode` = ?";
             $stmt = $dbConnection->prepare($checkQuery);
             if (!$stmt) {
-                throw new Exception("Failed to prepare statement: " . $dbConnection->error);
+                throw new Exception(" (".__FUNCTION__.") Failed to prepare statement: " . $dbConnection->error);
             }
 
             $stmt->bind_param("ss", $propertyCode, $chainCode);
             $stmt->execute();
             $result = $stmt->get_result();
-            $exists = $result->fetch_row()[0] > 0;
+            $existingRecord = $result->fetch_assoc();
 
-            if ($exists) {
+            // Initialize action variable
+            $action = '';
+            $rowsAffected = 0;
+            $beforeState = null;
+            $afterState = null;
+
+            if ($existingRecord) {
+                // Save before state
+                $beforeState = json_encode($existingRecord);
+
                 $updateQuery = "UPDATE `$tableName` SET `dataSource` = ?, `metaData` = ? WHERE `propertyCode` = ? AND `chainCode` = ?";
                 $updateStmt = $dbConnection->prepare($updateQuery);
                 if (!$updateStmt) {
-                    throw new Exception("Failed to prepare update statement: " . $dbConnection->error);
+                    throw new Exception(" (".__FUNCTION__.") Failed to prepare update statement: " . $dbConnection->error);
                 }
 
                 $updateStmt->bind_param("ssss", $dataSource, $metaData, $propertyCode, $chainCode);
                 $updateStmt->execute();
-                if ($updateStmt->error) {
-                    throw new Exception("Error in update operation: " . $updateStmt->error);
-                }
+
+                // Set action to update and get affected rows
+                $action = 'UPDATE';
+                $rowsAffected = $updateStmt->affected_rows;
+
+                // Save after state
+                $afterState = json_encode(['dataSource' => $dataSource, 'metaData' => $metaData]);
             } else {
                 $insertQuery = "INSERT INTO `$tableName` (`propertyCode`, `chainCode`, `dataSource`, `metaData`) VALUES (?, ?, ?, ?)";
                 $insertStmt = $dbConnection->prepare($insertQuery);
                 if (!$insertStmt) {
-                    throw new Exception("Failed to prepare insert statement: " . $dbConnection->error);
+                    throw new Exception(" (".__FUNCTION__.") Failed to prepare insert statement: " . $dbConnection->error);
                 }
 
                 $insertStmt->bind_param("ssss", $propertyCode, $chainCode, $dataSource, $metaData);
                 $insertStmt->execute();
-                if ($insertStmt->error) {
-                    throw new Exception("Error in insert operation: " . $insertStmt->error);
-                }
+
+                // Set action to insert and get affected rows
+                $action = 'INSERT';
+                $rowsAffected = $insertStmt->affected_rows;
+
+                // Save after state for insert
+                $afterState = json_encode(['propertyCode' => $propertyCode, 'chainCode' => $chainCode, 'dataSource' => $dataSource, 'metaData' => $metaData]);
             }
+
+            // Log the action with record identifier and rows affected
+            $actionTimestamp = date('Y-m-d H:i:s');
+            $recordIdentifier = $existingRecord ? $existingRecord['id'] : 'N/A';
+            $actionLogMessage = "[{$actionTimestamp}] (" . __FUNCTION__ . ") ACTION: $action, Record: $recordIdentifier, Rows Affected: $rowsAffected, Before: $beforeState, After: $afterState" . PHP_EOL;
+            error_log($actionLogMessage, 3, $actionLogFile);
 
             $dbConnection->commit();
 
@@ -289,7 +393,7 @@ function upsertReservationLibProperty($data, $dbConnection, &$errorCount) {
 
             // Log the error
             $errorTimestamp = date('Y-m-d H:i:s');
-            $errorLogMessage = "[{$errorTimestamp}] Error in upsertReservationLibProperty: " . $e->getMessage() . PHP_EOL;
+            $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.")  " . $e->getMessage() . PHP_EOL;
             error_log($errorLogMessage, 3, $errorLogFile);
 
             throw $e;
@@ -298,9 +402,12 @@ function upsertReservationLibProperty($data, $dbConnection, &$errorCount) {
 }
 
 
+
 function upsertCustomerLibLoyaltyProgram($data, $dbConnection, &$errorCount) {
     $tableName = 'CUSTOMERlibLoyaltyProgram';
-    $errorLogFile = 'error_log.txt'; // Define the error log file path
+    // Define the error log file path and action log file path
+    $errorLogFile = dirname(__FILE__) . '/error_log.txt';
+    $actionLogFile = dirname(__FILE__) . '/action_log.txt';
 
     foreach ($data as $element) {
         try {
@@ -314,47 +421,69 @@ function upsertCustomerLibLoyaltyProgram($data, $dbConnection, &$errorCount) {
 
                 $dbConnection->begin_transaction();
 
-                $checkQuery = "SELECT COUNT(*) FROM `$tableName` WHERE `name` = ? AND `source` = ?";
+                $checkQuery = "SELECT `id`, `metaData`, `dataSource` FROM `$tableName` WHERE `name` = ? AND `source` = ?";
                 $stmt = $dbConnection->prepare($checkQuery);
                 if (!$stmt) {
-                    throw new Exception("Failed to prepare statement: " . $dbConnection->error);
+                    throw new Exception(" (".__FUNCTION__.") Failed to prepare statement: " . $dbConnection->error);
                 }
 
                 $stmt->bind_param("ss", $name, $source);
                 $stmt->execute();
                 $result = $stmt->get_result();
-                $exists = $result->fetch_row()[0] > 0;
+                $existingRecord = $result->fetch_assoc();
 
-                if ($exists) {
+                // Initialize action variable
+                $action = '';
+                $rowsAffected = 0;
+                $beforeState = null;
+                $afterState = null;
+
+                if ($existingRecord) {
+                    // Save before state
+                    $beforeState = json_encode($existingRecord);
+
                     $updateQuery = "UPDATE `$tableName` SET `metaData` = ?, `dataSource` = ? WHERE `name` = ? AND `source` = ?";
                     $updateStmt = $dbConnection->prepare($updateQuery);
                     if (!$updateStmt) {
-                        throw new Exception("Failed to prepare update statement: " . $dbConnection->error);
+                        throw new Exception(" (".__FUNCTION__.") Failed to prepare update statement: " . $dbConnection->error);
                     }
 
                     $updateStmt->bind_param("ssss", $metaData, $dataSource, $name, $source);
                     $updateStmt->execute();
-                    if ($updateStmt->error) {
-                        throw new Exception("Error in update operation: " . $updateStmt->error);
-                    }
+
+                    // Set action to update and get affected rows
+                    $action = 'UPDATE';
+                    $rowsAffected = $updateStmt->affected_rows;
+
+                    // Save after state
+                    $afterState = json_encode(['metaData' => $metaData, 'dataSource' => $dataSource]);
                 } else {
                     $insertQuery = "INSERT INTO `$tableName` (`name`, `source`, `dataSource`, `metaData`) VALUES (?, ?, ?, ?)";
                     $insertStmt = $dbConnection->prepare($insertQuery);
                     if (!$insertStmt) {
-                        throw new Exception("Failed to prepare insert statement: " . $dbConnection->error);
+                        throw new Exception(" (".__FUNCTION__.") Failed to prepare insert statement: " . $dbConnection->error);
                     }
 
                     $insertStmt->bind_param("ssss", $name, $source, $dataSource, $metaData);
                     $insertStmt->execute();
-                    if ($insertStmt->error) {
-                        throw new Exception("Error in insert operation: " . $insertStmt->error);
-                    }
+
+                    // Set action to insert and get affected rows
+                    $action = 'INSERT';
+                    $rowsAffected = $insertStmt->affected_rows;
+
+                    // Save after state for insert
+                    $afterState = json_encode(['name' => $name, 'source' => $source, 'dataSource' => $dataSource, 'metaData' => $metaData]);
                 }
 
-                $dbConnection->commit();
+                // Log the action with record identifier and rows affected
+                $actionTimestamp = date('Y-m-d H:i:s');
+                $recordIdentifier = $existingRecord ? $existingRecord['id'] : 'N/A'; // Use 'N/A' for new records
+                $actionLogMessage = "[{$actionTimestamp}] (" . __FUNCTION__ . ") ACTION: $action, Record: $recordIdentifier, Rows Affected: $rowsAffected, Before: $beforeState, After: $afterState" . PHP_EOL;
+                error_log($actionLogMessage, 3, $actionLogFile);
 
+                $dbConnection->commit();
             } else {
-                throw new Exception("Invalid data structure.");
+                throw new Exception(" (".__FUNCTION__.") Invalid data structure.");
             }
         } catch (Exception $e) {
             // Increment error counter
@@ -364,7 +493,7 @@ function upsertCustomerLibLoyaltyProgram($data, $dbConnection, &$errorCount) {
 
             // Log the error
             $errorTimestamp = date('Y-m-d H:i:s');
-            $errorLogMessage = "[{$errorTimestamp}] Error in upsertCustomerLibLoyaltyProgram: " . $e->getMessage() . PHP_EOL;
+            $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") " . $e->getMessage() . PHP_EOL;
             error_log($errorLogMessage, 3, $errorLogFile);
 
             throw $e;
@@ -373,9 +502,12 @@ function upsertCustomerLibLoyaltyProgram($data, $dbConnection, &$errorCount) {
 }
 
 
+
 function upsertServicesLibTender($data, $dbConnection, &$errorCount) {
     $tableName = 'SERVICESlibTender';
-    $errorLogFile = 'error_log.txt'; // Define the error log file path
+    // Define the error log file path and action log file path
+    $errorLogFile = dirname(__FILE__) . '/error_log.txt';
+    $actionLogFile = dirname(__FILE__) . '/action_log.txt';
 
     foreach ($data as $record) {
         try {
@@ -385,7 +517,7 @@ function upsertServicesLibTender($data, $dbConnection, &$errorCount) {
 
             $dbConnection->begin_transaction();
 
-            $checkQuery = "SELECT COUNT(*) FROM `$tableName` WHERE `paymentMethod` = ?";
+            $checkQuery = "SELECT `id`, `dataSource`, `metaData` FROM `$tableName` WHERE `paymentMethod` = ?";
             $stmt = $dbConnection->prepare($checkQuery);
             if (!$stmt) {
                 throw new Exception("Failed to prepare statement: " . $dbConnection->error);
@@ -394,33 +526,56 @@ function upsertServicesLibTender($data, $dbConnection, &$errorCount) {
             $stmt->bind_param("s", $paymentMethod);
             $stmt->execute();
             $result = $stmt->get_result();
-            $exists = $result->fetch_row()[0] > 0;
+            $existingRecord = $result->fetch_assoc();
 
-            if ($exists) {
+            // Initialize action variable
+            $action = '';
+            $rowsAffected = 0;
+            $beforeState = null;
+            $afterState = null;
+
+            if ($existingRecord) {
+                // Save before state
+                $beforeState = json_encode($existingRecord);
+
                 $updateQuery = "UPDATE `$tableName` SET `dataSource` = ?, `metaData` = ? WHERE `paymentMethod` = ?";
                 $updateStmt = $dbConnection->prepare($updateQuery);
                 if (!$updateStmt) {
-                    throw new Exception("Failed to prepare update statement: " . $dbConnection->error);
+                    throw new Exception("(".__FUNCTION__.") Failed to prepare update statement: " . $dbConnection->error);
                 }
 
                 $updateStmt->bind_param("sss", $dataSource, $metaData, $paymentMethod);
                 $updateStmt->execute();
-                if ($updateStmt->error) {
-                    throw new Exception("Error in update operation: " . $updateStmt->error);
-                }
+
+                // Set action to update and get affected rows
+                $action = 'UPDATE';
+                $rowsAffected = $updateStmt->affected_rows;
+
+                // Save after state
+                $afterState = json_encode(['dataSource' => $dataSource, 'metaData' => $metaData]);
             } else {
                 $insertQuery = "INSERT INTO `$tableName` (`paymentMethod`, `dataSource`, `metaData`) VALUES (?, ?, ?)";
                 $insertStmt = $dbConnection->prepare($insertQuery);
                 if (!$insertStmt) {
-                    throw new Exception("Failed to prepare insert statement: " . $dbConnection->error);
+                    throw new Exception("(".__FUNCTION__.") Failed to prepare insert statement: " . $dbConnection->error);
                 }
 
                 $insertStmt->bind_param("sss", $paymentMethod, $dataSource, $metaData);
                 $insertStmt->execute();
-                if ($insertStmt->error) {
-                    throw new Exception("Error in insert operation: " . $insertStmt->error);
-                }
+
+                // Set action to insert and get affected rows
+                $action = 'INSERT';
+                $rowsAffected = $insertStmt->affected_rows;
+
+                // Save after state for insert
+                $afterState = json_encode(['paymentMethod' => $paymentMethod, 'dataSource' => $dataSource, 'metaData' => $metaData]);
             }
+
+            // Log the action with record identifier and rows affected
+            $actionTimestamp = date('Y-m-d H:i:s');
+            $recordIdentifier = $existingRecord ? $existingRecord['id'] : 'N/A'; // Use 'N/A' for new records
+            $actionLogMessage = "[{$actionTimestamp}] (" . __FUNCTION__ . ") ACTION: $action, Record: $recordIdentifier, Rows Affected: $rowsAffected, Before: $beforeState, After: $afterState" . PHP_EOL;
+            error_log($actionLogMessage, 3, $actionLogFile);
 
             $dbConnection->commit();
 
@@ -432,7 +587,7 @@ function upsertServicesLibTender($data, $dbConnection, &$errorCount) {
 
             // Log the error
             $errorTimestamp = date('Y-m-d H:i:s');
-            $errorLogMessage = "[{$errorTimestamp}] Error in upsertServicesLibTender: " . $e->getMessage() . PHP_EOL;
+            $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") " . $e->getMessage() . PHP_EOL;
             error_log($errorLogMessage, 3, $errorLogFile);
 
             throw $e;
@@ -441,9 +596,12 @@ function upsertServicesLibTender($data, $dbConnection, &$errorCount) {
 }
 
 
+
 function upsertServicesLibServiceItems($data, $dbConnection, &$errorCount) {
     $tableName = 'SERVICESlibServiceItems';
-    $errorLogFile = 'error_log.txt'; // Define the error log file path
+    // Define the error log file path and action log file path
+    $errorLogFile = dirname(__FILE__) . '/error_log.txt';
+    $actionLogFile = dirname(__FILE__) . '/action_log.txt';
 
     foreach ($data as $record) {
         try {
@@ -455,42 +613,65 @@ function upsertServicesLibServiceItems($data, $dbConnection, &$errorCount) {
 
             $dbConnection->begin_transaction();
 
-            $checkQuery = "SELECT COUNT(*) FROM `$tableName` WHERE `itemName` = ? AND `itemCode` = ? AND `ratePlanCode` = ?";
+            $checkQuery = "SELECT `id`, `dataSource`, `metaData` FROM `$tableName` WHERE `itemName` = ? AND `itemCode` = ? AND `ratePlanCode` = ?";
             $stmt = $dbConnection->prepare($checkQuery);
             if (!$stmt) {
-                throw new Exception("Failed to prepare statement: " . $dbConnection->error);
+                throw new Exception("(".__FUNCTION__.") Failed to prepare statement: " . $dbConnection->error);
             }
 
             $stmt->bind_param("sss", $itemName, $itemCode, $ratePlanCode);
             $stmt->execute();
             $result = $stmt->get_result();
-            $exists = $result->fetch_row()[0] > 0;
+            $existingRecord = $result->fetch_assoc();
 
-            if ($exists) {
+            // Initialize action variable
+            $action = '';
+            $rowsAffected = 0;
+            $beforeState = null;
+            $afterState = null;
+
+            if ($existingRecord) {
+                // Save before state
+                $beforeState = json_encode($existingRecord);
+
                 $updateQuery = "UPDATE `$tableName` SET `dataSource` = ?, `metaData` = ? WHERE `itemName` = ? AND `itemCode` = ? AND `ratePlanCode` = ?";
                 $updateStmt = $dbConnection->prepare($updateQuery);
                 if (!$updateStmt) {
-                    throw new Exception("Failed to prepare update statement: " . $dbConnection->error);
+                    throw new Exception("(".__FUNCTION__.") Failed to prepare update statement: " . $dbConnection->error);
                 }
 
                 $updateStmt->bind_param("sssss", $dataSource, $metaData, $itemName, $itemCode, $ratePlanCode);
                 $updateStmt->execute();
-                if ($updateStmt->error) {
-                    throw new Exception("Error in update operation: " . $updateStmt->error);
-                }
+
+                // Set action to update and get affected rows
+                $action = 'UPDATE';
+                $rowsAffected = $updateStmt->affected_rows;
+
+                // Save after state
+                $afterState = json_encode(['dataSource' => $dataSource, 'metaData' => $metaData]);
             } else {
                 $insertQuery = "INSERT INTO `$tableName` (`itemName`, `itemCode`, `ratePlanCode`, `dataSource`, `metaData`) VALUES (?, ?, ?, ?, ?)";
                 $insertStmt = $dbConnection->prepare($insertQuery);
                 if (!$insertStmt) {
-                    throw new Exception("Failed to prepare insert statement: " . $dbConnection->error);
+                    throw new Exception("(".__FUNCTION__.") Failed to prepare insert statement: " . $dbConnection->error);
                 }
 
                 $insertStmt->bind_param("sssss", $itemName, $itemCode, $ratePlanCode, $dataSource, $metaData);
                 $insertStmt->execute();
-                if ($insertStmt->error) {
-                    throw new Exception("Error in insert operation: " . $insertStmt->error);
-                }
+
+                // Set action to insert and get affected rows
+                $action = 'INSERT';
+                $rowsAffected = $insertStmt->affected_rows;
+
+                // Save after state for insert
+                $afterState = json_encode(['itemName' => $itemName, 'itemCode' => $itemCode, 'ratePlanCode' => $ratePlanCode, 'dataSource' => $dataSource, 'metaData' => $metaData]);
             }
+
+            // Log the action with record identifier and rows affected
+            $actionTimestamp = date('Y-m-d H:i:s');
+            $recordIdentifier = $existingRecord ? $existingRecord['id'] : 'N/A'; // Use 'N/A' for new records
+            $actionLogMessage = "[{$actionTimestamp}] (" . __FUNCTION__ . ") ACTION: $action, Record: $recordIdentifier, Rows Affected: $rowsAffected, Before: $beforeState, After: $afterState" . PHP_EOL;
+            error_log($actionLogMessage, 3, $actionLogFile);
 
             $dbConnection->commit();
 
@@ -502,13 +683,14 @@ function upsertServicesLibServiceItems($data, $dbConnection, &$errorCount) {
 
             // Log the error
             $errorTimestamp = date('Y-m-d H:i:s');
-            $errorLogMessage = "[{$errorTimestamp}] Error in upsertServicesLibServiceItems: " . $e->getMessage() . PHP_EOL;
+            $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") " . $e->getMessage() . PHP_EOL;
             error_log($errorLogMessage, 3, $errorLogFile);
 
             throw $e;
         }
     }
 }
+
 
 
 //function upsertServicesLibFolioOrdersType($data, $dbConnection, &$errorCount) {
@@ -591,7 +773,9 @@ function upsertServicesLibServiceItems($data, $dbConnection, &$errorCount) {
 
 function upsertReservationGroup($data, $dbConnection, &$errorCount) {
     $tableName = 'RESERVATIONgroup';
-    $errorLogFile = 'error_log.txt'; // Define the error log file path
+    // Define the error log file path and action log file path
+    $errorLogFile = dirname(__FILE__) . '/error_log.txt';
+    $actionLogFile = dirname(__FILE__) . '/action_log.txt';
 
     foreach ($data as $element) {
         try {
@@ -610,44 +794,67 @@ function upsertReservationGroup($data, $dbConnection, &$errorCount) {
 
                 $dbConnection->begin_transaction();
 
-                $stmt = $dbConnection->prepare("SELECT `id` FROM `$tableName` WHERE `groupName` = ? AND `groupNumber` = ? AND (`groupStartDate` = ? OR `groupStartDate` IS NULL) AND (`groupEndDate` = ? OR `groupEndDate` IS NULL)");
+                $stmt = $dbConnection->prepare("SELECT `id`, `metaData`, `dataSource` FROM `$tableName` WHERE `groupName` = ? AND `groupNumber` = ? AND (`groupStartDate` = ? OR `groupStartDate` IS NULL) AND (`groupEndDate` = ? OR `groupEndDate` IS NULL)");
                 if (!$stmt) {
-                    throw new Exception("Failed to prepare statement: " . $dbConnection->error);
+                    throw new Exception("(".__FUNCTION__.") Failed to prepare statement: " . $dbConnection->error);
                 }
 
                 $stmt->bind_param("ssss", $groupName, $groupNumber, $groupStartDate, $groupEndDate);
                 $stmt->execute();
                 $result = $stmt->get_result();
-                $exists = $result->fetch_assoc();
+                $existingRecord = $result->fetch_assoc();
 
-                if ($exists) {
+                // Initialize action variable
+                $action = '';
+                $rowsAffected = 0;
+                $beforeState = null;
+                $afterState = null;
+
+                if ($existingRecord) {
+                    // Save before state
+                    $beforeState = json_encode($existingRecord);
+
                     $updateStmt = $dbConnection->prepare("UPDATE `$tableName` SET `metaData` = ?, `dataSource` = ? WHERE `groupName` = ? AND `groupNumber` = ? AND (`groupStartDate` = ? OR `groupStartDate` IS NULL) AND (`groupEndDate` = ? OR `groupEndDate` IS NULL)");
                     if (!$updateStmt) {
-                        throw new Exception("Failed to prepare update statement: " . $dbConnection->error);
+                        throw new Exception("(".__FUNCTION__.") Failed to prepare update statement: " . $dbConnection->error);
                     }
 
                     $updateStmt->bind_param("ssssss", $metaData, $dataSource, $groupName, $groupNumber, $groupStartDate, $groupEndDate);
                     $updateStmt->execute();
-                    if ($updateStmt->error) {
-                        throw new Exception("Error in update operation: " . $updateStmt->error);
-                    }
+
+                    // Set action to update and get affected rows
+                    $action = 'UPDATE';
+                    $rowsAffected = $updateStmt->affected_rows;
+
+                    // Save after state
+                    $afterState = json_encode(['metaData' => $metaData, 'dataSource' => $dataSource]);
                 } else {
                     $insertStmt = $dbConnection->prepare("INSERT INTO `$tableName` (`groupName`, `groupNumber`, `groupStartDate`, `groupEndDate`, `dataSource`, `metaData`) VALUES (?, ?, ?, ?, ?, ?)");
                     if (!$insertStmt) {
-                        throw new Exception("Failed to prepare insert statement: " . $dbConnection->error);
+                        throw new Exception("(".__FUNCTION__.") Failed to prepare insert statement: " . $dbConnection->error);
                     }
 
                     $insertStmt->bind_param("ssssss", $groupName, $groupNumber, $groupStartDate, $groupEndDate, $dataSource, $metaData);
                     $insertStmt->execute();
-                    if ($insertStmt->error) {
-                        throw new Exception("Error in insert operation: " . $insertStmt->error);
-                    }
+
+                    // Set action to insert and get affected rows
+                    $action = 'INSERT';
+                    $rowsAffected = $insertStmt->affected_rows;
+
+                    // Save after state for insert
+                    $afterState = json_encode(['groupName' => $groupName, 'groupNumber' => $groupNumber, 'groupStartDate' => $groupStartDate, 'groupEndDate' => $groupEndDate, 'dataSource' => $dataSource, 'metaData' => $metaData]);
                 }
+
+                // Log the action with record identifier and rows affected
+                $actionTimestamp = date('Y-m-d H:i:s');
+                $recordIdentifier = $existingRecord ? $existingRecord['id'] : 'N/A'; // Use 'N/A' for new records
+                $actionLogMessage = "[{$actionTimestamp}] (" . __FUNCTION__ . ") ACTION: $action, Record: $recordIdentifier, Rows Affected: $rowsAffected, Before: $beforeState, After: $afterState" . PHP_EOL;
+                error_log($actionLogMessage, 3, $actionLogFile);
 
                 $dbConnection->commit();
 
             } else {
-                throw new Exception("Invalid data structure.");
+                throw new Exception("(".__FUNCTION__.") Invalid data structure.");
             }
         } catch (Exception $e) {
             // Increment error counter
@@ -657,7 +864,7 @@ function upsertReservationGroup($data, $dbConnection, &$errorCount) {
 
             // Log the error
             $errorTimestamp = date('Y-m-d H:i:s');
-            $errorLogMessage = "[{$errorTimestamp}] Error in upsertReservationGroup: " . $e->getMessage() . PHP_EOL;
+            $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.")  " . $e->getMessage() . PHP_EOL;
             error_log($errorLogMessage, 3, $errorLogFile);
 
             throw $e;
@@ -667,9 +874,12 @@ function upsertReservationGroup($data, $dbConnection, &$errorCount) {
 
 
 
+
 function upsertReservationLibStayStatus($data, $dbConnection, &$errorCount) {
     $tableName = 'RESERVATIONlibStayStatus';
-    $errorLogFile = 'error_log.txt'; // Define the error log file path
+    // Define the error log file path and action log file path
+    $errorLogFile = dirname(__FILE__) . '/error_log.txt';
+    $actionLogFile = dirname(__FILE__) . '/action_log.txt';
 
     foreach ($data as $element) {
         try {
@@ -683,48 +893,70 @@ function upsertReservationLibStayStatus($data, $dbConnection, &$errorCount) {
                 $dbConnection->begin_transaction();
 
                 // Check if a record with this status name already exists
-                $checkQuery = "SELECT COUNT(*) FROM `$tableName` WHERE `statusName` = ?";
+                $checkQuery = "SELECT `id`, `dataSource`, `metaData` FROM `$tableName` WHERE `statusName` = ?";
                 $stmt = $dbConnection->prepare($checkQuery);
                 if (!$stmt) {
-                    throw new Exception("Failed to prepare statement: " . $dbConnection->error);
+                    throw new Exception("(".__FUNCTION__.") Failed to prepare statement: " . $dbConnection->error);
                 }
 
                 $stmt->bind_param("s", $statusName);
                 $stmt->execute();
                 $result = $stmt->get_result();
-                $exists = $result->fetch_row()[0] > 0;
+                $existingRecord = $result->fetch_assoc();
 
-                // Upsert query
-                if ($exists) {
+                // Initialize action variable
+                $action = '';
+                $rowsAffected = 0;
+                $beforeState = null;
+                $afterState = null;
+
+                if ($existingRecord) {
+                    // Save before state
+                    $beforeState = json_encode($existingRecord);
+
                     $updateQuery = "UPDATE `$tableName` SET `dataSource` = ?, `metaData` = ? WHERE `statusName` = ?";
                     $updateStmt = $dbConnection->prepare($updateQuery);
                     if (!$updateStmt) {
-                        throw new Exception("Failed to prepare update statement: " . $dbConnection->error);
+                        throw new Exception("(".__FUNCTION__.") Failed to prepare update statement: " . $dbConnection->error);
                     }
 
                     $updateStmt->bind_param("sss", $dataSource, $metaData, $statusName);
                     $updateStmt->execute();
-                    if ($updateStmt->error) {
-                        throw new Exception("Error in update operation: " . $updateStmt->error);
-                    }
+
+                    // Set action to update and get affected rows
+                    $action = 'UPDATE';
+                    $rowsAffected = $updateStmt->affected_rows;
+
+                    // Save after state
+                    $afterState = json_encode(['dataSource' => $dataSource, 'metaData' => $metaData]);
                 } else {
                     $insertQuery = "INSERT INTO `$tableName` (`statusName`, `dataSource`, `metaData`) VALUES (?, ?, ?)";
                     $insertStmt = $dbConnection->prepare($insertQuery);
                     if (!$insertStmt) {
-                        throw new Exception("Failed to prepare insert statement: " . $dbConnection->error);
+                        throw new Exception("(".__FUNCTION__.") Failed to prepare insert statement: " . $dbConnection->error);
                     }
 
                     $insertStmt->bind_param("sss", $statusName, $dataSource, $metaData);
                     $insertStmt->execute();
-                    if ($insertStmt->error) {
-                        throw new Exception("Error in insert operation: " . $insertStmt->error);
-                    }
+
+                    // Set action to insert and get affected rows
+                    $action = 'INSERT';
+                    $rowsAffected = $insertStmt->affected_rows;
+
+                    // Save after state for insert
+                    $afterState = json_encode(['statusName' => $statusName, 'dataSource' => $dataSource, 'metaData' => $metaData]);
                 }
+
+                // Log the action with record identifier and rows affected
+                $actionTimestamp = date('Y-m-d H:i:s');
+                $recordIdentifier = $existingRecord ? $existingRecord['id'] : 'N/A'; // Use 'N/A' for new records
+                $actionLogMessage = "[{$actionTimestamp}] (" . __FUNCTION__ . ") ACTION: $action, Record: $recordIdentifier, Rows Affected: $rowsAffected, Before: $beforeState, After: $afterState" . PHP_EOL;
+                error_log($actionLogMessage, 3, $actionLogFile);
 
                 $dbConnection->commit();
 
             } else {
-                throw new Exception("Invalid data structure.");
+                throw new Exception("(".__FUNCTION__.") Invalid data structure.");
             }
         } catch (Exception $e) {
             // Increment error counter
@@ -734,7 +966,7 @@ function upsertReservationLibStayStatus($data, $dbConnection, &$errorCount) {
 
             // Log the error
             $errorTimestamp = date('Y-m-d H:i:s');
-            $errorLogMessage = "[{$errorTimestamp}] Error in upsertReservationLibStayStatus: " . $e->getMessage() . PHP_EOL;
+            $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.")  " . $e->getMessage() . PHP_EOL;
             error_log($errorLogMessage, 3, $errorLogFile);
 
             throw $e;
@@ -743,9 +975,12 @@ function upsertReservationLibStayStatus($data, $dbConnection, &$errorCount) {
 }
 
 
+
 function upsertReservationLibRoomType($data, $dbConnection, &$errorCount) {
     $tableName = 'RESERVATIONlibRoomType';
-    $errorLogFile = 'error_log.txt'; // Define the error log file path
+    // Define the error log file path and action log file path
+    $errorLogFile = dirname(__FILE__) . '/error_log.txt';
+    $actionLogFile = dirname(__FILE__) . '/action_log.txt';
 
     foreach ($data as $element) {
         try {
@@ -760,48 +995,70 @@ function upsertReservationLibRoomType($data, $dbConnection, &$errorCount) {
                 $dbConnection->begin_transaction();
 
                 // Check if a record with this combination already exists
-                $checkQuery = "SELECT `id` FROM `$tableName` WHERE `typeName` = ? AND `typeCode` = ?";
+                $checkQuery = "SELECT `id`, `dataSource`, `metaData` FROM `$tableName` WHERE `typeName` = ? AND `typeCode` = ?";
                 $stmt = $dbConnection->prepare($checkQuery);
                 if (!$stmt) {
-                    throw new Exception("Failed to prepare statement: " . $dbConnection->error);
+                    throw new Exception("(".__FUNCTION__.") Failed to prepare statement: " . $dbConnection->error);
                 }
 
                 $stmt->bind_param("ss", $typeName, $typeCode);
                 $stmt->execute();
                 $result = $stmt->get_result();
-                $exists = $result->fetch_assoc();
+                $existingRecord = $result->fetch_assoc();
 
-                // Upsert query
-                if ($exists) {
+                // Initialize action variable
+                $action = '';
+                $rowsAffected = 0;
+                $beforeState = null;
+                $afterState = null;
+
+                if ($existingRecord) {
+                    // Save before state
+                    $beforeState = json_encode($existingRecord);
+
                     $updateQuery = "UPDATE `$tableName` SET `dataSource` = ?, `metaData` = ? WHERE `typeName` = ? AND `typeCode` = ?";
                     $updateStmt = $dbConnection->prepare($updateQuery);
                     if (!$updateStmt) {
-                        throw new Exception("Failed to prepare update statement: " . $dbConnection->error);
+                        throw new Exception("(".__FUNCTION__.") Failed to prepare update statement: " . $dbConnection->error);
                     }
 
                     $updateStmt->bind_param("ssss", $dataSource, $metaData, $typeName, $typeCode);
                     $updateStmt->execute();
-                    if ($updateStmt->error) {
-                        throw new Exception("Error in update operation: " . $updateStmt->error);
-                    }
+
+                    // Set action to update and get affected rows
+                    $action = 'UPDATE';
+                    $rowsAffected = $updateStmt->affected_rows;
+
+                    // Save after state
+                    $afterState = json_encode(['dataSource' => $dataSource, 'metaData' => $metaData]);
                 } else {
                     $insertQuery = "INSERT INTO `$tableName` (`typeName`, `typeCode`, `dataSource`, `metaData`) VALUES (?, ?, ?, ?)";
                     $insertStmt = $dbConnection->prepare($insertQuery);
                     if (!$insertStmt) {
-                        throw new Exception("Failed to prepare insert statement: " . $dbConnection->error);
+                        throw new Exception("(".__FUNCTION__.") Failed to prepare insert statement: " . $dbConnection->error);
                     }
 
                     $insertStmt->bind_param("ssss", $typeName, $typeCode, $dataSource, $metaData);
                     $insertStmt->execute();
-                    if ($insertStmt->error) {
-                        throw new Exception("Error in insert operation: " . $insertStmt->error);
-                    }
+
+                    // Set action to insert and get affected rows
+                    $action = 'INSERT';
+                    $rowsAffected = $insertStmt->affected_rows;
+
+                    // Save after state for insert
+                    $afterState = json_encode(['typeName' => $typeName, 'typeCode' => $typeCode, 'dataSource' => $dataSource, 'metaData' => $metaData]);
                 }
+
+                // Log the action with record identifier and rows affected
+                $actionTimestamp = date('Y-m-d H:i:s');
+                $recordIdentifier = $existingRecord ? $existingRecord['id'] : 'N/A'; // Use 'N/A' for new records
+                $actionLogMessage = "[{$actionTimestamp}] (" . __FUNCTION__ . ") ACTION: $action, Record: $recordIdentifier, Rows Affected: $rowsAffected, Before: $beforeState, After: $afterState" . PHP_EOL;
+                error_log($actionLogMessage, 3, $actionLogFile);
 
                 $dbConnection->commit();
 
             } else {
-                throw new Exception("Invalid data structure.");
+                throw new Exception("(".__FUNCTION__.") Invalid data structure.");
             }
         } catch (Exception $e) {
             // Increment error counter
@@ -811,7 +1068,7 @@ function upsertReservationLibRoomType($data, $dbConnection, &$errorCount) {
 
             // Log the error
             $errorTimestamp = date('Y-m-d H:i:s');
-            $errorLogMessage = "[{$errorTimestamp}] Error in upsertReservationLibRoomType: " . $e->getMessage() . PHP_EOL;
+            $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") " . $e->getMessage() . PHP_EOL;
             error_log($errorLogMessage, 3, $errorLogFile);
 
             throw $e;
@@ -820,9 +1077,12 @@ function upsertReservationLibRoomType($data, $dbConnection, &$errorCount) {
 }
 
 
+
 function upsertReservationLibRoomClass($data, $dbConnection, &$errorCount) {
     $tableName = 'RESERVATIONlibRoomClass';
-    $errorLogFile = 'error_log.txt'; // Define the error log file path
+    // Define the error log file path and action log file path
+    $errorLogFile = dirname(__FILE__) . '/error_log.txt';
+    $actionLogFile = dirname(__FILE__) . '/action_log.txt';
 
     foreach ($data as $element) {
         try {
@@ -836,30 +1096,42 @@ function upsertReservationLibRoomClass($data, $dbConnection, &$errorCount) {
                 $dbConnection->begin_transaction();
 
                 // Check if a record with this class name already exists
-                $checkQuery = "SELECT `id` FROM `$tableName` WHERE `className` = ?";
+                $checkQuery = "SELECT `id`, `dataSource`, `metaData` FROM `$tableName` WHERE `className` = ?";
                 $stmt = $dbConnection->prepare($checkQuery);
                 if (!$stmt) {
-                    throw new Exception("Failed to prepare statement: " . $dbConnection->error);
+                    throw new Exception("(".__FUNCTION__.") Failed to prepare statement: " . $dbConnection->error);
                 }
 
                 $stmt->bind_param("s", $className);
                 $stmt->execute();
                 $result = $stmt->get_result();
-                $exists = $result->fetch_assoc();
+                $existingRecord = $result->fetch_assoc();
 
-                // Upsert query
-                if ($exists) {
+                // Initialize action variable
+                $action = '';
+                $rowsAffected = 0;
+                $beforeState = null;
+                $afterState = null;
+
+                if ($existingRecord) {
+                    // Save before state
+                    $beforeState = json_encode($existingRecord);
+
                     $updateQuery = "UPDATE `$tableName` SET `dataSource` = ?, `metaData` = ? WHERE `className` = ?";
                     $updateStmt = $dbConnection->prepare($updateQuery);
                     if (!$updateStmt) {
-                        throw new Exception("Failed to prepare update statement: " . $dbConnection->error);
+                        throw new Exception("(".__FUNCTION__.") Failed to prepare update statement: " . $dbConnection->error);
                     }
 
                     $updateStmt->bind_param("sss", $dataSource, $metaData, $className);
                     $updateStmt->execute();
-                    if ($updateStmt->error) {
-                        throw new Exception("Error in update operation: " . $updateStmt->error);
-                    }
+
+                    // Set action to update and get affected rows
+                    $action = 'UPDATE';
+                    $rowsAffected = $updateStmt->affected_rows;
+
+                    // Save after state
+                    $afterState = json_encode(['dataSource' => $dataSource, 'metaData' => $metaData]);
                 } else {
                     $insertQuery = "INSERT INTO `$tableName` (`className`, `dataSource`, `metaData`) VALUES (?, ?, ?)";
                     $insertStmt = $dbConnection->prepare($insertQuery);
@@ -869,15 +1141,25 @@ function upsertReservationLibRoomClass($data, $dbConnection, &$errorCount) {
 
                     $insertStmt->bind_param("sss", $className, $dataSource, $metaData);
                     $insertStmt->execute();
-                    if ($insertStmt->error) {
-                        throw new Exception("Error in insert operation: " . $insertStmt->error);
-                    }
+
+                    // Set action to insert and get affected rows
+                    $action = 'INSERT';
+                    $rowsAffected = $insertStmt->affected_rows;
+
+                    // Save after state for insert
+                    $afterState = json_encode(['className' => $className, 'dataSource' => $dataSource, 'metaData' => $metaData]);
                 }
+
+                // Log the action with record identifier and rows affected
+                $actionTimestamp = date('Y-m-d H:i:s');
+                $recordIdentifier = $existingRecord ? $existingRecord['id'] : 'N/A'; // Use 'N/A' for new records
+                $actionLogMessage = "[{$actionTimestamp}] (" . __FUNCTION__ . ") ACTION: $action, Record: $recordIdentifier, Rows Affected: $rowsAffected, Before: $beforeState, After: $afterState" . PHP_EOL;
+                error_log($actionLogMessage, 3, $actionLogFile);
 
                 $dbConnection->commit();
 
             } else {
-                throw new Exception("Invalid data structure.");
+                throw new Exception("(".__FUNCTION__.") Invalid data structure.");
             }
         } catch (Exception $e) {
             // Increment error counter
@@ -887,7 +1169,7 @@ function upsertReservationLibRoomClass($data, $dbConnection, &$errorCount) {
 
             // Log the error
             $errorTimestamp = date('Y-m-d H:i:s');
-            $errorLogMessage = "[{$errorTimestamp}] Error in upsertReservationLibRoomClass: " . $e->getMessage() . PHP_EOL;
+            $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") " . $e->getMessage() . PHP_EOL;
             error_log($errorLogMessage, 3, $errorLogFile);
 
             throw $e;
@@ -896,9 +1178,12 @@ function upsertReservationLibRoomClass($data, $dbConnection, &$errorCount) {
 }
 
 
+
 function upsertReservationStay($data, $dbConnection, &$errorCount) {
     $tableName = 'RESERVATIONstay';
-    $errorLogFile = 'error_log.txt'; // Define the error log file path
+    // Define the error log file path and action log file path
+    $errorLogFile = dirname(__FILE__) . '/error_log.txt';
+    $actionLogFile = dirname(__FILE__) . '/action_log.txt';
 
     foreach ($data as $element) {
         try {
@@ -909,6 +1194,7 @@ function upsertReservationStay($data, $dbConnection, &$errorCount) {
             $createdBy = $element['createdBy'] ?? null;
             $metaData = $element['metaData'] ?? null;
             $extPMSConfNum = $element['extPMSConfNum'] ?? null;
+            $extReservationId = $element['reservation_id'] ?? null;
             $extGuestId = $element['extGuestId'] ?? null;
             $dataSource = $element['dataSource'] ?? null;
             $libSourceId = $element['libSourceId'] ?? null;
@@ -917,44 +1203,67 @@ function upsertReservationStay($data, $dbConnection, &$errorCount) {
             $dbConnection->begin_transaction();
 
             // Check if a record with this combination already exists
-            $checkQuery = "SELECT `id` FROM `$tableName` WHERE `createDateTime` = ? AND `modifyDateTime` = ? AND `startDate` = ? AND `endDate` = ? AND `extGuestId` = ? AND `extPMSConfNum` = ?";
+            $checkQuery = "SELECT `id`, `metaData`, `extPMSConfNum`, `dataSource`, `libSourceId`, `libPropertyId`, `createdBy` FROM `$tableName` WHERE `startDate` = ? AND `endDate` = ? AND `extGuestId` = ? AND `extPMSConfNum` = ?";
             $stmt = $dbConnection->prepare($checkQuery);
             if (!$stmt) {
-                throw new Exception("Prepare failed: " . $dbConnection->error);
+                throw new Exception("(".__FUNCTION__.") Prepare failed: " . $dbConnection->error);
             }
 
-            $stmt->bind_param("iissis", $createDateTime, $modifyDateTime, $startDate, $endDate, $extGuestId, $extPMSConfNum);
+            $stmt->bind_param("ssis", $startDate, $endDate, $extGuestId, $extPMSConfNum);
             $stmt->execute();
             $result = $stmt->get_result();
-            $exists = $result->fetch_assoc();
+            $existingRecord = $result->fetch_assoc();
 
-            if ($exists) {
+            // Initialize action variable
+            $action = '';
+            $rowsAffected = 0;
+            $beforeState = null;
+            $afterState = null;
+
+            if ($existingRecord) {
+                // Save before state
+                $beforeState = json_encode($existingRecord);
+
                 // Update
-                $updateQuery = "UPDATE `$tableName` SET `metaData` = ?,`extPMSConfNum` = ?, `dataSource` = ?, `libSourceId` = ?, `libPropertyId` = ?, `createdBy` = ? WHERE `createDateTime` = ? AND `modifyDateTime` = ? AND `startDate` = ? AND `endDate` = ?";
+                $updateQuery = "UPDATE `$tableName` SET `createDateTime` = ?, `metaData` = ?,`extPMSConfNum` = ?, `dataSource` = ?, `libSourceId` = ?, `libPropertyId` = ?, `createdBy` = ?, `modifyDateTime` = ? WHERE `startDate` = ? AND `endDate` = ? AND `extGuestId` = ? AND `extPMSConfNum` = ?";
                 $updateStmt = $dbConnection->prepare($updateQuery);
                 if (!$updateStmt) {
-                    throw new Exception("Prepare failed: " . $dbConnection->error);
+                    throw new Exception("(".__FUNCTION__.") Prepare failed: " . $dbConnection->error);
                 }
 
-                $updateStmt->bind_param("sssiisssss", $metaData, $dataSource, $libSourceId, $libPropertyId, $createdBy, $createDateTime, $modifyDateTime, $startDate, $endDate);
+                $updateStmt->bind_param("isssiiisssss", $createDateTime, $metaData, $extPMSConfNum, $dataSource, $libSourceId, $libPropertyId, $createdBy, $modifyDateTime, $startDate, $endDate, $extGuestId, $extPMSConfNum);
                 $updateStmt->execute();
-                if ($updateStmt->error) {
-                    throw new Exception("Error in update operation: " . $updateStmt ->error);
-                }
+
+                // Set action to update and get affected rows
+                $action = 'UPDATE';
+                $rowsAffected = $updateStmt->affected_rows;
+
+                // Save after state
+                $afterState = json_encode(['createDateTime' => $createDateTime, 'metaData' => $metaData, 'extPMSConfNum' => $extPMSConfNum, 'dataSource' => $dataSource, 'libSourceId' => $libSourceId, 'libPropertyId' => $libPropertyId, 'createdBy' => $createdBy, 'modifyDateTime' => $modifyDateTime]);
             } else {
                 // Insert
                 $insertQuery = "INSERT INTO `$tableName` (`createDateTime`, `metaData`, `modifyDateTime`, `startDate`, `endDate`, `extPMSConfNum`, `dataSource`, `libSourceId`, `libPropertyId`, `createdBy`, `extGuestId`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                 $insertStmt = $dbConnection->prepare($insertQuery);
                 if (!$insertStmt) {
-                    throw new Exception("Prepare failed: " . $dbConnection->error);
+                    throw new Exception("(".__FUNCTION__.") Prepare failed: " . $dbConnection->error);
                 }
 
-                $insertStmt->bind_param("isissssiiss", $createDateTime, $metaData, $modifyDateTime, $startDate, $endDate, $extPMSConfNum, $dataSource, $libSourceId, $libPropertyId, $createdBy, $extGuestId);
+                $insertStmt->bind_param("sssssssiiss", $createDateTime, $metaData, $modifyDateTime, $startDate, $endDate, $extPMSConfNum, $dataSource, $libSourceId, $libPropertyId, $createdBy, $extGuestId);
                 $insertStmt->execute();
-                if ($insertStmt->error) {
-                    throw new Exception("Error in insert operation: " . $insertStmt->error);
-                }
+
+                // Set action to insert and get affected rows
+                $action = 'INSERT';
+                $rowsAffected = $insertStmt->affected_rows;
+
+                // Save after state for insert
+                $afterState = json_encode(['createDateTime' => $createDateTime, 'metaData' => $metaData, 'extPMSConfNum' => $extPMSConfNum, 'dataSource' => $dataSource, 'libSourceId' => $libSourceId, 'libPropertyId' => $libPropertyId, 'createdBy' => $createdBy, 'modifyDateTime' => $modifyDateTime]);
             }
+
+            // Log the action with record identifier and rows affected
+            $actionTimestamp = date('Y-m-d H:i:s');
+            $recordIdentifier = $existingRecord ? $existingRecord['id'] : 'N/A'; // Use 'N/A' for new records
+            $actionLogMessage = "[{$actionTimestamp}] (".__FUNCTION__.") Action: {$action}, Record ID: {$recordIdentifier}, Rows Affected: {$rowsAffected}" . PHP_EOL;
+            file_put_contents($actionLogFile, $actionLogMessage, FILE_APPEND);
 
             $dbConnection->commit();
 
@@ -966,7 +1275,7 @@ function upsertReservationStay($data, $dbConnection, &$errorCount) {
 
             // Log the error
             $errorTimestamp = date('Y-m-d H:i:s');
-            $errorLogMessage = "[{$errorTimestamp}] Error in upsertReservationStay: " . $e->getMessage() . PHP_EOL;
+            $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") " . $e->getMessage() . PHP_EOL;
             error_log($errorLogMessage, 3, $errorLogFile);
 
             throw $e;
@@ -976,11 +1285,11 @@ function upsertReservationStay($data, $dbConnection, &$errorCount) {
 
 
 
-
 function upsertCustomerRelationship($data, $dbConnection, &$errorCount) {
     $tableName = 'CUSTOMERrelationship';
-    $errorLogFile = 'error_log.txt'; // Define the error log file path
-
+    // Define the error log file path and action log file path
+    $errorLogFile = dirname(__FILE__) . '/error_log.txt';
+    $actionLogFile = dirname(__FILE__) . '/action_log.txt';
 
     foreach ($data as $element) {
         $isPrimaryGuest = isset($element['isPrimaryGuest']) ? (int)$element['isPrimaryGuest'] : null;
@@ -993,38 +1302,64 @@ function upsertCustomerRelationship($data, $dbConnection, &$errorCount) {
 
         try {
             // Check if a record with this combination already exists
-            $checkQuery = "SELECT `id` FROM `$tableName` WHERE `isPrimaryGuest` = ? AND `dataSource` = ? AND `contactTypeId` = ? AND `contactId` = ?";
+            $checkQuery = "SELECT `id`, `isPrimaryGuest`, `dataSource`, `contactTypeId`, `contactId` FROM `$tableName` WHERE `isPrimaryGuest` = ? AND `dataSource` = ? AND `contactTypeId` = ? AND `contactId` = ?";
             $stmt = $dbConnection->prepare($checkQuery);
             $stmt->bind_param("issi", $isPrimaryGuest, $dataSource, $contactTypeId, $contactId);
             $stmt->execute();
             $result = $stmt->get_result();
-            $exists = $result->fetch_assoc();
+            $existingRecord = $result->fetch_assoc();
 
-            // Upsert query
-            if ($exists) {
+            // Initialize action variable
+            $action = '';
+            $rowsAffected = 0;
+            $beforeState = null;
+            $afterState = null;
+
+            if ($existingRecord) {
+                // Save before state
+                $beforeState = json_encode($existingRecord);
+
                 // Update
                 $updateQuery = "UPDATE `$tableName` SET `isPrimaryGuest` = ?, `dataSource` = ?, `contactTypeId` = ?, `contactId` = ? WHERE `id` = ?";
                 $updateStmt = $dbConnection->prepare($updateQuery);
-                $updateStmt->bind_param("issii", $isPrimaryGuest, $dataSource, $contactTypeId, $contactId, $exists['id']);
+                $updateStmt->bind_param("issii", $isPrimaryGuest, $dataSource, $contactTypeId, $contactId, $existingRecord['id']);
+
+                // Set action to update
+                $action = 'UPDATE';
             } else {
                 // Insert
                 $insertQuery = "INSERT INTO `$tableName` (`isPrimaryGuest`, `dataSource`, `contactTypeId`, `contactId`) VALUES (?, ?, ?, ?)";
                 $insertStmt = $dbConnection->prepare($insertQuery);
                 $insertStmt->bind_param("issi", $isPrimaryGuest, $dataSource, $contactTypeId, $contactId);
+
+                // Set action to insert
+                $action = 'INSERT';
             }
 
             // Execute the query
-            if ($exists) {
+            if ($existingRecord) {
                 $updateStmt->execute();
                 if ($updateStmt->error) {
-                    throw new Exception("Error in update operation: " . $updateStmt->error);
+                    throw new Exception("(".__FUNCTION__.") Error in update operation: " . $updateStmt->error);
                 }
+
+                // Save after state
+                $afterState = json_encode(['isPrimaryGuest' => $isPrimaryGuest, 'dataSource' => $dataSource, 'contactTypeId' => $contactTypeId, 'contactId' => $contactId]);
             } else {
                 $insertStmt->execute();
                 if ($insertStmt->error) {
-                    throw new Exception("Error in insert operation: " . $insertStmt->error);
+                    throw new Exception("(".__FUNCTION__.") Error in insert operation: " . $insertStmt->error);
                 }
+
+                // Save after state for insert
+                $afterState = json_encode(['isPrimaryGuest' => $isPrimaryGuest, 'dataSource' => $dataSource, 'contactTypeId' => $contactTypeId, 'contactId' => $contactId]);
             }
+
+            // Log the action with record identifier and rows affected
+            $actionTimestamp = date('Y-m-d H:i:s');
+            $recordIdentifier = $existingRecord ? $existingRecord['id'] : 'N/A'; // Use 'N/A' for new records
+            $actionLogMessage = "[{$actionTimestamp}] (".__FUNCTION__.") Action: {$action}, Record ID: {$recordIdentifier}, Rows Affected: {$rowsAffected}" . PHP_EOL;
+            file_put_contents($actionLogFile, $actionLogMessage, FILE_APPEND);
 
             // Commit the transaction
             $dbConnection->commit();
@@ -1037,7 +1372,7 @@ function upsertCustomerRelationship($data, $dbConnection, &$errorCount) {
 
             // Log the error
             $errorTimestamp = date('Y-m-d H:i:s');
-            $errorLogMessage = "[{$errorTimestamp}] Error in upsertCustomerRelationship: " . $e->getMessage() . PHP_EOL;
+            $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") " . $e->getMessage() . PHP_EOL;
             error_log($errorLogMessage, 3, $errorLogFile);
 
             throw $e;
@@ -1045,13 +1380,16 @@ function upsertCustomerRelationship($data, $dbConnection, &$errorCount) {
     }
 }
 
+
+
+
 function upsertCustomerMembership($data, $dbConnection, &$errorCount) {
     $tableName = 'CUSTOMERmembership';
-    $errorLogFile = 'error_log.txt'; // Define the error log file path
-
+    // Define the error log file path and action log file path
+    $errorLogFile = dirname(__FILE__) . '/error_log.txt';
+    $actionLogFile = dirname(__FILE__) . '/action_log.txt';
 
     foreach ($data as $element) {
-        try {
         $level = $element['level'] ?? null;
         $membershipCode = $element['membershipCode'] ?? null;
         $dataSource = $element['dataSource'] ?? null;
@@ -1061,40 +1399,66 @@ function upsertCustomerMembership($data, $dbConnection, &$errorCount) {
         // Start a transaction
         $dbConnection->begin_transaction();
 
-
+        try {
             // Check if a record with this combination already exists
-            $checkQuery = "SELECT `id` FROM `$tableName` WHERE `contactId` = ? AND `libLoyaltyProgramId` = ? AND `level` = ? AND `membershipCode` = ?";
+            $checkQuery = "SELECT `id`, `level`, `membershipCode`, `dataSource`, `libLoyaltyProgramId`, `contactId` FROM `$tableName` WHERE `contactId` = ? AND `libLoyaltyProgramId` = ? AND `level` = ? AND `membershipCode` = ?";
             $stmt = $dbConnection->prepare($checkQuery);
             $stmt->bind_param("iiss", $contactId, $libLoyaltyProgramId, $level, $membershipCode);
             $stmt->execute();
             $result = $stmt->get_result();
-            $exists = $result->fetch_assoc();
+            $existingRecord = $result->fetch_assoc();
 
-            // Upsert query
-            if ($exists) {
+            // Initialize action variable
+            $action = '';
+            $rowsAffected = 0;
+            $beforeState = null;
+            $afterState = null;
+
+            if ($existingRecord) {
+                // Save before state
+                $beforeState = json_encode($existingRecord);
+
                 // Update
                 $updateQuery = "UPDATE `$tableName` SET `level` = ?, `membershipCode` = ?, `dataSource` = ? WHERE `id` = ?";
                 $updateStmt = $dbConnection->prepare($updateQuery);
-                $updateStmt->bind_param("sssi", $level, $membershipCode, $dataSource, $exists['id']);
+                $updateStmt->bind_param("sssi", $level, $membershipCode, $dataSource, $existingRecord['id']);
+
+                // Set action to update
+                $action = 'UPDATE';
             } else {
                 // Insert
                 $insertQuery = "INSERT INTO `$tableName` (`level`, `membershipCode`, `dataSource`, `libLoyaltyProgramId`, `contactId`) VALUES (?, ?, ?, ?, ?)";
                 $insertStmt = $dbConnection->prepare($insertQuery);
                 $insertStmt->bind_param("sssii", $level, $membershipCode, $dataSource, $libLoyaltyProgramId, $contactId);
+
+                // Set action to insert
+                $action = 'INSERT';
             }
 
             // Execute the query
-            if ($exists) {
+            if ($existingRecord) {
                 $updateStmt->execute();
                 if ($updateStmt->error) {
-                    throw new Exception("Error in update operation: " . $updateStmt->error);
+                    throw new Exception("(".__FUNCTION__.") Error in update operation: " . $updateStmt->error);
                 }
+
+                // Save after state
+                $afterState = json_encode(['level' => $level, 'membershipCode' => $membershipCode, 'dataSource' => $dataSource, 'libLoyaltyProgramId' => $libLoyaltyProgramId, 'contactId' => $contactId]);
             } else {
                 $insertStmt->execute();
                 if ($insertStmt->error) {
-                    throw new Exception("Error in insert operation: " . $insertStmt->error);
+                    throw new Exception("(".__FUNCTION__.") Error in insert operation: " . $insertStmt->error);
                 }
+
+                // Save after state for insert
+                $afterState = json_encode(['level' => $level, 'membershipCode' => $membershipCode, 'dataSource' => $dataSource, 'libLoyaltyProgramId' => $libLoyaltyProgramId, 'contactId' => $contactId]);
             }
+
+            // Log the action with record identifier and rows affected
+            $actionTimestamp = date('Y-m-d H:i:s');
+            $recordIdentifier = $existingRecord ? $existingRecord['id'] : 'N/A'; // Use 'N/A' for new records
+            $actionLogMessage = "[{$actionTimestamp}] (".__FUNCTION__.") Action: {$action}, Record ID: {$recordIdentifier}, Rows Affected: {$rowsAffected}, Before State: {$beforeState}, After State: {$afterState}" . PHP_EOL;
+            file_put_contents($actionLogFile, $actionLogMessage, FILE_APPEND);
 
             // Commit the transaction
             $dbConnection->commit();
@@ -1107,7 +1471,7 @@ function upsertCustomerMembership($data, $dbConnection, &$errorCount) {
 
             // Log the error
             $errorTimestamp = date('Y-m-d H:i:s');
-            $errorLogMessage = "[{$errorTimestamp}] Error in upsertCustomerMembership: " . $e->getMessage() . PHP_EOL;
+            $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.")  " . $e->getMessage() . PHP_EOL;
             error_log($errorLogMessage, 3, $errorLogFile);
 
             throw $e;
@@ -1115,13 +1479,14 @@ function upsertCustomerMembership($data, $dbConnection, &$errorCount) {
     }
 }
 
+
 function upsertServicesPayment($data, $dbConnection, &$errorCount) {
     $tableName = 'SERVICESpayment';
-    $errorLogFile = 'error_log.txt'; // Define the error log file path
-
+    // Define the error log file path and action log file path
+    $errorLogFile = dirname(__FILE__) . '/error_log.txt';
+    $actionLogFile = dirname(__FILE__) . '/action_log.txt';
 
     foreach ($data as $element) {
-        try {
         $paymentAmount = $element['paymentAmount'] ?? null;
         $currencyCode = $element['currencyCode'] ?? null;
         $dataSource = $element['dataSource'] ?? null;
@@ -1130,8 +1495,9 @@ function upsertServicesPayment($data, $dbConnection, &$errorCount) {
         // Start a transaction
         $dbConnection->begin_transaction();
 
+        try {
             // Construct the check query with consideration for NULL values
-            $checkQuery = "SELECT COUNT(*) as count FROM `$tableName` WHERE 
+            $checkQuery = "SELECT `id`, `paymentAmount`, `currencyCode`, `dataSource`, `libTenderId` FROM `$tableName` WHERE 
                 (`paymentAmount` = ? OR (? IS NULL AND `paymentAmount` IS NULL)) AND 
                 (`currencyCode` = ? OR (? IS NULL AND `currencyCode` IS NULL)) AND 
                 `dataSource` = ? AND 
@@ -1141,25 +1507,43 @@ function upsertServicesPayment($data, $dbConnection, &$errorCount) {
             $checkStmt->bind_param("dssdsi", $paymentAmount, $paymentAmount, $currencyCode, $currencyCode, $dataSource, $libTenderId);
             $checkStmt->execute();
             $result = $checkStmt->get_result();
-            $row = $result->fetch_assoc();
+            $existingRecord = $result->fetch_assoc();
+
+            // Initialize action variable
+            $action = '';
+            $rowsAffected = 0;
+            $beforeState = null;
+            $afterState = null;
 
             // Insert only if the record does not exist
-            if ($row['count'] == 0) {
+            if (!$existingRecord) {
+                // Save before state for insert
+                $beforeState = json_encode(['paymentAmount' => $paymentAmount, 'currencyCode' => $currencyCode, 'dataSource' => $dataSource, 'libTenderId' => $libTenderId]);
+
                 $insertQuery = "INSERT INTO `$tableName` (`paymentAmount`, `currencyCode`, `dataSource`, `libTenderId`) VALUES (?, ?, ?, ?)";
                 $insertStmt = $dbConnection->prepare($insertQuery);
-                if (!$insertStmt) {
-                    throw new Exception("Failed to prepare insert statement: " . $dbConnection->error);
-                }
                 $insertStmt->bind_param("dssi", $paymentAmount, $currencyCode, $dataSource, $libTenderId);
                 $insertStmt->execute();
 
                 if ($insertStmt->error) {
-                    throw new Exception("Error in insert operation: " . $insertStmt->error);
+                    throw new Exception("(".__FUNCTION__.") " . $insertStmt->error);
                 }
+
+                // Set action to insert
+                $action = 'INSERT';
             }
 
             // Commit the transaction
             $dbConnection->commit();
+
+            // Save after state for insert
+            $afterState = json_encode(['paymentAmount' => $paymentAmount, 'currencyCode' => $currencyCode, 'dataSource' => $dataSource, 'libTenderId' => $libTenderId]);
+
+            // Log the action with record identifier and rows affected
+            $actionTimestamp = date('Y-m-d H:i:s');
+            $recordIdentifier = $existingRecord ? $existingRecord['id'] : 'N/A'; // Use 'N/A' for new records
+            $actionLogMessage = "[{$actionTimestamp}] (".__FUNCTION__.") Action: {$action}, Record ID: {$recordIdentifier}, Rows Affected: {$rowsAffected}, Before State: {$beforeState}, After State: {$afterState}" . PHP_EOL;
+            file_put_contents($actionLogFile, $actionLogMessage, FILE_APPEND);
 
         } catch (Exception $e) {
             // Increment error counter
@@ -1169,7 +1553,7 @@ function upsertServicesPayment($data, $dbConnection, &$errorCount) {
 
             // Log the error
             $errorTimestamp = date('Y-m-d H:i:s');
-            $errorLogMessage = "[{$errorTimestamp}] Error in upsertServicesPayment: " . $e->getMessage() . PHP_EOL;
+            $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.")  " . $e->getMessage() . PHP_EOL;
             error_log($errorLogMessage, 3, $errorLogFile);
 
             throw $e;
@@ -1178,9 +1562,12 @@ function upsertServicesPayment($data, $dbConnection, &$errorCount) {
 }
 
 
+
 function upsertCustomerContact($data, $dbConnection, &$errorCount) {
     $tableName = 'CUSTOMERcontact';
-    $errorLogFile = 'error_log.txt'; // Define the error log file path
+    // Define the error log file path and action log file path
+    $errorLogFile = dirname(__FILE__) . '/error_log.txt';
+    $actionLogFile = dirname(__FILE__) . '/action_log.txt';
 
     foreach ($data as $record) {
         // Extract the required fields
@@ -1202,46 +1589,89 @@ function upsertCustomerContact($data, $dbConnection, &$errorCount) {
 
         try {
             // Check if a record with this combination already exists
-            $checkQuery = "SELECT COUNT(*) FROM `$tableName` WHERE `firstName` = ? AND `lastName` = ? AND `extGuestId` = ?";
+            $checkQuery = "SELECT `id`, `title`, `email`, `birthDate`, `languageCode`, `languageFormat`, `metaData`, `dataSource` FROM `$tableName` WHERE `firstName` = ? AND `lastName` = ? AND `extGuestId` = ?";
             $stmt = $dbConnection->prepare($checkQuery);
             $stmt->bind_param("sss", $firstName, $lastName, $extGuestId);
             $stmt->execute();
             $result = $stmt->get_result();
-            $exists = $result->fetch_row()[0] > 0;
+            $existingRecord = $result->fetch_assoc();
+
+            // Initialize action variable
+            $action = '';
+            $rowsAffected = 0;
+            $beforeState = null;
+            $afterState = null;
 
             // Upsert query
-            if ($exists) {
+            if ($existingRecord) {
+                // Save before state for update
+                $beforeState = json_encode($existingRecord);
+
                 // Update
                 $updateQuery = "UPDATE `$tableName` SET `title` = ?, `email` = ?, `birthDate` = ?, `languageCode` = ?, `languageFormat` = ?, `metaData` = ?, `dataSource` = ? WHERE `firstName` = ? AND `lastName` = ? AND `extGuestId` = ?";
                 $updateStmt = $dbConnection->prepare($updateQuery);
                 $updateStmt->bind_param("ssssssssss", $title, $email, $birthDate, $languageCode, $languageFormat, $metaData, $dataSource, $firstName, $lastName, $extGuestId);
+                $updateStmt->execute();
+
+                if ($updateStmt->error) {
+                    throw new Exception("Error in update operation: " . $updateStmt->error);
+                }
+
+                // Set action to update
+                $action = 'UPDATE';
+                $rowsAffected = $updateStmt->affected_rows;
             } else {
+                // Save before state for insert
+                $beforeState = json_encode([
+                    'firstName' => $firstName,
+                    'lastName' => $lastName,
+                    'extGuestId' => $extGuestId,
+                    'title' => '',
+                    'email' => '',
+                    'birthDate' => null,
+                    'languageCode' => '',
+                    'languageFormat' => '',
+                    'metaData' => null,
+                    'dataSource' => '',
+                ]);
+
                 // Insert
                 $insertQuery = "INSERT INTO `$tableName` (`firstName`, `lastName`, `title`, `email`, `birthDate`, `languageCode`, `languageFormat`, `metaData`, `dataSource`, `extGuestId`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                 $insertStmt = $dbConnection->prepare($insertQuery);
                 $insertStmt->bind_param("ssssssssss", $firstName, $lastName, $title, $email, $birthDate, $languageCode, $languageFormat, $metaData, $dataSource, $extGuestId);
-            }
-
-            // Execute the query
-            if ($exists) {
-                $updateStmt->execute();
-                if ($updateStmt->error) {
-                    throw new Exception("Error in update operation: " . $updateStmt->error);
-                }
-            } else {
                 $insertStmt->execute();
-                if ($insertStmt->error) {
-                    throw new Exception("Error in insert operation: " . $insertStmt->error);
-                }
-            }
 
-            // Log the success message
-            $errorTimestamp = date('Y-m-d H:i:s');
-            $successMessage = "[{$errorTimestamp}] Successfully upserted CUSTOMER contacts" . PHP_EOL;
-            error_log($successMessage, 3, $errorLogFile);
+                if ($insertStmt->error) {
+                    throw new Exception("(".__FUNCTION__.") Error in insert operation: " . $insertStmt->error);
+                }
+
+                // Set action to insert
+                $action = 'INSERT';
+                $rowsAffected = $insertStmt->affected_rows;
+            }
 
             // Commit the transaction
             $dbConnection->commit();
+
+            // Save after state for insert or update
+            $afterState = json_encode([
+                'firstName' => $firstName,
+                'lastName' => $lastName,
+                'extGuestId' => $extGuestId,
+                'title' => $title,
+                'email' => $email,
+                'birthDate' => $birthDate,
+                'languageCode' => $languageCode,
+                'languageFormat' => $languageFormat,
+                'metaData' => $metaData,
+                'dataSource' => $dataSource,
+            ]);
+
+            // Log the action with record identifier and rows affected
+            $actionTimestamp = date('Y-m-d H:i:s');
+            $recordIdentifier = "{$firstName}, {$lastName}, {$extGuestId}";
+            $actionLogMessage = "[{$actionTimestamp}] (".__FUNCTION__.") Action: {$action}, Record ID: {$recordIdentifier}, Rows Affected: {$rowsAffected}, Before State: {$beforeState}, After State: {$afterState}" . PHP_EOL;
+            file_put_contents($actionLogFile, $actionLogMessage, FILE_APPEND);
 
         } catch (Exception $e) {
             // Increment error counter
@@ -1252,7 +1682,7 @@ function upsertCustomerContact($data, $dbConnection, &$errorCount) {
 
             // Log the error
             $errorTimestamp = date('Y-m-d H:i:s');
-            $errorLogMessage = "[{$errorTimestamp}] Error in upsertReservationRoomDetails: " . $e->getMessage() . PHP_EOL;
+            $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.")  " . $e->getMessage() . PHP_EOL;
             error_log($errorLogMessage, 3, $errorLogFile);
 
             throw $e;  // Re-throw the exception
@@ -1261,15 +1691,18 @@ function upsertCustomerContact($data, $dbConnection, &$errorCount) {
 }
 
 
+
 function upsertReservationStayStatusStay($data, $dbConnection, &$errorCount) {
     $tableName = 'RESERVATIONstayStatusStay';
-    $errorLogFile = 'error_log.txt'; // Define the error log file path
+    // Define the error log file path and action log file path
+    $errorLogFile = dirname(__FILE__) . '/error_log.txt';
+    $actionLogFile = dirname(__FILE__) . '/action_log.txt';
 
     foreach ($data as $element) {
         // Skip the record if stayId is null
         if (empty($element['stayId'])) {
             $timestamp = date('Y-m-d H:i:s');
-            $logMessage = "[$timestamp] Skipped record due to null stayId: " . json_encode($element) . PHP_EOL;
+            $logMessage = "[$timestamp] (".__FUNCTION__.") Skipped record due to null stayId: " . json_encode($element) . PHP_EOL;
             error_log($logMessage, 3, $errorLogFile);
             continue;
         }
@@ -1286,47 +1719,92 @@ function upsertReservationStayStatusStay($data, $dbConnection, &$errorCount) {
 
         try {
             // Check if a record with this combination already exists
-            $checkQuery = "SELECT `id` FROM `$tableName` WHERE `stayId` = ? AND `stayStatusId` = ?";
+            $checkQuery = "SELECT `id`, `cancelledBy`, `cancellationDateTime`, `cancellationReasonCode`, `cancellationReasonText`, `dataSource` FROM `$tableName` WHERE `stayId` = ? AND `stayStatusId` = ?";
             $stmt = $dbConnection->prepare($checkQuery);
             if (!$stmt) {
-                throw new Exception("Prepare failed: " . $dbConnection->error);
+                throw new Exception("(".__FUNCTION__.") Prepare failed: " . $dbConnection->error);
             }
 
             $stmt->bind_param("ii", $stayId, $stayStatusId);
             $stmt->execute();
             $result = $stmt->get_result();
-            $exists = $result->fetch_assoc();
+            $existingRecord = $result->fetch_assoc();
 
-            if ($exists) {
+            // Initialize action variable
+            $action = '';
+            $rowsAffected = 0;
+            $beforeState = null;
+            $afterState = null;
+
+            if ($existingRecord) {
+                // Save before state for update
+                $beforeState = json_encode($existingRecord);
+
                 // Update
                 $updateQuery = "UPDATE `$tableName` SET `cancelledBy` = ?, `cancellationDateTime` = ?, `cancellationReasonCode` = ?, `cancellationReasonText` = ?, `dataSource` = ? WHERE `stayId` = ? AND `stayStatusId` = ?";
                 $updateStmt = $dbConnection->prepare($updateQuery);
                 if (!$updateStmt) {
-                    throw new Exception("Prepare failed: " . $dbConnection->error);
+                    throw new Exception("(".__FUNCTION__.") Prepare failed: " . $dbConnection->error);
                 }
 
                 $updateStmt->bind_param("sisssii", $cancelledBy, $cancellationDateTime, $cancellationReasonCode, $cancellationReasonText, $dataSource, $stayId, $stayStatusId);
                 $updateStmt->execute();
                 if ($updateStmt->error) {
-                    throw new Exception("Error in update operation: " . $updateStmt->error);
-                }
-            } else {
-                // Insert
-                $insertQuery = "INSERT INTO `$tableName` (`cancelledBy`, `cancellationDateTime`, `cancellationReasonCode`, `cancellationReasonText`, `dataSource`, `stayId`, `stayStatusId`) VALUES (?, ?, ?, ?, ?, ?, ?)";
-                $insertStmt = $dbConnection->prepare($insertQuery);
-                if (!$insertStmt) {
-                    throw new Exception("Prepare failed: " . $dbConnection->error);
+                    throw new Exception("(".__FUNCTION__.") Error in update operation: " . $updateStmt->error);
                 }
 
-                $insertStmt->bind_param("sisssii", $cancelledBy, $cancellationDateTime, $cancellationReasonCode, $cancellationReasonText, $dataSource, $stayId, $stayStatusId);
+                // Set action to update
+                $action = 'UPDATE';
+                $rowsAffected = $updateStmt->affected_rows;
+            } else {
+                // Save before state for insert
+                $beforeState = json_encode([
+                    'stayId' => $stayId,
+                    'stayStatusId' => $stayStatusId,
+                    'cancelledBy' => null,
+                    'cancellationDateTime' => null,
+                    'cancellationReasonCode' => null,
+                    'cancellationReasonText' => null,
+                    'dataSource' => null,
+                ]);
+
+                // Insert
+                $insertQuery = "INSERT INTO `$tableName` (`stayId`, `stayStatusId`, `cancelledBy`, `cancellationDateTime`, `cancellationReasonCode`, `cancellationReasonText`, `dataSource`) VALUES (?, ?, ?, ?, ?, ?, ?)";
+                $insertStmt = $dbConnection->prepare($insertQuery);
+                if (!$insertStmt) {
+                    throw new Exception("(".__FUNCTION__.") Prepare failed: " . $dbConnection->error);
+                }
+
+                $insertStmt->bind_param("iisssss", $stayId, $stayStatusId, $cancelledBy, $cancellationDateTime, $cancellationReasonCode, $cancellationReasonText, $dataSource);
                 $insertStmt->execute();
                 if ($insertStmt->error) {
-                    throw new Exception("Error in insert operation: " . $insertStmt->error);
+                    throw new Exception("(".__FUNCTION__.") Error in insert operation: " . $insertStmt->error);
                 }
+
+                // Set action to insert
+                $action = 'INSERT';
+                $rowsAffected = $insertStmt->affected_rows;
             }
 
             // Commit the transaction
             $dbConnection->commit();
+
+            // Save after state for insert or update
+            $afterState = json_encode([
+                'stayId' => $stayId,
+                'stayStatusId' => $stayStatusId,
+                'cancelledBy' => $cancelledBy,
+                'cancellationDateTime' => $cancellationDateTime,
+                'cancellationReasonCode' => $cancellationReasonCode,
+                'cancellationReasonText' => $cancellationReasonText,
+                'dataSource' => $dataSource,
+            ]);
+
+            // Log the action with record identifier and rows affected
+            $actionTimestamp = date('Y-m-d H:i:s');
+            $recordIdentifier = "stayId: {$stayId}, stayStatusId: {$stayStatusId}";
+            $actionLogMessage = "[{$actionTimestamp}] (".__FUNCTION__.") Action: {$action}, Record ID: {$recordIdentifier}, Rows Affected: {$rowsAffected}, Before State: {$beforeState}, After State: {$afterState}" . PHP_EOL;
+            file_put_contents($actionLogFile, $actionLogMessage, FILE_APPEND);
 
         } catch (Exception $e) {
             // Increment error counter
@@ -1337,7 +1815,7 @@ function upsertReservationStayStatusStay($data, $dbConnection, &$errorCount) {
 
             // Log the error
             $errorTimestamp = date('Y-m-d H:i:s');
-            $errorLogMessage = "[{$errorTimestamp}] Error in upsertReservationStayStatusStay: " . $e->getMessage() . PHP_EOL;
+            $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") " . $e->getMessage() . PHP_EOL;
             error_log($errorLogMessage, 3, $errorLogFile);
 
             throw $e;  // Re-throw the exception
@@ -1348,15 +1826,18 @@ function upsertReservationStayStatusStay($data, $dbConnection, &$errorCount) {
 
 
 
+
 function upsertReservationRoomDetails($arrRESERVATIONroomDetails, $dbConnection, &$errorCount) {
     $tableName = 'RESERVATIONroomDetails';
-    $errorLogFile = 'error_log.txt'; // Define the error log file path
+    // Define the error log file path and action log file path
+    $errorLogFile = dirname(__FILE__) . '/error_log.txt';
+    $actionLogFile = dirname(__FILE__) . '/action_log.txt';
 
     foreach ($arrRESERVATIONroomDetails as $element) {
         // Skip the record if key fields are missing
         if (empty($element['libRoomId']) || empty($element['stayId'])) {
             $timestamp = date('Y-m-d H:i:s');
-            $logMessage = "[$timestamp] Skipped record due to missing key fields: " . json_encode($element) . PHP_EOL;
+            $logMessage = "[$timestamp] (".__FUNCTION__.")  Skipped record due to missing key fields: " . json_encode($element) . PHP_EOL;
             error_log($logMessage, 3, $errorLogFile);
             continue;
         }
@@ -1379,47 +1860,102 @@ function upsertReservationRoomDetails($arrRESERVATIONroomDetails, $dbConnection,
 
         try {
             // Check if a record with this combination already exists
-            $checkQuery = "SELECT `id` FROM `$tableName` WHERE `libRoomId` = ? AND `stayId` = ?";
+            $checkQuery = "SELECT `id`, `startDate`, `endDate`, `amount`, `ratePlanCode`, `isBlocked`, `isComplimentary`, `isHouseUse`, `dataSource`, `libRoomTypeId`, `libRoomClassId` FROM `$tableName` WHERE `libRoomId` = ? AND `stayId` = ?";
             $stmt = $dbConnection->prepare($checkQuery);
             if (!$stmt) {
-                throw new Exception("Prepare failed: " . $dbConnection->error);
+                throw new Exception("(".__FUNCTION__.") Prepare failed: " . $dbConnection->error);
             }
 
             $stmt->bind_param("ii", $libRoomId, $stayId);
             $stmt->execute();
             $result = $stmt->get_result();
-            $exists = $result->fetch_assoc();
+            $existingRecord = $result->fetch_assoc();
 
-            if ($exists) {
+            // Initialize action variable
+            $action = '';
+            $rowsAffected = 0;
+            $beforeState = null;
+            $afterState = null;
+
+            if ($existingRecord) {
+                // Save before state for update
+                $beforeState = json_encode($existingRecord);
+
                 // Update
                 $updateQuery = "UPDATE `$tableName` SET `startDate` = ?, `endDate` = ?, `amount` = ?, `ratePlanCode` = ?, `isBlocked` = ?, `isComplimentary` = ?, `isHouseUse` = ?, `dataSource` = ?, `libRoomTypeId` = ?, `libRoomClassId` = ? WHERE `libRoomId` = ? AND `stayId` = ?";
                 $updateStmt = $dbConnection->prepare($updateQuery);
                 if (!$updateStmt) {
-                    throw new Exception("Prepare failed: " . $dbConnection->error);
+                    throw new Exception("(".__FUNCTION__.") Prepare failed: " . $dbConnection->error);
                 }
 
                 $updateStmt->bind_param("ssdsiiisiiii", $startDate, $endDate, $amount, $ratePlanCode, $isBlocked, $isComplimentary, $isHouseUse, $dataSource, $libRoomTypeId, $libRoomClassId, $libRoomId, $stayId);
                 $updateStmt->execute();
                 if ($updateStmt->error) {
-                    throw new Exception("Error in update operation: " . $updateStmt->error);
-                }
-            } else {
-                // Insert
-                $insertQuery = "INSERT INTO `$tableName` (`startDate`, `endDate`, `amount`, `ratePlanCode`, `isBlocked`, `isComplimentary`, `isHouseUse`, `dataSource`, `libRoomId`, `stayId`, `libRoomTypeId`, `libRoomClassId`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-                $insertStmt = $dbConnection->prepare($insertQuery);
-                if (!$insertStmt) {
-                    throw new Exception("Prepare failed: " . $dbConnection->error);
+                    throw new Exception("(".__FUNCTION__.") Error in update operation: " . $updateStmt->error);
                 }
 
-                $insertStmt->bind_param("ssdsiiisiiii", $startDate, $endDate, $amount, $ratePlanCode, $isBlocked, $isComplimentary, $isHouseUse, $dataSource, $libRoomId, $stayId, $libRoomTypeId, $libRoomClassId);
+                // Set action to update
+                $action = 'UPDATE';
+                $rowsAffected = $updateStmt->affected_rows;
+            } else {
+                // Save before state for insert
+                $beforeState = json_encode([
+                    'libRoomId' => $libRoomId,
+                    'stayId' => $stayId,
+                    'startDate' => null,
+                    'endDate' => null,
+                    'amount' => null,
+                    'ratePlanCode' => null,
+                    'isBlocked' => null,
+                    'isComplimentary' => null,
+                    'isHouseUse' => null,
+                    'dataSource' => null,
+                    'libRoomTypeId' => null,
+                    'libRoomClassId' => null,
+                ]);
+
+                // Insert
+                $insertQuery = "INSERT INTO `$tableName` (`libRoomId`, `stayId`, `startDate`, `endDate`, `amount`, `ratePlanCode`, `isBlocked`, `isComplimentary`, `isHouseUse`, `dataSource`, `libRoomTypeId`, `libRoomClassId`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                $insertStmt = $dbConnection->prepare($insertQuery);
+                if (!$insertStmt) {
+                    throw new Exception("(".__FUNCTION__.") Prepare failed: " . $dbConnection->error);
+                }
+
+                $insertStmt->bind_param("iissdsiiisii", $libRoomId, $stayId, $startDate, $endDate, $amount, $ratePlanCode, $isBlocked, $isComplimentary, $isHouseUse, $dataSource, $libRoomTypeId, $libRoomClassId);
                 $insertStmt->execute();
                 if ($insertStmt->error) {
-                    throw new Exception("Error in insert operation: " . $insertStmt->error);
+                    throw new Exception("(".__FUNCTION__.") Error in insert operation: " . $insertStmt->error);
                 }
+
+                // Set action to insert
+                $action = 'INSERT';
+                $rowsAffected = $insertStmt->affected_rows;
             }
 
             // Commit the transaction
             $dbConnection->commit();
+
+            // Save after state for insert or update
+            $afterState = json_encode([
+                'libRoomId' => $libRoomId,
+                'stayId' => $stayId,
+                'startDate' => $startDate,
+                'endDate' => $endDate,
+                'amount' => $amount,
+                'ratePlanCode' => $ratePlanCode,
+                'isBlocked' => $isBlocked,
+                'isComplimentary' => $isComplimentary,
+                'isHouseUse' => $isHouseUse,
+                'dataSource' => $dataSource,
+                'libRoomTypeId' => $libRoomTypeId,
+                'libRoomClassId' => $libRoomClassId,
+            ]);
+
+            // Log the action with record identifier and rows affected
+            $actionTimestamp = date('Y-m-d H:i:s');
+            $recordIdentifier = "libRoomId: {$libRoomId}, stayId: {$stayId}";
+            $actionLogMessage = "[{$actionTimestamp}] (".__FUNCTION__.") Action: {$action}, Record ID: {$recordIdentifier}, Rows Affected: {$rowsAffected}, Before State: {$beforeState}, After State: {$afterState}" . PHP_EOL;
+            file_put_contents($actionLogFile, $actionLogMessage, FILE_APPEND);
 
         } catch (Exception $e) {
             // Increment error counter
@@ -1430,7 +1966,7 @@ function upsertReservationRoomDetails($arrRESERVATIONroomDetails, $dbConnection,
 
             // Log the error
             $errorTimestamp = date('Y-m-d H:i:s');
-            $errorLogMessage = "[{$errorTimestamp}] Error in upsertReservationRoomDetails: " . $e->getMessage() . PHP_EOL;
+            $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") " . $e->getMessage() . PHP_EOL;
             error_log($errorLogMessage, 3, $errorLogFile);
 
             throw $e;  // Re-throw the exception
@@ -1438,11 +1974,12 @@ function upsertReservationRoomDetails($arrRESERVATIONroomDetails, $dbConnection,
     }
 }
 
+
 function upsertSERVICESfolioOrders($arrSERVICESfolioOrders, $dbConnection, &$errorCount) {
     $tableName = 'SERVICESfolioOrders';
-    $errorLogFile = 'error_log.txt'; // Define the error log file path
-
-
+    // Define the error log file path and action log file path
+    $errorLogFile = dirname(__FILE__) . '/error_log.txt';
+    $actionLogFile = dirname(__FILE__) . '/action_log.txt';
 
     foreach ($arrSERVICESfolioOrders as $order) {
         // Extract the fields that will be used for matching existing records
@@ -1450,25 +1987,32 @@ function upsertSERVICESfolioOrders($arrSERVICESfolioOrders, $dbConnection, &$err
         $stayId = $order['stayId'];
         $paymentId = $order['paymentId'];
         $libServiceItemsId = $order['libServiceItemsId'];
-//        $libFolioOrdersTypeId = $order['libFolioOrdersTypeId'];
         $metaData = $order['metaData'];
-        // ... Other fields as necessary
 
         $dbConnection->begin_transaction();
         try {
             // Check if a record with this combination already exists
-            $checkQuery = "SELECT `id` FROM `$tableName` WHERE `contactId` = ? AND `stayId` = ? AND `paymentId` = ? AND `libServiceItemsId` = ?";
+            $checkQuery = "SELECT `id`, `folioOrderType`, `unitCount`, `unitPrice`, `fixedCost`, `postingFrequency`, `startDate`, `endDate`, `amount`, `fixedChargesQuantity`, `ratePlanCode`, `transferId`, `transferDateTime`, `transferOnArrival`, `isIncluded`, `dataSource` FROM `$tableName` WHERE `contactId` = ? AND `stayId` = ? AND `paymentId` = ? AND `libServiceItemsId` = ?";
             $stmt = $dbConnection->prepare($checkQuery);
             if (!$stmt) {
-                throw new Exception("Prepare failed: " . $dbConnection->error);
+                throw new Exception("(".__FUNCTION__.") Prepare failed: " . $dbConnection->error);
             }
 
             $stmt->bind_param("iiii", $contactId, $stayId, $paymentId, $libServiceItemsId);
             $stmt->execute();
             $result = $stmt->get_result();
-            $exists = $result->fetch_assoc();
+            $existingRecord = $result->fetch_assoc();
 
-            if ($exists) {
+            // Initialize action variable
+            $action = '';
+            $rowsAffected = 0;
+            $beforeState = null;
+            $afterState = null;
+
+            if ($existingRecord) {
+                // Save before state for update
+                $beforeState = json_encode($existingRecord);
+
                 // Update existing record
                 $updateQuery = "UPDATE `$tableName` SET
                     `folioOrderType` = ?,
@@ -1485,61 +2029,12 @@ function upsertSERVICESfolioOrders($arrSERVICESfolioOrders, $dbConnection, &$err
                     `transferDateTime` = ?,
                     `transferOnArrival` = ?,
                     `isIncluded` = ?,
-                    `dataSource` = ?
+                    `dataSource` = ?,
+                    `metaData` = ?
                 WHERE `contactId` = ? AND `stayId` = ? AND `paymentId` = ? AND `libServiceItemsId` = ?";
 
                 $updateStmt = $dbConnection->prepare($updateQuery);
-                $updateStmt->bind_param("siddsssdisssiisiiii",
-                    $order['folioOrderType'],
-                    $order['unitCount'],
-                    $order['unitPrice'],
-                    $order['fixedCost'],
-                    $order['postingFrequency'],
-                    $order['startDate'],
-                    $order['endDate'],
-                    $order['amount'],
-                    $order['fixedChargesQuantity'],
-                    $order['ratePlanCode'],
-                    $order['transferId'],
-                    $order['transferDateTime'],
-                    $order['transferOnArrival'],
-                    $order['isIncluded'],
-                    $order['dataSource'],
-                    // Where conditions
-                    $contactId,
-                    $stayId,
-                    $paymentId,
-                    $libServiceItemsId
-                );
-                $updateStmt->execute();
-            } else {
-                // Insert new record
-                $insertQuery = "INSERT INTO `$tableName` (
-                    `folioOrderType`, 
-                    `unitCount`, 
-                    `unitPrice`, 
-                    `fixedCost`, 
-                    `postingFrequency`, 
-                    `startDate`, 
-                    `endDate`, 
-                    `amount`, 
-                    `fixedChargesQuantity`, 
-                    `ratePlanCode`, 
-                    `transferId`, 
-                    `transferDateTime`, 
-                    `transferOnArrival`, 
-                    `isIncluded`,
-                    `dataSource`,
-                    `metaData`,
-                    `contactId`, 
-                    `stayId`, 
-                    `paymentId`, 
-                    `libServiceItemsId`
-
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-                $insertStmt = $dbConnection->prepare($insertQuery);
-                $insertStmt->bind_param("siddsssdisssiissiiii",
+                $updateStmt->bind_param("siddsssdisssiissiiii",
                     $order['folioOrderType'],
                     $order['unitCount'],
                     $order['unitPrice'],
@@ -1556,17 +2051,106 @@ function upsertSERVICESfolioOrders($arrSERVICESfolioOrders, $dbConnection, &$err
                     $order['isIncluded'],
                     $order['dataSource'],
                     $order['metaData'],
-                    // Inserted values
+                    // Where conditions
                     $contactId,
                     $stayId,
                     $paymentId,
                     $libServiceItemsId
                 );
+                $updateStmt->execute();
+
+                // Set action to update
+                $action = 'UPDATE';
+                $rowsAffected = $updateStmt->affected_rows;
+            } else {
+                // Save before state for insert
+                $beforeState = json_encode([
+                    'contactId' => $contactId,
+                    'stayId' => $stayId,
+                    'paymentId' => $paymentId,
+                    'libServiceItemsId' => $libServiceItemsId,
+                    'folioOrderType' => null,
+                    'unitCount' => null,
+                    'unitPrice' => null,
+                    'fixedCost' => null,
+                    'postingFrequency' => null,
+                    'startDate' => null,
+                    'endDate' => null,
+                    'amount' => null,
+                    'fixedChargesQuantity' => null,
+                    'ratePlanCode' => null,
+                    'transferId' => null,
+                    'transferDateTime' => null,
+                    'transferOnArrival' => null,
+                    'isIncluded' => null,
+                    'dataSource' => null,
+                    'metaData' => null,
+                ]);
+
+                // Insert new record
+                $insertQuery = "INSERT INTO `$tableName` (
+                    `contactId`,
+                    `stayId`,
+                    `paymentId`,
+                    `libServiceItemsId`,
+                    `unitCount`, 
+                    `unitPrice`, 
+                    `fixedCost`, 
+                    `postingFrequency`, 
+                    `startDate`, 
+                    `endDate`, 
+                    `amount`, 
+                    `fixedChargesQuantity`, 
+                    `ratePlanCode`, 
+                    `transferId`, 
+                    `transferDateTime`, 
+                    `transferOnArrival`, 
+                    `isIncluded`,
+                    `dataSource`,
+                    `metaData`
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+                $insertStmt = $dbConnection->prepare($insertQuery);
+                $insertStmt->bind_param("iiiidddsssddssssiss", $contactId, $stayId, $paymentId, $libServiceItemsId,  $order['unitCount'], $order['unitPrice'], $order['fixedCost'], $order['postingFrequency'], $order['startDate'], $order['endDate'], $order['amount'], $order['fixedChargesQuantity'], $order['ratePlanCode'], $order['transferId'], $order['transferDateTime'], $order['transferOnArrival'], $order['isIncluded'], $order['dataSource'], $order['metaData']);
                 $insertStmt->execute();
+
+                // Set action to insert
+                $action = 'INSERT';
+                $rowsAffected = $insertStmt->affected_rows;
             }
 
             // Commit the transaction
             $dbConnection->commit();
+
+            // Save after state for insert or update
+            $afterState = json_encode([
+                'contactId' => $contactId,
+                'stayId' => $stayId,
+                'paymentId' => $paymentId,
+                'libServiceItemsId' => $libServiceItemsId,
+                'folioOrderType' => $order['folioOrderType'],
+                'unitCount' => $order['unitCount'],
+                'unitPrice' => $order['unitPrice'],
+                'fixedCost' => $order['fixedCost'],
+                'postingFrequency' => $order['postingFrequency'],
+                'startDate' => $order['startDate'],
+                'endDate' => $order['endDate'],
+                'amount' => $order['amount'],
+                'fixedChargesQuantity' => $order['fixedChargesQuantity'],
+                'ratePlanCode' => $order['ratePlanCode'],
+                'transferId' => $order['transferId'],
+                'transferDateTime' => $order['transferDateTime'],
+                'transferOnArrival' => $order['transferOnArrival'],
+                'isIncluded' => $order['isIncluded'],
+                'dataSource' => $order['dataSource'],
+                'metaData' => $order['metaData'],
+            ]);
+
+            // Log the action with record identifier and rows affected
+            $actionTimestamp = date('Y-m-d H:i:s');
+            $recordIdentifier = "contactId: {$contactId}, stayId: {$stayId}, paymentId: {$paymentId}, libServiceItemsId: {$libServiceItemsId}";
+            $actionLogMessage = "[{$actionTimestamp}] (".__FUNCTION__.") Action: {$action}, Record ID: {$recordIdentifier}, Rows Affected: {$rowsAffected}, Before State: {$beforeState}, After State: {$afterState}" . PHP_EOL;
+            file_put_contents($actionLogFile, $actionLogMessage, FILE_APPEND);
 
         } catch (Exception $e) {
             // Increment error counter
@@ -1577,12 +2161,13 @@ function upsertSERVICESfolioOrders($arrSERVICESfolioOrders, $dbConnection, &$err
 
             // Log the error
             $errorTimestamp = date('Y-m-d H:i:s');
-            $errorLogMessage = "[{$errorTimestamp}] Error in upsertSERVICESfolioOrders: "."contactId = " . $contactId . "stayId = ". $stayId . "paymentId = "  . $paymentId . "libServiceItemsId = " . $libServiceItemsId . $e->getMessage() . PHP_EOL;
+            $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Error: " . $e->getMessage() . PHP_EOL;
             error_log($errorLogMessage, 3, $errorLogFile);
 
             throw $e;  // Re-throw the exception
         }
     }
 }
+
 
 ?>

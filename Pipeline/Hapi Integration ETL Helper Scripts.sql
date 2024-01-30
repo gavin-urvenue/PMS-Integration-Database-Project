@@ -35,9 +35,6 @@ delete from SERVICESlibTender;
 
 delete from SERVICESlibServiceItems;
 
-delete from SERVICESlibFolioOrdersType;
-
-delete from SERVICESlibFolioOrdersType;
 
 delete from RESERVATIONgroup;
 
@@ -56,9 +53,6 @@ delete from PMSDATABASEmisc ;
 -- Stored procedure that completes all of the deletes above
 CALL pms_db.usp_clear_all_tables();
 
-
-
-
 -- view table counts
 
 select count(*), 'CUSTOMERlibContactType' tableName from CUSTOMERlibContactType
@@ -74,8 +68,6 @@ UNION
 select count(*), 'SERVICESlibTender'  from SERVICESlibTender lt 
 UNION
 select count(*), 'SERVICESlibServiceItems'  from SERVICESlibServiceItems lsi 
-UNION
-select count(*), 'SERVICESlibFolioOrdersType'  from SERVICESlibFolioOrdersType lfo 
 UNION
 select count(*), 'SERVICESpayment'  from SERVICESpayment s
 UNION
@@ -105,10 +97,17 @@ select count(*), 'RESERVATIONgroupStay' from RESERVATIONgroupStay rs2
 UNION
 select count(*), 'PMSDATABASEmisc' from PMSDATABASEmisc p 
 
+select * from pms_db.PMSDATABASEmisc p 
+
+
+
 -- update system user to be able to run many queries for pipeline process
 
 UPDATE mysql.user
-SET max_questions = '0'
-where User = 'urvenue'
+SET max_questions = 0
+where User = urvenue
 
 FLUSH PRIVILEGES;
+
+
+

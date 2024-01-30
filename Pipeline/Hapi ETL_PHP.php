@@ -10,7 +10,7 @@
 //and then an insert into grandchild tables, with the child tables being dependent on the parent tables and the
 //grandchild tables being dependent on the child tables.
 
-
+//Setting up Error Logging
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -180,57 +180,8 @@ $arrRESERVATIONlibRoomType = createRESERVATIONLibRoomType($myDataSemiParsed, $er
 $arrRESERVATIONlibStayStatus = createRESERVATIONLibStayStatus($myDataSemiParsed, $errorCount);
 $arrRESERVATIONGroup = createRESERVATIONGroup($myDataSemiParsed, $errorCount);
 $arrRESERVATIONlibRoom = createRESERVATIONLibRoom($myDataSemiParsed, $errorCount);
-/// CHILD
-//can't populate until primary keys for parent tables are established. These are made via a table trigger/stored proc combo
-/// GRANDCHILD
-//can't populate until primary keys for parent tables are established. These are made via a table trigger/stored proc combo
-///
 
 
-
-
-//arrays of table names categorized by parent, child, and grandchild
-$arrParentTables =
-    ['CUSTOMERlibContactType',
-    'CUSTOMERcontact',
-    'CUSTOMERlibLoyaltyProgram',
-    'SERVICESlibFolioOrderType',
-    'SERVICESlibTender',
-    'SERVICESlibServiceItems',
-    'RESERVATIONlibProperty',
-    'RESERVATIONlibSource',
-    'RESERVATIONlibRoomClass',
-    'RESERVATIONlibRoomType',
-    'RESERVATIONlibStayStatus',
-    'RESERVATIONgroup',
-    'RESERVATIONlibRoom'];
-$arrParentTableArrays =
-    [
-        $arrCUSTOMERlibContactType,
-        $arrCUSTOMERcontact,
-        $arrCUSTOMERlibLoyaltyProgram,
-//        $arrSERVICESlibFolioOrdersType,
-        $arrSERVICESlibTender,
-        $arrSERVICESlibServiceItems,
-        $arrRESERVATIONlibProperty,
-        $arrRESERVATIONlibSource,
-        $arrRESERVATIONlibRoomClass,
-        $arrRESERVATIONlibRoomType,
-        $arrRESERVATIONlibStayStatus,
-        $arrRESERVATIONGroup,
-        $arrRESERVATIONlibRoom
-
-    ];
-$childTables =
-    ['RESERVATIONstay',
-    'RESERVATIONroomDetails',
-    'RESERVATIONstayStatuSstay',
-    'CUSTOMERrelationship',
-    'CUSTOMERmembership',
-    'SERVICESpayment'];
-$grandChildTables =
-    ['RESERVATIONgroupstay',
-    'SERVICESfolioOrders'];
 
 //Validate Parent table associative arrays that they would fit into their appropriate tables
 // Loop through each table and its corresponding data array
@@ -494,12 +445,18 @@ try {
 //var_dump(array_slice($arrRESERVATIONstayStatusStay, 0, 10, true));
 //print_r($normalizedData);
 //print_r($arrRESERVATIONstay);
-print_r($arrSERVICESfolioOrders);
+//print_r($arrSERVICESfolioOrders);
 //
-//$output = var_export(array_slice($normalizedData, 0, 10, true), true);
-//$filename = "normalizedData.txt";
+//$output = var_export($arrSERVICESfolioOrders, true);
+//$filename = "arrSERVICESfolioOrders.txt";
 //file_put_contents($filename, $output);
 //var_dump(array_slice($arrSERVICESfolioOrders, 0, 10, true));
+$csv_file = new SplFileObject('arrSERVICESfolioOrders.csv', 'w');
+
+foreach ($arrSERVICESfolioOrders as $folioOrders) {
+    $csv_file->fputcsv($folioOrders);
+}
+
 
 
 try {

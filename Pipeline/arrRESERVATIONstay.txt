@@ -1,0 +1,3126 @@
+array (
+  0 => 
+  array (
+    'id' => 4093,
+    'rndcode' => 'LBGOEVPEZMLG',
+    'createtstamp' => 1702576780,
+    'modtstamp' => 1705970066,
+    'status' => 7,
+    'procesststamp' => 0,
+    'ext_id' => 'f49e5b295f7a418785f92007114451fd',
+    'ext_status' => 'RESERVED',
+    'confirmation_number' => 2129516,
+    'reservation_id' => 2129516,
+    'propertyDetails' => 
+    array (
+      'code' => 'PGH',
+      'chainCode' => 'ACCOR',
+    ),
+    'extracted_property_code' => 'PGH',
+    'extracted_chain_code' => 'ACCOR',
+    'extracted_guest_id' => 'c6d8767b2ff447849dea28502f2e6fb3',
+    'referenceIds' => 
+    array (
+      0 => 
+      array (
+        'id' => '2129516',
+        'idType' => 'RESERVATION_ID',
+        'systemId' => 'Opera',
+        'legNumber' => '1',
+        'systemType' => 'PMS',
+      ),
+      1 => 
+      array (
+        'id' => '2129516',
+        'idType' => 'CONFIRMATION_NUMBER',
+        'systemId' => 'Opera',
+        'legNumber' => '1',
+        'systemType' => 'PMS',
+      ),
+    ),
+    'createdDateTime_repo' => '',
+    'createdDateTime' => '2022-10-08T03:25:04',
+    'createdBy' => 'MMOHITE',
+    'lastModifiedDateTime_repo' => '2022-11-28T05:17:27Z',
+    'lastModifiedDateTime' => '2022-11-28T00:16:35',
+    'lastModifiedBy' => 'MMOHITTE',
+    'receivedDateTime' => '2022-11-28T05:17:26.645Z',
+    'notificationType' => 'UPDATE',
+    'action' => 'UNKNOWN',
+    'arrival' => '2022-11-28',
+    'departure' => '2022-12-13',
+    'bookedUnits' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-12-12',
+        'start' => '2022-11-28',
+        'unitCount' => 1,
+        'unitTypeCode' => 'CK1NR',
+      ),
+    ),
+    'occupiedUnits' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-12-12',
+        'start' => '2022-11-28',
+        'unitId' => 'ABC123',
+        'extraBeds' => 
+        array (
+          0 => 
+          array (
+            'type' => 'CRIB',
+            'count' => 0,
+          ),
+          1 => 
+          array (
+            'type' => 'ROLLAWAY',
+            'count' => 0,
+          ),
+        ),
+        'unitTypeCode' => 'CK1NR',
+      ),
+    ),
+    'occupancyDetails' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-12-12',
+        'start' => '2022-11-28',
+        'isPerUnit' => true,
+        'occupants' => 
+        array (
+          0 => 
+          array (
+            'type' => 'ADULT',
+            'count' => 1,
+          ),
+          1 => 
+          array (
+            'type' => 'CHILD',
+            'count' => 0,
+          ),
+        ),
+      ),
+    ),
+    'currency' => 
+    array (
+      'code' => 'USD',
+    ),
+    'ratePlans' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-12-12',
+        'code' => '0T01-FLAT100',
+        'start' => '2022-11-28',
+      ),
+    ),
+    'prices' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-12-12',
+        'start' => '2022-11-28',
+        'amount' => 100,
+        'ratePlanCode' => '0T01-FLAT100',
+      ),
+    ),
+    'discounts' => NULL,
+    'guaranteeCode' => 'NG',
+    'paymentMethod' => 
+    array (
+      'code' => 'CR',
+    ),
+    'isComplimentary' => NULL,
+    'segmentations' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-12-12',
+        'code' => 'ZHO',
+        'type' => 'MARKET',
+        'start' => '2022-11-28',
+      ),
+      1 => 
+      array (
+        'end' => '2022-12-12',
+        'code' => '800',
+        'type' => 'SOURCE',
+        'start' => '2022-11-28',
+      ),
+      2 => 
+      array (
+        'end' => '2022-12-12',
+        'code' => 'PMS',
+        'type' => 'CHANNEL',
+        'start' => '2022-11-28',
+      ),
+    ),
+    'guests' => 
+    array (
+      0 => 
+      array (
+        'guest' => 
+        array (
+          'id' => 'c6d8767b2ff447849dea28502f2e6fb3',
+          'type' => 'GUEST',
+          'names' => 
+          array (
+            0 => 
+            array (
+              'surname' => 'KITMOHITEUAT',
+              'givenName' => 'KITMAHESHUAT',
+            ),
+          ),
+          'gender' => 'UNKNOWN',
+          'consents' => 
+          array (
+            0 => 
+            array (
+              'category' => 'Mail',
+              'isAllowed' => true,
+            ),
+            1 => 
+            array (
+              'category' => 'EMail',
+              'isAllowed' => false,
+            ),
+            2 => 
+            array (
+              'category' => 'Phone',
+              'isAllowed' => false,
+            ),
+            3 => 
+            array (
+              'category' => 'Sms',
+              'isAllowed' => false,
+            ),
+            4 => 
+            array (
+              'category' => 'History',
+              'isAllowed' => false,
+            ),
+            5 => 
+            array (
+              'category' => 'Market research',
+              'isAllowed' => true,
+            ),
+            6 => 
+            array (
+              'category' => 'Third party',
+              'isAllowed' => true,
+            ),
+          ),
+          'addresses' => 
+          array (
+            0 => 
+            array (
+              'type' => 'HOME',
+              'country' => 
+              array (
+                'code' => 'AA',
+                'format' => 'CUSTOM',
+              ),
+              'isPrimary' => true,
+            ),
+          ),
+          'createdBy' => 'MMOHITE',
+          'isPrivate' => false,
+          'referenceIds' => 
+          array (
+            0 => 
+            array (
+              'id' => '1120030',
+              'idType' => 'GUEST_ID',
+              'systemId' => 'Opera',
+              'systemType' => 'PMS',
+            ),
+          ),
+          'contactDetails' => 
+          array (
+            0 => 
+            array (
+              'type' => 'EMAIL',
+              'value' => 'MMOHITE@CYBAGE.COM',
+              'category' => 'EMAIL',
+              'isPrimary' => true,
+            ),
+          ),
+          'lastModifiedBy' => 'MMOHITE',
+          'createdDateTime' => '2022-10-08T03:24:17',
+          'primaryLanguage' => 
+          array (
+            'code' => 'E',
+            'format' => 'CUSTOM',
+          ),
+          'propertyDetails' => 
+          array (
+            'code' => 'PGH',
+            'chainCode' => 'ACCOR',
+          ),
+          'lastModifiedDateTime' => '2022-10-08T03:24:20',
+        ),
+        'isPrimary' => true,
+      ),
+    ),
+    'doNotDisplayPrice' => NULL,
+    'actualDateTimeOfArrival' => NULL,
+    'actualDateTimeOfDeparture' => NULL,
+    'estimatedDateTimeOfArrival' => NULL,
+    'services' => NULL,
+    'additionalData' => 
+    array (
+      0 => 
+      array (
+        'code' => 'nameTaxType',
+        'value' => '0',
+      ),
+    ),
+    'purposeOfStay' => NULL,
+    'sharerIds' => NULL,
+    'cancellationDetails' => NULL,
+    'blocks' => NULL,
+    'profiles' => NULL,
+    'memberships' => NULL,
+    'comments' => NULL,
+    'optionDate' => NULL,
+    'estimatedDateTimeOfDeparture' => NULL,
+    'reservationTotal' => NULL,
+    'taxes' => NULL,
+    'promotionCode' => NULL,
+    'cancellationPolicies' => 
+    array (
+      0 => 
+      array (
+        'code' => '24HR',
+        'description' => '24 hours prior to arrival',
+      ),
+    ),
+    'fixedCharges' => NULL,
+    'forecastRevenue' => NULL,
+    'blockIds' => NULL,
+    'requestedDeposits' => NULL,
+    'specialRequests' => NULL,
+    'alerts' => NULL,
+    'transfers' => NULL,
+    'contacts' => NULL,
+    'isHouseUse' => NULL,
+    'schemaVersion' => 3.0,
+    'command_id' => NULL,
+    'import_code' => NULL,
+  ),
+  1 => 
+  array (
+    'id' => 4094,
+    'rndcode' => 'MBGOVULYGMSL',
+    'createtstamp' => 1702576780,
+    'modtstamp' => 1705970066,
+    'status' => 7,
+    'procesststamp' => 0,
+    'ext_id' => '315ac359f52e4eb6be5f3f398f8e9f85',
+    'ext_status' => 'RESERVED',
+    'confirmation_number' => 2130017,
+    'reservation_id' => 2130017,
+    'propertyDetails' => 
+    array (
+      'code' => 'PGH',
+      'chainCode' => 'ACCOR',
+    ),
+    'extracted_property_code' => 'PGH',
+    'extracted_chain_code' => 'ACCOR',
+    'extracted_guest_id' => '7ab567fbf8e545cca1c39dc626c99fc5',
+    'referenceIds' => 
+    array (
+      0 => 
+      array (
+        'id' => '2130017',
+        'idType' => 'RESERVATION_ID',
+        'systemId' => 'Opera',
+        'legNumber' => '1',
+        'systemType' => 'PMS',
+      ),
+      1 => 
+      array (
+        'id' => '2130017',
+        'idType' => 'CONFIRMATION_NUMBER',
+        'systemId' => 'Opera',
+        'legNumber' => '1',
+        'systemType' => 'PMS',
+      ),
+    ),
+    'createdDateTime_repo' => '',
+    'createdDateTime' => '2022-10-13T01:10:28',
+    'createdBy' => 'MMOHITE',
+    'lastModifiedDateTime_repo' => '2022-11-28T05:17:29Z',
+    'lastModifiedDateTime' => '2022-11-28T00:17:03',
+    'lastModifiedBy' => 'MMOHITTE',
+    'receivedDateTime' => '2022-11-28T05:17:29.635Z',
+    'notificationType' => 'UPDATE',
+    'action' => 'UNKNOWN',
+    'arrival' => '2022-11-28',
+    'departure' => '2022-12-10',
+    'bookedUnits' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-12-09',
+        'start' => '2022-11-28',
+        'unitCount' => 1,
+        'unitTypeCode' => 'CK1NR',
+      ),
+    ),
+    'occupiedUnits' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-12-09',
+        'start' => '2022-11-28',
+        'unitId' => 'VLL123',
+        'extraBeds' => 
+        array (
+          0 => 
+          array (
+            'type' => 'CRIB',
+            'count' => 0,
+          ),
+          1 => 
+          array (
+            'type' => 'ROLLAWAY',
+            'count' => 0,
+          ),
+        ),
+        'unitTypeCode' => 'CK1NR',
+      ),
+    ),
+    'occupancyDetails' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-12-09',
+        'start' => '2022-11-28',
+        'isPerUnit' => true,
+        'occupants' => 
+        array (
+          0 => 
+          array (
+            'type' => 'ADULT',
+            'count' => 1,
+          ),
+          1 => 
+          array (
+            'type' => 'CHILD',
+            'count' => 0,
+          ),
+        ),
+      ),
+    ),
+    'currency' => 
+    array (
+      'code' => 'USD',
+    ),
+    'ratePlans' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-12-09',
+        'code' => '0T01-FLAT100',
+        'start' => '2022-11-28',
+      ),
+    ),
+    'prices' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-12-09',
+        'start' => '2022-11-28',
+        'amount' => 100,
+        'ratePlanCode' => '0T01-FLAT100',
+      ),
+    ),
+    'discounts' => NULL,
+    'guaranteeCode' => 'NG',
+    'paymentMethod' => 
+    array (
+      'code' => 'CR',
+    ),
+    'isComplimentary' => NULL,
+    'segmentations' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-12-09',
+        'code' => 'ZHO',
+        'type' => 'MARKET',
+        'start' => '2022-11-28',
+      ),
+      1 => 
+      array (
+        'end' => '2022-12-09',
+        'code' => '800',
+        'type' => 'SOURCE',
+        'start' => '2022-11-28',
+      ),
+      2 => 
+      array (
+        'end' => '2022-12-09',
+        'code' => 'PGH',
+        'type' => 'CHANNEL',
+        'start' => '2022-11-28',
+      ),
+    ),
+    'guests' => 
+    array (
+      0 => 
+      array (
+        'guest' => 
+        array (
+          'id' => '7ab567fbf8e545cca1c39dc626c99fc5',
+          'type' => 'GUEST',
+          'names' => 
+          array (
+            0 => 
+            array (
+              'surname' => 'LN',
+              'givenName' => 'FN',
+            ),
+          ),
+          'gender' => 'UNKNOWN',
+          'consents' => 
+          array (
+            0 => 
+            array (
+              'category' => 'Mail',
+              'isAllowed' => true,
+            ),
+            1 => 
+            array (
+              'category' => 'EMail',
+              'isAllowed' => false,
+            ),
+            2 => 
+            array (
+              'category' => 'Phone',
+              'isAllowed' => false,
+            ),
+            3 => 
+            array (
+              'category' => 'Sms',
+              'isAllowed' => false,
+            ),
+            4 => 
+            array (
+              'category' => 'History',
+              'isAllowed' => false,
+            ),
+            5 => 
+            array (
+              'category' => 'Market research',
+              'isAllowed' => true,
+            ),
+            6 => 
+            array (
+              'category' => 'Third party',
+              'isAllowed' => true,
+            ),
+          ),
+          'addresses' => 
+          array (
+            0 => 
+            array (
+              'type' => 'HOME',
+              'country' => 
+              array (
+                'code' => 'AA',
+                'format' => 'CUSTOM',
+              ),
+              'isPrimary' => true,
+            ),
+          ),
+          'createdBy' => 'MMOHITE',
+          'isPrivate' => false,
+          'referenceIds' => 
+          array (
+            0 => 
+            array (
+              'id' => '1120530',
+              'idType' => 'GUEST_ID',
+              'systemId' => 'Opera',
+              'systemType' => 'PMS',
+            ),
+          ),
+          'contactDetails' => 
+          array (
+            0 => 
+            array (
+              'type' => 'EMAIL',
+              'value' => 'poojapo@cybage.com',
+              'category' => 'EMAIL',
+              'isPrimary' => true,
+            ),
+          ),
+          'lastModifiedBy' => 'RKOTUR',
+          'createdDateTime' => '2022-10-13T01:09:35',
+          'primaryLanguage' => 
+          array (
+            'code' => 'E',
+            'format' => 'CUSTOM',
+          ),
+          'propertyDetails' => 
+          array (
+            'code' => 'PGH',
+            'chainCode' => 'ACCOR',
+          ),
+          'lastModifiedDateTime' => '2022-10-13T01:39:02',
+        ),
+        'isPrimary' => true,
+      ),
+    ),
+    'doNotDisplayPrice' => NULL,
+    'actualDateTimeOfArrival' => NULL,
+    'actualDateTimeOfDeparture' => NULL,
+    'estimatedDateTimeOfArrival' => NULL,
+    'services' => NULL,
+    'additionalData' => 
+    array (
+      0 => 
+      array (
+        'code' => 'nameTaxType',
+        'value' => '0',
+      ),
+    ),
+    'purposeOfStay' => NULL,
+    'sharerIds' => NULL,
+    'cancellationDetails' => NULL,
+    'blocks' => NULL,
+    'profiles' => NULL,
+    'memberships' => NULL,
+    'comments' => NULL,
+    'optionDate' => NULL,
+    'estimatedDateTimeOfDeparture' => NULL,
+    'reservationTotal' => NULL,
+    'taxes' => NULL,
+    'promotionCode' => NULL,
+    'cancellationPolicies' => 
+    array (
+      0 => 
+      array (
+        'code' => '24HR',
+        'description' => '24 hours prior to arrival',
+      ),
+    ),
+    'fixedCharges' => NULL,
+    'forecastRevenue' => NULL,
+    'blockIds' => NULL,
+    'requestedDeposits' => NULL,
+    'specialRequests' => NULL,
+    'alerts' => NULL,
+    'transfers' => NULL,
+    'contacts' => NULL,
+    'isHouseUse' => NULL,
+    'schemaVersion' => 3.0,
+    'command_id' => NULL,
+    'import_code' => NULL,
+  ),
+  2 => 
+  array (
+    'id' => 4095,
+    'rndcode' => 'NBGODNFLNJGK',
+    'createtstamp' => 1702576780,
+    'modtstamp' => 1705970066,
+    'status' => 7,
+    'procesststamp' => 0,
+    'ext_id' => '94747661d06b415e9b1470fa79aca610',
+    'ext_status' => 'RESERVED',
+    'confirmation_number' => 2131766,
+    'reservation_id' => 2131766,
+    'propertyDetails' => 
+    array (
+      'code' => 'PGH',
+      'chainCode' => 'ACCOR',
+    ),
+    'extracted_property_code' => 'PGH',
+    'extracted_chain_code' => 'ACCOR',
+    'extracted_guest_id' => 'c233bbdfccd649ab979a0a6a9b1217ee',
+    'referenceIds' => 
+    array (
+      0 => 
+      array (
+        'id' => '2131766',
+        'idType' => 'RESERVATION_ID',
+        'systemId' => 'Opera',
+        'legNumber' => '1',
+        'systemType' => 'PMS',
+      ),
+      1 => 
+      array (
+        'id' => '2131766',
+        'idType' => 'CONFIRMATION_NUMBER',
+        'systemId' => 'Opera',
+        'legNumber' => '1',
+        'systemType' => 'PMS',
+      ),
+    ),
+    'createdDateTime_repo' => '',
+    'createdDateTime' => '2022-11-09T06:29:26',
+    'createdBy' => 'AMANGAR',
+    'lastModifiedDateTime_repo' => '2022-11-09T11:40:46Z',
+    'lastModifiedDateTime' => '2022-11-09T06:39:42',
+    'lastModifiedBy' => 'AMANGAR',
+    'receivedDateTime' => '2022-11-09T11:40:45.705Z',
+    'notificationType' => 'UPDATE',
+    'action' => 'UNKNOWN',
+    'arrival' => '2022-11-09',
+    'departure' => '2023-11-11',
+    'bookedUnits' => 
+    array (
+      0 => 
+      array (
+        'end' => '2023-11-10',
+        'start' => '2022-11-09',
+        'unitCount' => 1,
+        'unitTypeCode' => 'CK1NC',
+      ),
+    ),
+    'occupiedUnits' => 
+    array (
+      0 => 
+      array (
+        'end' => '2023-11-10',
+        'start' => '2022-11-09',
+        'unitId' => '1411',
+        'extraBeds' => 
+        array (
+          0 => 
+          array (
+            'type' => 'CRIB',
+            'count' => 0,
+          ),
+          1 => 
+          array (
+            'type' => 'ROLLAWAY',
+            'count' => 0,
+          ),
+        ),
+        'unitTypeCode' => 'CK1NC',
+      ),
+    ),
+    'occupancyDetails' => 
+    array (
+      0 => 
+      array (
+        'end' => '2023-11-10',
+        'start' => '2022-11-09',
+        'isPerUnit' => true,
+        'occupants' => 
+        array (
+          0 => 
+          array (
+            'type' => 'ADULT',
+            'count' => 1,
+          ),
+          1 => 
+          array (
+            'type' => 'CHILD',
+            'count' => 0,
+          ),
+        ),
+      ),
+    ),
+    'currency' => 
+    array (
+      'code' => 'USD',
+    ),
+    'ratePlans' => 
+    array (
+      0 => 
+      array (
+        'end' => '2023-11-10',
+        'code' => '0T01-FLAT100',
+        'start' => '2022-11-09',
+      ),
+    ),
+    'prices' => 
+    array (
+      0 => 
+      array (
+        'end' => '2023-11-10',
+        'start' => '2022-11-09',
+        'amount' => 100,
+        'ratePlanCode' => '0T01-FLAT100',
+      ),
+    ),
+    'discounts' => NULL,
+    'guaranteeCode' => 'VO',
+    'paymentMethod' => 
+    array (
+      'code' => 'CR',
+    ),
+    'isComplimentary' => NULL,
+    'segmentations' => 
+    array (
+      0 => 
+      array (
+        'end' => '2023-11-10',
+        'code' => 'ZHO',
+        'type' => 'MARKET',
+        'start' => '2022-11-09',
+      ),
+      1 => 
+      array (
+        'end' => '2023-11-10',
+        'code' => 'EMA',
+        'type' => 'SOURCE',
+        'start' => '2022-11-09',
+      ),
+    ),
+    'guests' => 
+    array (
+      0 => 
+      array (
+        'guest' => 
+        array (
+          'id' => 'c233bbdfccd649ab979a0a6a9b1217ee',
+          'type' => 'GUEST',
+          'names' => 
+          array (
+            0 => 
+            array (
+              'surname' => 'Mangarrr',
+              'givenName' => 'Amit',
+            ),
+          ),
+          'gender' => 'UNKNOWN',
+          'consents' => 
+          array (
+            0 => 
+            array (
+              'category' => 'Mail',
+              'isAllowed' => true,
+            ),
+            1 => 
+            array (
+              'category' => 'EMail',
+              'isAllowed' => false,
+            ),
+            2 => 
+            array (
+              'category' => 'Phone',
+              'isAllowed' => false,
+            ),
+            3 => 
+            array (
+              'category' => 'Sms',
+              'isAllowed' => false,
+            ),
+            4 => 
+            array (
+              'category' => 'History',
+              'isAllowed' => false,
+            ),
+            5 => 
+            array (
+              'category' => 'Market research',
+              'isAllowed' => true,
+            ),
+            6 => 
+            array (
+              'category' => 'Third party',
+              'isAllowed' => true,
+            ),
+          ),
+          'addresses' => 
+          array (
+            0 => 
+            array (
+              'type' => 'HOME',
+              'country' => 
+              array (
+                'code' => 'AA',
+                'format' => 'CUSTOM',
+              ),
+              'isPrimary' => true,
+            ),
+          ),
+          'createdBy' => 'AMANGAR',
+          'isPrivate' => false,
+          'referenceIds' => 
+          array (
+            0 => 
+            array (
+              'id' => '1117279',
+              'idType' => 'GUEST_ID',
+              'systemId' => 'Opera',
+              'systemType' => 'PMS',
+            ),
+          ),
+          'contactDetails' => 
+          array (
+            0 => 
+            array (
+              'type' => 'EMAIL',
+              'value' => 'amit.mangar@accor.com',
+              'category' => 'EMAIL',
+              'isPrimary' => true,
+            ),
+          ),
+          'lastModifiedBy' => 'AMANGAR',
+          'classifications' => 
+          array (
+            0 => 
+            array (
+              'code' => 'V1',
+            ),
+          ),
+          'createdDateTime' => '2022-09-30T02:16:01',
+          'primaryLanguage' => 
+          array (
+            'code' => 'E',
+            'format' => 'CUSTOM',
+          ),
+          'propertyDetails' => 
+          array (
+            'code' => 'PGH',
+            'chainCode' => 'ACCOR',
+          ),
+          'lastModifiedDateTime' => '2022-09-30T02:16:12',
+        ),
+        'isPrimary' => true,
+      ),
+    ),
+    'doNotDisplayPrice' => NULL,
+    'actualDateTimeOfArrival' => NULL,
+    'actualDateTimeOfDeparture' => NULL,
+    'estimatedDateTimeOfArrival' => '2022-11-09T02:21:00',
+    'services' => NULL,
+    'additionalData' => 
+    array (
+      0 => 
+      array (
+        'code' => 'nameTaxType',
+        'value' => '0',
+      ),
+    ),
+    'purposeOfStay' => NULL,
+    'sharerIds' => NULL,
+    'cancellationDetails' => NULL,
+    'blocks' => NULL,
+    'profiles' => NULL,
+    'memberships' => NULL,
+    'comments' => NULL,
+    'optionDate' => NULL,
+    'estimatedDateTimeOfDeparture' => NULL,
+    'reservationTotal' => NULL,
+    'taxes' => NULL,
+    'promotionCode' => NULL,
+    'cancellationPolicies' => 
+    array (
+      0 => 
+      array (
+        'code' => '24HR',
+        'description' => '24 hours prior to arrival',
+      ),
+    ),
+    'fixedCharges' => NULL,
+    'forecastRevenue' => NULL,
+    'blockIds' => NULL,
+    'requestedDeposits' => NULL,
+    'specialRequests' => NULL,
+    'alerts' => NULL,
+    'transfers' => NULL,
+    'contacts' => NULL,
+    'isHouseUse' => NULL,
+    'schemaVersion' => 3.0,
+    'command_id' => NULL,
+    'import_code' => NULL,
+  ),
+  3 => 
+  array (
+    'id' => 4096,
+    'rndcode' => 'OBGOFHWJGECO',
+    'createtstamp' => 1702576780,
+    'modtstamp' => 1705970066,
+    'status' => 7,
+    'procesststamp' => 0,
+    'ext_id' => '1d29194981a44316bdde21e7e746fc84',
+    'ext_status' => 'RESERVED',
+    'confirmation_number' => 2131767,
+    'reservation_id' => 2131767,
+    'propertyDetails' => 
+    array (
+      'code' => 'PGH',
+      'chainCode' => 'ACCOR',
+    ),
+    'extracted_property_code' => 'PGH',
+    'extracted_chain_code' => 'ACCOR',
+    'extracted_guest_id' => 'c233bbdfccd649ab979a0a6a9b1217ee',
+    'referenceIds' => 
+    array (
+      0 => 
+      array (
+        'id' => '2131767',
+        'idType' => 'RESERVATION_ID',
+        'systemId' => 'Opera',
+        'legNumber' => '1',
+        'systemType' => 'PMS',
+      ),
+      1 => 
+      array (
+        'id' => '2131767',
+        'idType' => 'CONFIRMATION_NUMBER',
+        'systemId' => 'Opera',
+        'legNumber' => '1',
+        'systemType' => 'PMS',
+      ),
+    ),
+    'createdDateTime_repo' => '',
+    'createdDateTime' => '2022-11-09T06:36:46',
+    'createdBy' => 'AMANGAR',
+    'lastModifiedDateTime_repo' => '2022-11-09T11:51:03Z',
+    'lastModifiedDateTime' => '2022-11-09T06:50:31',
+    'lastModifiedBy' => 'AMANGAR',
+    'receivedDateTime' => '2022-11-09T11:51:02.36Z',
+    'notificationType' => 'UPDATE',
+    'action' => 'UNKNOWN',
+    'arrival' => '2022-11-10',
+    'departure' => '2022-11-12',
+    'bookedUnits' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-11-11',
+        'start' => '2022-11-10',
+        'unitCount' => 1,
+        'unitTypeCode' => 'CK1NC',
+      ),
+    ),
+    'occupiedUnits' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-11-11',
+        'start' => '2022-11-10',
+        'extraBeds' => 
+        array (
+          0 => 
+          array (
+            'type' => 'CRIB',
+            'count' => 0,
+          ),
+          1 => 
+          array (
+            'type' => 'ROLLAWAY',
+            'count' => 0,
+          ),
+        ),
+        'unitTypeCode' => 'CK1NC',
+      ),
+    ),
+    'occupancyDetails' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-11-11',
+        'start' => '2022-11-10',
+        'isPerUnit' => true,
+        'occupants' => 
+        array (
+          0 => 
+          array (
+            'type' => 'ADULT',
+            'count' => 1,
+          ),
+          1 => 
+          array (
+            'type' => 'CHILD',
+            'count' => 0,
+          ),
+        ),
+      ),
+    ),
+    'currency' => 
+    array (
+      'code' => 'USD',
+    ),
+    'ratePlans' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-11-11',
+        'code' => '0T01-FLAT100',
+        'start' => '2022-11-10',
+      ),
+    ),
+    'prices' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-11-11',
+        'start' => '2022-11-10',
+        'amount' => 100,
+        'ratePlanCode' => '0T01-FLAT100',
+      ),
+    ),
+    'discounts' => NULL,
+    'guaranteeCode' => 'VO',
+    'paymentMethod' => 
+    array (
+      'code' => 'CR',
+    ),
+    'isComplimentary' => NULL,
+    'segmentations' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-11-11',
+        'code' => 'ZHO',
+        'type' => 'MARKET',
+        'start' => '2022-11-10',
+      ),
+      1 => 
+      array (
+        'end' => '2022-11-11',
+        'code' => 'EMA',
+        'type' => 'SOURCE',
+        'start' => '2022-11-10',
+      ),
+    ),
+    'guests' => 
+    array (
+      0 => 
+      array (
+        'guest' => 
+        array (
+          'id' => 'c233bbdfccd649ab979a0a6a9b1217ee',
+          'type' => 'GUEST',
+          'names' => 
+          array (
+            0 => 
+            array (
+              'surname' => 'Mangarrr',
+              'givenName' => 'Amit',
+            ),
+          ),
+          'gender' => 'UNKNOWN',
+          'consents' => 
+          array (
+            0 => 
+            array (
+              'category' => 'Mail',
+              'isAllowed' => true,
+            ),
+            1 => 
+            array (
+              'category' => 'EMail',
+              'isAllowed' => false,
+            ),
+            2 => 
+            array (
+              'category' => 'Phone',
+              'isAllowed' => false,
+            ),
+            3 => 
+            array (
+              'category' => 'Sms',
+              'isAllowed' => false,
+            ),
+            4 => 
+            array (
+              'category' => 'History',
+              'isAllowed' => false,
+            ),
+            5 => 
+            array (
+              'category' => 'Market research',
+              'isAllowed' => true,
+            ),
+            6 => 
+            array (
+              'category' => 'Third party',
+              'isAllowed' => true,
+            ),
+          ),
+          'addresses' => 
+          array (
+            0 => 
+            array (
+              'type' => 'HOME',
+              'country' => 
+              array (
+                'code' => 'AA',
+                'format' => 'CUSTOM',
+              ),
+              'isPrimary' => true,
+            ),
+          ),
+          'createdBy' => 'AMANGAR',
+          'isPrivate' => false,
+          'referenceIds' => 
+          array (
+            0 => 
+            array (
+              'id' => '1117279',
+              'idType' => 'GUEST_ID',
+              'systemId' => 'Opera',
+              'systemType' => 'PMS',
+            ),
+          ),
+          'contactDetails' => 
+          array (
+            0 => 
+            array (
+              'type' => 'EMAIL',
+              'value' => 'amit.mangar@accor.com',
+              'category' => 'EMAIL',
+              'isPrimary' => true,
+            ),
+          ),
+          'lastModifiedBy' => 'AMANGAR',
+          'classifications' => 
+          array (
+            0 => 
+            array (
+              'code' => 'V1',
+            ),
+          ),
+          'createdDateTime' => '2022-09-30T02:16:01',
+          'primaryLanguage' => 
+          array (
+            'code' => 'E',
+            'format' => 'CUSTOM',
+          ),
+          'propertyDetails' => 
+          array (
+            'code' => 'PGH',
+            'chainCode' => 'ACCOR',
+          ),
+          'lastModifiedDateTime' => '2022-09-30T02:16:12',
+        ),
+        'isPrimary' => true,
+      ),
+    ),
+    'doNotDisplayPrice' => NULL,
+    'actualDateTimeOfArrival' => NULL,
+    'actualDateTimeOfDeparture' => NULL,
+    'estimatedDateTimeOfArrival' => '2022-11-10T02:21:00',
+    'services' => NULL,
+    'additionalData' => 
+    array (
+      0 => 
+      array (
+        'code' => 'nameTaxType',
+        'value' => '0',
+      ),
+    ),
+    'purposeOfStay' => NULL,
+    'sharerIds' => NULL,
+    'cancellationDetails' => NULL,
+    'blocks' => NULL,
+    'profiles' => NULL,
+    'memberships' => NULL,
+    'comments' => NULL,
+    'optionDate' => NULL,
+    'estimatedDateTimeOfDeparture' => NULL,
+    'reservationTotal' => NULL,
+    'taxes' => NULL,
+    'promotionCode' => NULL,
+    'cancellationPolicies' => 
+    array (
+      0 => 
+      array (
+        'code' => '24HR',
+        'description' => '24 hours prior to arrival',
+      ),
+    ),
+    'fixedCharges' => NULL,
+    'forecastRevenue' => NULL,
+    'blockIds' => NULL,
+    'requestedDeposits' => NULL,
+    'specialRequests' => NULL,
+    'alerts' => NULL,
+    'transfers' => NULL,
+    'contacts' => NULL,
+    'isHouseUse' => NULL,
+    'schemaVersion' => 3.0,
+    'command_id' => NULL,
+    'import_code' => NULL,
+  ),
+  4 => 
+  array (
+    'id' => 4097,
+    'rndcode' => 'PBGOZPAJUWXG',
+    'createtstamp' => 1702576780,
+    'modtstamp' => 1705970066,
+    'status' => 7,
+    'procesststamp' => 0,
+    'ext_id' => 'd250390e1914459cbb6637044af5d782',
+    'ext_status' => 'RESERVED',
+    'confirmation_number' => 2131768,
+    'reservation_id' => 2131768,
+    'propertyDetails' => 
+    array (
+      'code' => 'PGH',
+      'chainCode' => 'ACCOR',
+    ),
+    'extracted_property_code' => 'PGH',
+    'extracted_chain_code' => 'ACCOR',
+    'extracted_guest_id' => '87fda6d05b6548d298473ebc8d53342c',
+    'referenceIds' => 
+    array (
+      0 => 
+      array (
+        'id' => '2131768',
+        'idType' => 'RESERVATION_ID',
+        'systemId' => 'Opera',
+        'legNumber' => '1',
+        'systemType' => 'PMS',
+      ),
+      1 => 
+      array (
+        'id' => '2131768',
+        'idType' => 'CONFIRMATION_NUMBER',
+        'systemId' => 'Opera',
+        'legNumber' => '1',
+        'systemType' => 'PMS',
+      ),
+    ),
+    'createdDateTime_repo' => '',
+    'createdDateTime' => '2022-11-10T08:18:12',
+    'createdBy' => 'RKOTUR',
+    'lastModifiedDateTime_repo' => '2022-11-10T13:19:05Z',
+    'lastModifiedDateTime' => '2022-11-10T08:18:12',
+    'lastModifiedBy' => 'RKOTUR',
+    'receivedDateTime' => '2022-11-10T13:19:05.378Z',
+    'notificationType' => 'UPDATE',
+    'action' => 'UNKNOWN',
+    'arrival' => '2022-11-10',
+    'departure' => '2022-11-12',
+    'bookedUnits' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-11-11',
+        'start' => '2022-11-10',
+        'unitCount' => 1,
+        'unitTypeCode' => 'CQ2NR',
+      ),
+    ),
+    'occupiedUnits' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-11-11',
+        'start' => '2022-11-10',
+        'unitId' => '1412',
+        'extraBeds' => 
+        array (
+          0 => 
+          array (
+            'type' => 'CRIB',
+            'count' => 0,
+          ),
+          1 => 
+          array (
+            'type' => 'ROLLAWAY',
+            'count' => 0,
+          ),
+        ),
+        'unitTypeCode' => 'CQ2NR',
+      ),
+    ),
+    'occupancyDetails' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-11-11',
+        'start' => '2022-11-10',
+        'isPerUnit' => true,
+        'occupants' => 
+        array (
+          0 => 
+          array (
+            'type' => 'ADULT',
+            'count' => 1,
+          ),
+          1 => 
+          array (
+            'type' => 'CHILD',
+            'count' => 0,
+          ),
+        ),
+      ),
+    ),
+    'currency' => 
+    array (
+      'code' => 'USD',
+    ),
+    'ratePlans' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-11-11',
+        'code' => '0T01-FLAT100',
+        'start' => '2022-11-10',
+      ),
+    ),
+    'prices' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-11-11',
+        'start' => '2022-11-10',
+        'amount' => 100,
+        'ratePlanCode' => '0T01-FLAT100',
+      ),
+    ),
+    'discounts' => NULL,
+    'guaranteeCode' => 'NG',
+    'paymentMethod' => 
+    array (
+      'code' => 'CR',
+    ),
+    'isComplimentary' => NULL,
+    'segmentations' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-11-11',
+        'code' => 'ZHO',
+        'type' => 'MARKET',
+        'start' => '2022-11-10',
+      ),
+      1 => 
+      array (
+        'end' => '2022-11-11',
+        'code' => '800',
+        'type' => 'SOURCE',
+        'start' => '2022-11-10',
+      ),
+      2 => 
+      array (
+        'end' => '2022-11-11',
+        'code' => 'PMS',
+        'type' => 'CHANNEL',
+        'start' => '2022-11-10',
+      ),
+    ),
+    'guests' => 
+    array (
+      0 => 
+      array (
+        'guest' => 
+        array (
+          'id' => '87fda6d05b6548d298473ebc8d53342c',
+          'type' => 'GUEST',
+          'names' => 
+          array (
+            0 => 
+            array (
+              'surname' => 'Woakes',
+              'givenName' => 'Chris',
+            ),
+          ),
+          'gender' => 'UNKNOWN',
+          'consents' => 
+          array (
+            0 => 
+            array (
+              'category' => 'Mail',
+              'isAllowed' => true,
+            ),
+            1 => 
+            array (
+              'category' => 'EMail',
+              'isAllowed' => false,
+            ),
+            2 => 
+            array (
+              'category' => 'Phone',
+              'isAllowed' => false,
+            ),
+            3 => 
+            array (
+              'category' => 'Sms',
+              'isAllowed' => false,
+            ),
+            4 => 
+            array (
+              'category' => 'History',
+              'isAllowed' => false,
+            ),
+            5 => 
+            array (
+              'category' => 'Market research',
+              'isAllowed' => true,
+            ),
+            6 => 
+            array (
+              'category' => 'Third party',
+              'isAllowed' => true,
+            ),
+          ),
+          'addresses' => 
+          array (
+            0 => 
+            array (
+              'type' => 'HOME',
+              'country' => 
+              array (
+                'code' => 'AA',
+                'format' => 'CUSTOM',
+              ),
+              'isPrimary' => true,
+            ),
+          ),
+          'createdBy' => 'RKOTUR',
+          'isPrivate' => false,
+          'referenceIds' => 
+          array (
+            0 => 
+            array (
+              'id' => '1122529',
+              'idType' => 'GUEST_ID',
+              'systemId' => 'Opera',
+              'systemType' => 'PMS',
+            ),
+          ),
+          'contactDetails' => 
+          array (
+            0 => 
+            array (
+              'type' => 'EMAIL',
+              'value' => 'rkotur@cybage.com',
+              'category' => 'EMAIL',
+              'isPrimary' => true,
+            ),
+          ),
+          'lastModifiedBy' => 'RKOTUR',
+          'createdDateTime' => '2022-11-10T08:17:24',
+          'primaryLanguage' => 
+          array (
+            'code' => 'E',
+            'format' => 'CUSTOM',
+          ),
+          'propertyDetails' => 
+          array (
+            'code' => 'PGH',
+            'chainCode' => 'ACCOR',
+          ),
+          'lastModifiedDateTime' => '2022-11-10T08:18:04',
+        ),
+        'isPrimary' => true,
+      ),
+    ),
+    'doNotDisplayPrice' => NULL,
+    'actualDateTimeOfArrival' => NULL,
+    'actualDateTimeOfDeparture' => NULL,
+    'estimatedDateTimeOfArrival' => NULL,
+    'services' => NULL,
+    'additionalData' => 
+    array (
+      0 => 
+      array (
+        'code' => 'nameTaxType',
+        'value' => '0',
+      ),
+    ),
+    'purposeOfStay' => NULL,
+    'sharerIds' => NULL,
+    'cancellationDetails' => NULL,
+    'blocks' => NULL,
+    'profiles' => NULL,
+    'memberships' => NULL,
+    'comments' => NULL,
+    'optionDate' => NULL,
+    'estimatedDateTimeOfDeparture' => NULL,
+    'reservationTotal' => NULL,
+    'taxes' => NULL,
+    'promotionCode' => NULL,
+    'cancellationPolicies' => 
+    array (
+      0 => 
+      array (
+        'code' => '24HR',
+        'description' => '24 hours prior to arrival',
+      ),
+    ),
+    'fixedCharges' => NULL,
+    'forecastRevenue' => NULL,
+    'blockIds' => NULL,
+    'requestedDeposits' => NULL,
+    'specialRequests' => NULL,
+    'alerts' => NULL,
+    'transfers' => NULL,
+    'contacts' => NULL,
+    'isHouseUse' => NULL,
+    'schemaVersion' => 3.0,
+    'command_id' => NULL,
+    'import_code' => NULL,
+  ),
+  5 => 
+  array (
+    'id' => 4098,
+    'rndcode' => 'QBGOYZBLYRSZ',
+    'createtstamp' => 1702576780,
+    'modtstamp' => 1705970066,
+    'status' => 7,
+    'procesststamp' => 0,
+    'ext_id' => '344373b264d34e88a325c12c60030c2c',
+    'ext_status' => 'IN_HOUSE',
+    'confirmation_number' => 2123267,
+    'reservation_id' => 2123267,
+    'propertyDetails' => 
+    array (
+      'code' => 'PGH',
+      'chainCode' => 'ACCOR',
+    ),
+    'extracted_property_code' => 'PGH',
+    'extracted_chain_code' => 'ACCOR',
+    'extracted_guest_id' => '5439d4ceaac04ae28060b8af67ca9701',
+    'referenceIds' => 
+    array (
+      0 => 
+      array (
+        'id' => '2123267',
+        'idType' => 'RESERVATION_ID',
+        'systemId' => 'Opera',
+        'legNumber' => '1',
+        'systemType' => 'PMS',
+      ),
+      1 => 
+      array (
+        'id' => '2123267',
+        'idType' => 'CONFIRMATION_NUMBER',
+        'systemId' => 'Opera',
+        'legNumber' => '1',
+        'systemType' => 'PMS',
+      ),
+    ),
+    'createdDateTime_repo' => '',
+    'createdDateTime' => '2022-09-14T01:15:35',
+    'createdBy' => 'MMOHITE',
+    'lastModifiedDateTime_repo' => '2022-11-24T04:08:16Z',
+    'lastModifiedDateTime' => '2022-11-23T23:07:50',
+    'lastModifiedBy' => 'MMOHITTE',
+    'receivedDateTime' => '2022-11-24T04:08:16.147Z',
+    'notificationType' => 'UPDATE',
+    'action' => 'UNKNOWN',
+    'arrival' => '2022-08-25',
+    'departure' => '2023-08-27',
+    'bookedUnits' => 
+    array (
+      0 => 
+      array (
+        'end' => '2023-08-26',
+        'start' => '2022-08-25',
+        'unitCount' => 1,
+        'unitTypeCode' => 'CK1NC',
+      ),
+    ),
+    'occupiedUnits' => 
+    array (
+      0 => 
+      array (
+        'end' => '2023-08-26',
+        'start' => '2022-08-25',
+        'unitId' => 'NH12',
+        'extraBeds' => 
+        array (
+          0 => 
+          array (
+            'type' => 'CRIB',
+            'count' => 0,
+          ),
+          1 => 
+          array (
+            'type' => 'ROLLAWAY',
+            'count' => 0,
+          ),
+        ),
+        'unitTypeCode' => 'CK1NC',
+      ),
+    ),
+    'occupancyDetails' => 
+    array (
+      0 => 
+      array (
+        'end' => '2023-08-26',
+        'start' => '2022-08-25',
+        'isPerUnit' => true,
+        'occupants' => 
+        array (
+          0 => 
+          array (
+            'type' => 'ADULT',
+            'count' => 1,
+          ),
+          1 => 
+          array (
+            'type' => 'CHILD',
+            'count' => 1,
+          ),
+        ),
+        'childrenDetails' => 
+        array (
+          0 => 
+          array (
+            'age' => 5,
+            'count' => 1,
+          ),
+        ),
+      ),
+    ),
+    'currency' => 
+    array (
+      'code' => 'USD',
+    ),
+    'ratePlans' => 
+    array (
+      0 => 
+      array (
+        'end' => '2023-08-26',
+        'code' => '0T01-FLAT100',
+        'start' => '2022-08-25',
+      ),
+    ),
+    'prices' => 
+    array (
+      0 => 
+      array (
+        'end' => '2023-08-26',
+        'start' => '2022-08-25',
+        'amount' => 100,
+        'ratePlanCode' => '0T01-FLAT100',
+      ),
+    ),
+    'discounts' => NULL,
+    'guaranteeCode' => 'CHECKED IN',
+    'paymentMethod' => 
+    array (
+      'code' => 'CR',
+    ),
+    'isComplimentary' => NULL,
+    'segmentations' => 
+    array (
+      0 => 
+      array (
+        'end' => '2023-08-26',
+        'code' => 'ZHO',
+        'type' => 'MARKET',
+        'start' => '2022-08-25',
+      ),
+      1 => 
+      array (
+        'end' => '2023-08-26',
+        'code' => '800',
+        'type' => 'SOURCE',
+        'start' => '2022-08-25',
+      ),
+      2 => 
+      array (
+        'end' => '2023-08-26',
+        'code' => 'PMS',
+        'type' => 'CHANNEL',
+        'start' => '2022-08-25',
+      ),
+    ),
+    'guests' => 
+    array (
+      0 => 
+      array (
+        'guest' => 
+        array (
+          'id' => '5439d4ceaac04ae28060b8af67ca9701',
+          'type' => 'GUEST',
+          'names' => 
+          array (
+            0 => 
+            array (
+              'surname' => 'starc',
+              'givenName' => 'tom',
+            ),
+          ),
+          'gender' => 'UNKNOWN',
+          'consents' => 
+          array (
+            0 => 
+            array (
+              'category' => 'Mail',
+              'isAllowed' => true,
+            ),
+            1 => 
+            array (
+              'category' => 'EMail',
+              'isAllowed' => false,
+            ),
+            2 => 
+            array (
+              'category' => 'Phone',
+              'isAllowed' => false,
+            ),
+            3 => 
+            array (
+              'category' => 'Sms',
+              'isAllowed' => false,
+            ),
+            4 => 
+            array (
+              'category' => 'History',
+              'isAllowed' => false,
+            ),
+            5 => 
+            array (
+              'category' => 'Market research',
+              'isAllowed' => true,
+            ),
+            6 => 
+            array (
+              'category' => 'Third party',
+              'isAllowed' => true,
+            ),
+          ),
+          'addresses' => 
+          array (
+            0 => 
+            array (
+              'type' => 'HOME',
+              'country' => 
+              array (
+                'code' => 'AA',
+                'format' => 'CUSTOM',
+              ),
+              'isPrimary' => true,
+            ),
+          ),
+          'createdBy' => 'RKOTUR',
+          'isPrivate' => false,
+          'referenceIds' => 
+          array (
+            0 => 
+            array (
+              'id' => '1114780',
+              'idType' => 'GUEST_ID',
+              'systemId' => 'Opera',
+              'systemType' => 'PMS',
+            ),
+          ),
+          'lastModifiedBy' => 'RKOTUR',
+          'classifications' => 
+          array (
+            0 => 
+            array (
+              'code' => 'T1',
+            ),
+          ),
+          'createdDateTime' => '2022-09-14T01:15:14',
+          'primaryLanguage' => 
+          array (
+            'code' => 'E',
+            'format' => 'CUSTOM',
+          ),
+          'propertyDetails' => 
+          array (
+            'code' => 'PGH',
+            'chainCode' => 'ACCOR',
+          ),
+          'lastModifiedDateTime' => '2022-11-10T08:47:09',
+        ),
+        'isPrimary' => true,
+      ),
+    ),
+    'doNotDisplayPrice' => NULL,
+    'actualDateTimeOfArrival' => '2022-08-25T01:17:00',
+    'actualDateTimeOfDeparture' => NULL,
+    'estimatedDateTimeOfArrival' => NULL,
+    'services' => NULL,
+    'additionalData' => 
+    array (
+      0 => 
+      array (
+        'code' => 'nameTaxType',
+        'value' => '0',
+      ),
+    ),
+    'purposeOfStay' => NULL,
+    'sharerIds' => NULL,
+    'cancellationDetails' => NULL,
+    'blocks' => NULL,
+    'profiles' => NULL,
+    'memberships' => NULL,
+    'comments' => NULL,
+    'optionDate' => NULL,
+    'estimatedDateTimeOfDeparture' => NULL,
+    'reservationTotal' => NULL,
+    'taxes' => NULL,
+    'promotionCode' => NULL,
+    'cancellationPolicies' => 
+    array (
+      0 => 
+      array (
+        'code' => '24HR',
+        'description' => '24 hours prior to arrival',
+      ),
+    ),
+    'fixedCharges' => NULL,
+    'forecastRevenue' => NULL,
+    'blockIds' => NULL,
+    'requestedDeposits' => NULL,
+    'specialRequests' => NULL,
+    'alerts' => NULL,
+    'transfers' => NULL,
+    'contacts' => NULL,
+    'isHouseUse' => NULL,
+    'schemaVersion' => 3.0,
+    'command_id' => NULL,
+    'import_code' => NULL,
+  ),
+  6 => 
+  array (
+    'id' => 4099,
+    'rndcode' => 'RBGOVCAUVWUM',
+    'createtstamp' => 1702576780,
+    'modtstamp' => 1705970066,
+    'status' => 7,
+    'procesststamp' => 0,
+    'ext_id' => '70a32e9d92de4f4db46e2b1025695ce1',
+    'ext_status' => 'RESERVED',
+    'confirmation_number' => 2131769,
+    'reservation_id' => 2131769,
+    'propertyDetails' => 
+    array (
+      'code' => 'PGH',
+      'chainCode' => 'ACCOR',
+    ),
+    'extracted_property_code' => 'PGH',
+    'extracted_chain_code' => 'ACCOR',
+    'extracted_guest_id' => '6efd969067b946e7b9f719af3115ae0e',
+    'referenceIds' => 
+    array (
+      0 => 
+      array (
+        'id' => '2131769',
+        'idType' => 'RESERVATION_ID',
+        'systemId' => 'Opera',
+        'legNumber' => '1',
+        'systemType' => 'PMS',
+      ),
+      1 => 
+      array (
+        'id' => '2131769',
+        'idType' => 'CONFIRMATION_NUMBER',
+        'systemId' => 'Opera',
+        'legNumber' => '1',
+        'systemType' => 'PMS',
+      ),
+    ),
+    'createdDateTime_repo' => '',
+    'createdDateTime' => '2022-11-11T01:03:53',
+    'createdBy' => 'RKOTUR',
+    'lastModifiedDateTime_repo' => '2022-11-11T06:04:58Z',
+    'lastModifiedDateTime' => '2022-11-11T01:03:53',
+    'lastModifiedBy' => 'RKOTUR',
+    'receivedDateTime' => '2022-11-11T06:04:57.807Z',
+    'notificationType' => 'UPDATE',
+    'action' => 'UNKNOWN',
+    'arrival' => '2022-11-11',
+    'departure' => '2022-11-13',
+    'bookedUnits' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-11-12',
+        'start' => '2022-11-11',
+        'unitCount' => 1,
+        'unitTypeCode' => 'CK1NR',
+      ),
+    ),
+    'occupiedUnits' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-11-12',
+        'start' => '2022-11-11',
+        'unitId' => '1410',
+        'extraBeds' => 
+        array (
+          0 => 
+          array (
+            'type' => 'CRIB',
+            'count' => 0,
+          ),
+          1 => 
+          array (
+            'type' => 'ROLLAWAY',
+            'count' => 0,
+          ),
+        ),
+        'unitTypeCode' => 'CK1NR',
+      ),
+    ),
+    'occupancyDetails' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-11-12',
+        'start' => '2022-11-11',
+        'isPerUnit' => true,
+        'occupants' => 
+        array (
+          0 => 
+          array (
+            'type' => 'ADULT',
+            'count' => 1,
+          ),
+          1 => 
+          array (
+            'type' => 'CHILD',
+            'count' => 0,
+          ),
+        ),
+      ),
+    ),
+    'currency' => 
+    array (
+      'code' => 'USD',
+    ),
+    'ratePlans' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-11-12',
+        'code' => '0T01-FLAT100',
+        'start' => '2022-11-11',
+      ),
+    ),
+    'prices' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-11-12',
+        'start' => '2022-11-11',
+        'amount' => 100,
+        'ratePlanCode' => '0T01-FLAT100',
+      ),
+    ),
+    'discounts' => NULL,
+    'guaranteeCode' => 'NG',
+    'paymentMethod' => 
+    array (
+      'code' => 'CR',
+    ),
+    'isComplimentary' => NULL,
+    'segmentations' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-11-12',
+        'code' => 'ZHO',
+        'type' => 'MARKET',
+        'start' => '2022-11-11',
+      ),
+      1 => 
+      array (
+        'end' => '2022-11-12',
+        'code' => '800',
+        'type' => 'SOURCE',
+        'start' => '2022-11-11',
+      ),
+      2 => 
+      array (
+        'end' => '2022-11-12',
+        'code' => 'PMS',
+        'type' => 'CHANNEL',
+        'start' => '2022-11-11',
+      ),
+    ),
+    'guests' => 
+    array (
+      0 => 
+      array (
+        'guest' => 
+        array (
+          'id' => '6efd969067b946e7b9f719af3115ae0e',
+          'type' => 'GUEST',
+          'names' => 
+          array (
+            0 => 
+            array (
+              'surname' => 'philip',
+              'givenName' => 'KL',
+            ),
+          ),
+          'gender' => 'UNKNOWN',
+          'consents' => 
+          array (
+            0 => 
+            array (
+              'category' => 'Mail',
+              'isAllowed' => true,
+            ),
+            1 => 
+            array (
+              'category' => 'EMail',
+              'isAllowed' => false,
+            ),
+            2 => 
+            array (
+              'category' => 'Phone',
+              'isAllowed' => false,
+            ),
+            3 => 
+            array (
+              'category' => 'Sms',
+              'isAllowed' => false,
+            ),
+            4 => 
+            array (
+              'category' => 'History',
+              'isAllowed' => false,
+            ),
+            5 => 
+            array (
+              'category' => 'Market research',
+              'isAllowed' => true,
+            ),
+            6 => 
+            array (
+              'category' => 'Third party',
+              'isAllowed' => true,
+            ),
+          ),
+          'addresses' => 
+          array (
+            0 => 
+            array (
+              'type' => 'HOME',
+              'country' => 
+              array (
+                'code' => 'AA',
+                'format' => 'CUSTOM',
+              ),
+              'isPrimary' => true,
+            ),
+          ),
+          'createdBy' => 'RKOTUR',
+          'isPrivate' => false,
+          'referenceIds' => 
+          array (
+            0 => 
+            array (
+              'id' => '1122530',
+              'idType' => 'GUEST_ID',
+              'systemId' => 'Opera',
+              'systemType' => 'PMS',
+            ),
+          ),
+          'contactDetails' => 
+          array (
+            0 => 
+            array (
+              'type' => 'EMAIL',
+              'value' => 'rkotur@cybage.com',
+              'category' => 'EMAIL',
+              'isPrimary' => true,
+            ),
+          ),
+          'lastModifiedBy' => 'RKOTUR',
+          'createdDateTime' => '2022-11-11T01:02:55',
+          'primaryLanguage' => 
+          array (
+            'code' => 'E',
+            'format' => 'CUSTOM',
+          ),
+          'propertyDetails' => 
+          array (
+            'code' => 'PGH',
+            'chainCode' => 'ACCOR',
+          ),
+          'lastModifiedDateTime' => '2022-11-11T01:03:12',
+        ),
+        'isPrimary' => true,
+      ),
+    ),
+    'doNotDisplayPrice' => NULL,
+    'actualDateTimeOfArrival' => NULL,
+    'actualDateTimeOfDeparture' => NULL,
+    'estimatedDateTimeOfArrival' => NULL,
+    'services' => NULL,
+    'additionalData' => 
+    array (
+      0 => 
+      array (
+        'code' => 'nameTaxType',
+        'value' => '0',
+      ),
+    ),
+    'purposeOfStay' => NULL,
+    'sharerIds' => NULL,
+    'cancellationDetails' => NULL,
+    'blocks' => NULL,
+    'profiles' => NULL,
+    'memberships' => NULL,
+    'comments' => NULL,
+    'optionDate' => NULL,
+    'estimatedDateTimeOfDeparture' => NULL,
+    'reservationTotal' => NULL,
+    'taxes' => NULL,
+    'promotionCode' => NULL,
+    'cancellationPolicies' => 
+    array (
+      0 => 
+      array (
+        'code' => '24HR',
+        'description' => '24 hours prior to arrival',
+      ),
+    ),
+    'fixedCharges' => NULL,
+    'forecastRevenue' => NULL,
+    'blockIds' => NULL,
+    'requestedDeposits' => NULL,
+    'specialRequests' => NULL,
+    'alerts' => NULL,
+    'transfers' => NULL,
+    'contacts' => NULL,
+    'isHouseUse' => NULL,
+    'schemaVersion' => 3.0,
+    'command_id' => NULL,
+    'import_code' => NULL,
+  ),
+  7 => 
+  array (
+    'id' => 40100,
+    'rndcode' => 'IIHCOKPJCHES',
+    'createtstamp' => 1702576780,
+    'modtstamp' => 1705970066,
+    'status' => 7,
+    'procesststamp' => 0,
+    'ext_id' => '87557634bc4f46b1be1ff7507884cc44',
+    'ext_status' => 'RESERVED',
+    'confirmation_number' => 2131770,
+    'reservation_id' => 2131770,
+    'propertyDetails' => 
+    array (
+      'code' => 'PGH',
+      'chainCode' => 'ACCOR',
+    ),
+    'extracted_property_code' => 'PGH',
+    'extracted_chain_code' => 'ACCOR',
+    'extracted_guest_id' => 'e69db6360e184c36b7f288457b730b2a',
+    'referenceIds' => 
+    array (
+      0 => 
+      array (
+        'id' => '2131770',
+        'idType' => 'RESERVATION_ID',
+        'systemId' => 'Opera',
+        'legNumber' => '1',
+        'systemType' => 'PMS',
+      ),
+      1 => 
+      array (
+        'id' => '2131770',
+        'idType' => 'CONFIRMATION_NUMBER',
+        'systemId' => 'Opera',
+        'legNumber' => '1',
+        'systemType' => 'PMS',
+      ),
+    ),
+    'createdDateTime_repo' => '',
+    'createdDateTime' => '2022-11-11T01:47:02',
+    'createdBy' => 'RKOTUR',
+    'lastModifiedDateTime_repo' => '2022-11-11T06:47:57Z',
+    'lastModifiedDateTime' => '2022-11-11T01:47:02',
+    'lastModifiedBy' => 'RKOTUR',
+    'receivedDateTime' => '2022-11-11T06:47:56.816Z',
+    'notificationType' => 'UPDATE',
+    'action' => 'UNKNOWN',
+    'arrival' => '2022-11-11',
+    'departure' => '2022-11-13',
+    'bookedUnits' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-11-12',
+        'start' => '2022-11-11',
+        'unitCount' => 1,
+        'unitTypeCode' => 'CK1NC',
+      ),
+    ),
+    'occupiedUnits' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-11-12',
+        'start' => '2022-11-11',
+        'unitId' => '1405',
+        'extraBeds' => 
+        array (
+          0 => 
+          array (
+            'type' => 'CRIB',
+            'count' => 0,
+          ),
+          1 => 
+          array (
+            'type' => 'ROLLAWAY',
+            'count' => 0,
+          ),
+        ),
+        'unitTypeCode' => 'CK1NC',
+      ),
+    ),
+    'occupancyDetails' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-11-12',
+        'start' => '2022-11-11',
+        'isPerUnit' => true,
+        'occupants' => 
+        array (
+          0 => 
+          array (
+            'type' => 'ADULT',
+            'count' => 1,
+          ),
+          1 => 
+          array (
+            'type' => 'CHILD',
+            'count' => 0,
+          ),
+        ),
+      ),
+    ),
+    'currency' => 
+    array (
+      'code' => 'USD',
+    ),
+    'ratePlans' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-11-12',
+        'code' => '0T01-FLAT100',
+        'start' => '2022-11-11',
+      ),
+    ),
+    'prices' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-11-12',
+        'start' => '2022-11-11',
+        'amount' => 100,
+        'ratePlanCode' => '0T01-FLAT100',
+      ),
+    ),
+    'discounts' => NULL,
+    'guaranteeCode' => 'NG',
+    'paymentMethod' => 
+    array (
+      'code' => 'CR',
+    ),
+    'isComplimentary' => NULL,
+    'segmentations' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-11-12',
+        'code' => 'ZHO',
+        'type' => 'MARKET',
+        'start' => '2022-11-11',
+      ),
+      1 => 
+      array (
+        'end' => '2022-11-12',
+        'code' => '800',
+        'type' => 'SOURCE',
+        'start' => '2022-11-11',
+      ),
+      2 => 
+      array (
+        'end' => '2022-11-12',
+        'code' => 'PMS',
+        'type' => 'CHANNEL',
+        'start' => '2022-11-11',
+      ),
+    ),
+    'guests' => 
+    array (
+      0 => 
+      array (
+        'guest' => 
+        array (
+          'id' => 'e69db6360e184c36b7f288457b730b2a',
+          'type' => 'GUEST',
+          'names' => 
+          array (
+            0 => 
+            array (
+              'surname' => 'Patel',
+              'givenName' => 'Hemraj',
+            ),
+          ),
+          'gender' => 'UNKNOWN',
+          'consents' => 
+          array (
+            0 => 
+            array (
+              'category' => 'Mail',
+              'isAllowed' => true,
+            ),
+            1 => 
+            array (
+              'category' => 'EMail',
+              'isAllowed' => false,
+            ),
+            2 => 
+            array (
+              'category' => 'Phone',
+              'isAllowed' => false,
+            ),
+            3 => 
+            array (
+              'category' => 'Sms',
+              'isAllowed' => false,
+            ),
+            4 => 
+            array (
+              'category' => 'History',
+              'isAllowed' => false,
+            ),
+            5 => 
+            array (
+              'category' => 'Market research',
+              'isAllowed' => true,
+            ),
+            6 => 
+            array (
+              'category' => 'Third party',
+              'isAllowed' => true,
+            ),
+          ),
+          'addresses' => 
+          array (
+            0 => 
+            array (
+              'type' => 'HOME',
+              'country' => 
+              array (
+                'code' => 'AA',
+                'format' => 'CUSTOM',
+              ),
+              'isPrimary' => true,
+            ),
+          ),
+          'createdBy' => 'RKOTUR',
+          'isPrivate' => false,
+          'referenceIds' => 
+          array (
+            0 => 
+            array (
+              'id' => '1122531',
+              'idType' => 'GUEST_ID',
+              'systemId' => 'Opera',
+              'systemType' => 'PMS',
+            ),
+          ),
+          'contactDetails' => 
+          array (
+            0 => 
+            array (
+              'type' => 'EMAIL',
+              'value' => 'rkotur@cybage.com',
+              'category' => 'EMAIL',
+              'isPrimary' => true,
+            ),
+          ),
+          'lastModifiedBy' => 'RKOTUR',
+          'createdDateTime' => '2022-11-11T01:46:36',
+          'primaryLanguage' => 
+          array (
+            'code' => 'E',
+            'format' => 'CUSTOM',
+          ),
+          'propertyDetails' => 
+          array (
+            'code' => 'PGH',
+            'chainCode' => 'ACCOR',
+          ),
+          'lastModifiedDateTime' => '2022-11-11T01:46:58',
+        ),
+        'isPrimary' => true,
+      ),
+    ),
+    'doNotDisplayPrice' => NULL,
+    'actualDateTimeOfArrival' => NULL,
+    'actualDateTimeOfDeparture' => NULL,
+    'estimatedDateTimeOfArrival' => NULL,
+    'services' => NULL,
+    'additionalData' => 
+    array (
+      0 => 
+      array (
+        'code' => 'nameTaxType',
+        'value' => '0',
+      ),
+    ),
+    'purposeOfStay' => NULL,
+    'sharerIds' => NULL,
+    'cancellationDetails' => NULL,
+    'blocks' => NULL,
+    'profiles' => NULL,
+    'memberships' => NULL,
+    'comments' => NULL,
+    'optionDate' => NULL,
+    'estimatedDateTimeOfDeparture' => NULL,
+    'reservationTotal' => NULL,
+    'taxes' => NULL,
+    'promotionCode' => NULL,
+    'cancellationPolicies' => 
+    array (
+      0 => 
+      array (
+        'code' => '24HR',
+        'description' => '24 hours prior to arrival',
+      ),
+    ),
+    'fixedCharges' => NULL,
+    'forecastRevenue' => NULL,
+    'blockIds' => NULL,
+    'requestedDeposits' => NULL,
+    'specialRequests' => NULL,
+    'alerts' => NULL,
+    'transfers' => NULL,
+    'contacts' => NULL,
+    'isHouseUse' => NULL,
+    'schemaVersion' => 3.0,
+    'command_id' => NULL,
+    'import_code' => NULL,
+  ),
+  8 => 
+  array (
+    'id' => 40101,
+    'rndcode' => 'JIHCOBQDULWR',
+    'createtstamp' => 1702576780,
+    'modtstamp' => 1705970066,
+    'status' => 7,
+    'procesststamp' => 0,
+    'ext_id' => '39cd8e29f5fe4e2cb3f76b40b3eccb53',
+    'ext_status' => 'RESERVED',
+    'confirmation_number' => 2132016,
+    'reservation_id' => 2132016,
+    'propertyDetails' => 
+    array (
+      'code' => 'PGH',
+      'chainCode' => 'ACCOR',
+    ),
+    'extracted_property_code' => 'PGH',
+    'extracted_chain_code' => 'ACCOR',
+    'extracted_guest_id' => 'a3d681684d3744a9b8533ce319d2cab9',
+    'referenceIds' => 
+    array (
+      0 => 
+      array (
+        'id' => '2132016',
+        'idType' => 'RESERVATION_ID',
+        'systemId' => 'Opera',
+        'legNumber' => '1',
+        'systemType' => 'PMS',
+      ),
+      1 => 
+      array (
+        'id' => '2132016',
+        'idType' => 'CONFIRMATION_NUMBER',
+        'systemId' => 'Opera',
+        'legNumber' => '1',
+        'systemType' => 'PMS',
+      ),
+    ),
+    'createdDateTime_repo' => '',
+    'createdDateTime' => '2022-11-14T04:30:12',
+    'createdBy' => 'RKOTUR',
+    'lastModifiedDateTime_repo' => '2022-11-14T09:31:08Z',
+    'lastModifiedDateTime' => '2022-11-14T04:30:12',
+    'lastModifiedBy' => 'RKOTUR',
+    'receivedDateTime' => '2022-11-14T09:31:07.86Z',
+    'notificationType' => 'UPDATE',
+    'action' => 'UNKNOWN',
+    'arrival' => '2022-11-14',
+    'departure' => '2022-11-16',
+    'bookedUnits' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-11-15',
+        'start' => '2022-11-14',
+        'unitCount' => 1,
+        'unitTypeCode' => 'CK1NR',
+      ),
+    ),
+    'occupiedUnits' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-11-15',
+        'start' => '2022-11-14',
+        'unitId' => '1410',
+        'extraBeds' => 
+        array (
+          0 => 
+          array (
+            'type' => 'CRIB',
+            'count' => 0,
+          ),
+          1 => 
+          array (
+            'type' => 'ROLLAWAY',
+            'count' => 0,
+          ),
+        ),
+        'unitTypeCode' => 'CK1NR',
+      ),
+    ),
+    'occupancyDetails' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-11-15',
+        'start' => '2022-11-14',
+        'isPerUnit' => true,
+        'occupants' => 
+        array (
+          0 => 
+          array (
+            'type' => 'ADULT',
+            'count' => 1,
+          ),
+          1 => 
+          array (
+            'type' => 'CHILD',
+            'count' => 0,
+          ),
+        ),
+      ),
+    ),
+    'currency' => 
+    array (
+      'code' => 'USD',
+    ),
+    'ratePlans' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-11-15',
+        'code' => '0T01-FLAT100',
+        'start' => '2022-11-14',
+      ),
+    ),
+    'prices' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-11-15',
+        'start' => '2022-11-14',
+        'amount' => 100,
+        'ratePlanCode' => '0T01-FLAT100',
+      ),
+    ),
+    'discounts' => NULL,
+    'guaranteeCode' => 'NG',
+    'paymentMethod' => 
+    array (
+      'code' => 'CR',
+    ),
+    'isComplimentary' => NULL,
+    'segmentations' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-11-15',
+        'code' => 'ZHO',
+        'type' => 'MARKET',
+        'start' => '2022-11-14',
+      ),
+      1 => 
+      array (
+        'end' => '2022-11-15',
+        'code' => '800',
+        'type' => 'SOURCE',
+        'start' => '2022-11-14',
+      ),
+      2 => 
+      array (
+        'end' => '2022-11-15',
+        'code' => 'PMS',
+        'type' => 'CHANNEL',
+        'start' => '2022-11-14',
+      ),
+    ),
+    'guests' => 
+    array (
+      0 => 
+      array (
+        'guest' => 
+        array (
+          'id' => 'a3d681684d3744a9b8533ce319d2cab9',
+          'type' => 'GUEST',
+          'names' => 
+          array (
+            0 => 
+            array (
+              'surname' => 'Wadia',
+              'givenName' => 'Kamlesh',
+            ),
+          ),
+          'gender' => 'UNKNOWN',
+          'consents' => 
+          array (
+            0 => 
+            array (
+              'category' => 'Mail',
+              'isAllowed' => true,
+            ),
+            1 => 
+            array (
+              'category' => 'EMail',
+              'isAllowed' => false,
+            ),
+            2 => 
+            array (
+              'category' => 'Phone',
+              'isAllowed' => false,
+            ),
+            3 => 
+            array (
+              'category' => 'Sms',
+              'isAllowed' => false,
+            ),
+            4 => 
+            array (
+              'category' => 'History',
+              'isAllowed' => false,
+            ),
+            5 => 
+            array (
+              'category' => 'Market research',
+              'isAllowed' => true,
+            ),
+            6 => 
+            array (
+              'category' => 'Third party',
+              'isAllowed' => true,
+            ),
+          ),
+          'addresses' => 
+          array (
+            0 => 
+            array (
+              'type' => 'HOME',
+              'country' => 
+              array (
+                'code' => 'AA',
+                'format' => 'CUSTOM',
+              ),
+              'isPrimary' => true,
+            ),
+          ),
+          'createdBy' => 'RKOTUR',
+          'isPrivate' => false,
+          'referenceIds' => 
+          array (
+            0 => 
+            array (
+              'id' => '1122779',
+              'idType' => 'GUEST_ID',
+              'systemId' => 'Opera',
+              'systemType' => 'PMS',
+            ),
+          ),
+          'contactDetails' => 
+          array (
+            0 => 
+            array (
+              'type' => 'EMAIL',
+              'value' => 'rkotur@cybage.com',
+              'category' => 'EMAIL',
+              'isPrimary' => true,
+            ),
+          ),
+          'lastModifiedBy' => 'RKOTUR',
+          'createdDateTime' => '2022-11-14T04:29:16',
+          'primaryLanguage' => 
+          array (
+            'code' => 'E',
+            'format' => 'CUSTOM',
+          ),
+          'propertyDetails' => 
+          array (
+            'code' => 'PGH',
+            'chainCode' => 'ACCOR',
+          ),
+          'lastModifiedDateTime' => '2022-11-14T04:29:48',
+        ),
+        'isPrimary' => true,
+      ),
+    ),
+    'doNotDisplayPrice' => NULL,
+    'actualDateTimeOfArrival' => NULL,
+    'actualDateTimeOfDeparture' => NULL,
+    'estimatedDateTimeOfArrival' => NULL,
+    'services' => NULL,
+    'additionalData' => 
+    array (
+      0 => 
+      array (
+        'code' => 'nameTaxType',
+        'value' => '0',
+      ),
+    ),
+    'purposeOfStay' => NULL,
+    'sharerIds' => NULL,
+    'cancellationDetails' => NULL,
+    'blocks' => NULL,
+    'profiles' => NULL,
+    'memberships' => NULL,
+    'comments' => NULL,
+    'optionDate' => NULL,
+    'estimatedDateTimeOfDeparture' => NULL,
+    'reservationTotal' => NULL,
+    'taxes' => NULL,
+    'promotionCode' => NULL,
+    'cancellationPolicies' => 
+    array (
+      0 => 
+      array (
+        'code' => '24HR',
+        'description' => '24 hours prior to arrival',
+      ),
+    ),
+    'fixedCharges' => NULL,
+    'forecastRevenue' => NULL,
+    'blockIds' => NULL,
+    'requestedDeposits' => NULL,
+    'specialRequests' => NULL,
+    'alerts' => NULL,
+    'transfers' => NULL,
+    'contacts' => NULL,
+    'isHouseUse' => NULL,
+    'schemaVersion' => 3.0,
+    'command_id' => NULL,
+    'import_code' => NULL,
+  ),
+  9 => 
+  array (
+    'id' => 40102,
+    'rndcode' => 'KIHCOBQCNHWC',
+    'createtstamp' => 1702576780,
+    'modtstamp' => 1705970066,
+    'status' => 7,
+    'procesststamp' => 0,
+    'ext_id' => 'eeaa555b2fc04cc88e970938c14c47c7',
+    'ext_status' => 'IN_HOUSE',
+    'confirmation_number' => 2132017,
+    'reservation_id' => 2132017,
+    'propertyDetails' => 
+    array (
+      'code' => 'PGH',
+      'chainCode' => 'ACCOR',
+    ),
+    'extracted_property_code' => 'PGH',
+    'extracted_chain_code' => 'ACCOR',
+    'extracted_guest_id' => '84be21f0462e4fbdb5f7c7ccf1cd9529',
+    'referenceIds' => 
+    array (
+      0 => 
+      array (
+        'id' => '2132017',
+        'idType' => 'RESERVATION_ID',
+        'systemId' => 'Opera',
+        'legNumber' => '1',
+        'systemType' => 'PMS',
+      ),
+      1 => 
+      array (
+        'id' => '2132017',
+        'idType' => 'CONFIRMATION_NUMBER',
+        'systemId' => 'Opera',
+        'legNumber' => '1',
+        'systemType' => 'PMS',
+      ),
+    ),
+    'createdDateTime_repo' => '',
+    'createdDateTime' => '2022-11-14T04:32:37',
+    'createdBy' => 'RKOTUR',
+    'lastModifiedDateTime_repo' => '2022-11-14T09:36:01Z',
+    'lastModifiedDateTime' => '2022-11-14T04:35:15',
+    'lastModifiedBy' => 'RKOTUR',
+    'receivedDateTime' => '2022-11-14T09:36:01.049Z',
+    'notificationType' => 'UPDATE',
+    'action' => 'UNKNOWN',
+    'arrival' => '2022-08-25',
+    'departure' => '2022-11-19',
+    'bookedUnits' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-11-18',
+        'start' => '2022-08-25',
+        'unitCount' => 1,
+        'unitTypeCode' => 'CQ2NR',
+      ),
+    ),
+    'occupiedUnits' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-11-18',
+        'start' => '2022-08-25',
+        'unitId' => '1506',
+        'extraBeds' => 
+        array (
+          0 => 
+          array (
+            'type' => 'CRIB',
+            'count' => 0,
+          ),
+          1 => 
+          array (
+            'type' => 'ROLLAWAY',
+            'count' => 0,
+          ),
+        ),
+        'unitTypeCode' => 'CQ2NR',
+      ),
+    ),
+    'occupancyDetails' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-11-18',
+        'start' => '2022-08-25',
+        'isPerUnit' => true,
+        'occupants' => 
+        array (
+          0 => 
+          array (
+            'type' => 'ADULT',
+            'count' => 1,
+          ),
+          1 => 
+          array (
+            'type' => 'CHILD',
+            'count' => 0,
+          ),
+        ),
+      ),
+    ),
+    'currency' => 
+    array (
+      'code' => 'USD',
+    ),
+    'ratePlans' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-11-18',
+        'code' => '0T01-FLAT100',
+        'start' => '2022-08-25',
+      ),
+    ),
+    'prices' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-11-18',
+        'start' => '2022-08-25',
+        'amount' => 100,
+        'ratePlanCode' => '0T01-FLAT100',
+      ),
+    ),
+    'discounts' => NULL,
+    'guaranteeCode' => 'CHECKED IN',
+    'paymentMethod' => 
+    array (
+      'code' => 'CR',
+    ),
+    'isComplimentary' => NULL,
+    'segmentations' => 
+    array (
+      0 => 
+      array (
+        'end' => '2022-11-18',
+        'code' => 'ZHO',
+        'type' => 'MARKET',
+        'start' => '2022-08-25',
+      ),
+      1 => 
+      array (
+        'end' => '2022-11-18',
+        'code' => '800',
+        'type' => 'SOURCE',
+        'start' => '2022-08-25',
+      ),
+      2 => 
+      array (
+        'end' => '2022-11-18',
+        'code' => 'PMS',
+        'type' => 'CHANNEL',
+        'start' => '2022-08-25',
+      ),
+    ),
+    'guests' => 
+    array (
+      0 => 
+      array (
+        'guest' => 
+        array (
+          'id' => '84be21f0462e4fbdb5f7c7ccf1cd9529',
+          'type' => 'GUEST',
+          'names' => 
+          array (
+            0 => 
+            array (
+              'surname' => 'dude',
+              'givenName' => 'Sandeep',
+            ),
+          ),
+          'gender' => 'UNKNOWN',
+          'consents' => 
+          array (
+            0 => 
+            array (
+              'category' => 'Mail',
+              'isAllowed' => true,
+            ),
+            1 => 
+            array (
+              'category' => 'EMail',
+              'isAllowed' => false,
+            ),
+            2 => 
+            array (
+              'category' => 'Phone',
+              'isAllowed' => false,
+            ),
+            3 => 
+            array (
+              'category' => 'Sms',
+              'isAllowed' => false,
+            ),
+            4 => 
+            array (
+              'category' => 'History',
+              'isAllowed' => false,
+            ),
+            5 => 
+            array (
+              'category' => 'Market research',
+              'isAllowed' => true,
+            ),
+            6 => 
+            array (
+              'category' => 'Third party',
+              'isAllowed' => true,
+            ),
+          ),
+          'addresses' => 
+          array (
+            0 => 
+            array (
+              'type' => 'HOME',
+              'country' => 
+              array (
+                'code' => 'AA',
+                'format' => 'CUSTOM',
+              ),
+              'isPrimary' => true,
+            ),
+          ),
+          'createdBy' => 'RKOTUR',
+          'isPrivate' => false,
+          'referenceIds' => 
+          array (
+            0 => 
+            array (
+              'id' => '1122780',
+              'idType' => 'GUEST_ID',
+              'systemId' => 'Opera',
+              'systemType' => 'PMS',
+            ),
+          ),
+          'contactDetails' => 
+          array (
+            0 => 
+            array (
+              'type' => 'EMAIL',
+              'value' => 'rkotur@cybage.com',
+              'category' => 'EMAIL',
+              'isPrimary' => true,
+            ),
+          ),
+          'lastModifiedBy' => 'RKOTUR',
+          'createdDateTime' => '2022-11-14T04:31:52',
+          'primaryLanguage' => 
+          array (
+            'code' => 'E',
+            'format' => 'CUSTOM',
+          ),
+          'propertyDetails' => 
+          array (
+            'code' => 'PGH',
+            'chainCode' => 'ACCOR',
+          ),
+          'lastModifiedDateTime' => '2022-11-14T04:34:28',
+        ),
+        'isPrimary' => true,
+      ),
+    ),
+    'doNotDisplayPrice' => NULL,
+    'actualDateTimeOfArrival' => '2022-08-25T04:35:15',
+    'actualDateTimeOfDeparture' => NULL,
+    'estimatedDateTimeOfArrival' => NULL,
+    'services' => NULL,
+    'additionalData' => 
+    array (
+      0 => 
+      array (
+        'code' => 'nameTaxType',
+        'value' => '0',
+      ),
+    ),
+    'purposeOfStay' => NULL,
+    'sharerIds' => NULL,
+    'cancellationDetails' => NULL,
+    'blocks' => NULL,
+    'profiles' => NULL,
+    'memberships' => NULL,
+    'comments' => NULL,
+    'optionDate' => NULL,
+    'estimatedDateTimeOfDeparture' => NULL,
+    'reservationTotal' => NULL,
+    'taxes' => NULL,
+    'promotionCode' => NULL,
+    'cancellationPolicies' => 
+    array (
+      0 => 
+      array (
+        'code' => '24HR',
+        'description' => '24 hours prior to arrival',
+      ),
+    ),
+    'fixedCharges' => NULL,
+    'forecastRevenue' => NULL,
+    'blockIds' => NULL,
+    'requestedDeposits' => NULL,
+    'specialRequests' => NULL,
+    'alerts' => NULL,
+    'transfers' => NULL,
+    'contacts' => NULL,
+    'isHouseUse' => NULL,
+    'schemaVersion' => 3.0,
+    'command_id' => NULL,
+    'import_code' => NULL,
+  ),
+)
