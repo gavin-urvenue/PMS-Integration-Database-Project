@@ -1752,7 +1752,7 @@ function createArrRESERVATIONstayStatusStay($normalizedData, $arrRESERVATIONstay
 
 
 
-function createArrReservationRoomDetails(
+function createArrRESERVATIONroomDetails(
     $normalizedData,
     $arrCUSTOMERcontact,
     $arrRESERVATIONstay,
@@ -1771,10 +1771,11 @@ function createArrReservationRoomDetails(
         $indexedContacts[$index] = $contact['id'];
     }
 
-    $indexedStays = [];
+    // Indexing reservation stays for fast lookup
+    $indexedReservationStays = [];
     foreach ($arrRESERVATIONstay as $stay) {
-        $index = $stay['createDateTime'] . '|' . $stay['modifyDateTime'] . '|' . $stay['startDate'] . '|' . $stay['endDate'];
-        $indexedStays[$index] = $stay['id'];
+        $index = $stay['createDateTime'] . '|' . $stay['modifyDateTime'] . '|' . $stay['startDate'] . '|' . $stay['endDate']  . '|' . $stay['extGuestId'] . '|' . $stay['extPMSConfNum'];
+        $indexedReservationStays[$index] = $stay['id'];
     }
 
     $indexedRoomTypes = [];
@@ -1815,8 +1816,6 @@ function createArrReservationRoomDetails(
             // Decode and extract guest details
             $guestDetails = $entry['guests'][0]['guest'] ?? null;
 
-            //            $occupiedUnits = json_decode($entry['occupiedUnits'], true);
-//            $roomNumber = $occupiedUnits[0]['unitId'] ?? 'UNKNOWN';
 
 
             // Extract room number and typeCode from occupiedUnits
@@ -1844,15 +1843,27 @@ function createArrReservationRoomDetails(
                 $surname = $guestDetails['names'][0]['surname'] ?? null;
                 $contactIndex = $givenName . '|' . $surname . '|' . $entry['extracted_guest_id'];
                 $contactId = $indexedContacts[$contactIndex] ?? null;
-
+                $startDate = $entry['arrival'] ?? null; // Assuming these are already in the correct format
+                $endDate = $entry['departure'] ?? null;
                 $createDateTime = strtotime($entry['createdDateTime']);
                 $modifyDateTime = strtotime($entry['lastModifiedDateTime']);
-                $stayIndex = $createDateTime . '|' . $modifyDateTime . '|' . $entry['arrival'] . '|' . $entry['departure'];
-                $stayId = $indexedStays[$stayIndex] ?? null;
+                $extGuestId = $entry['extracted_guest_id'] ?? null;
+                $extPMSConfNum = $entry['confirmation_number'] ?? null;
+
+
+                // Create index for stay lookup
+                $stayIndex = $createDateTime . '|' . $modifyDateTime . '|' . $startDate . '|' . $endDate . '|' . $extGuestId . '|' . $extPMSConfNum;
+                // Lookup for stayId using the index
+                if (isset($indexedReservationStays[$stayIndex])) {
+                    $stayId = is_array($indexedReservationStays[$stayIndex])
+                        ? reset($indexedReservationStays[$stayIndex])
+                        : $indexedReservationStays[$stayIndex];
+                } else {
+                    $stayId = null;
+                }
 
                 // Room type and class lookups
-//                $roomTypeCode = json_decode($entry['occupiedUnits'], true)[0]['unitTypeCode'] ?? null;
-//                $libRoomTypeId = $indexedRoomTypes[$roomTypeCode] ?? null;
+
                 $className = 'UNKNOWN'; // Replace with actual logic to determine class name
                 $libRoomClassId = $indexedRoomClasses[$className] ?? null;
 
@@ -1868,11 +1879,11 @@ function createArrReservationRoomDetails(
                     'contactId' => $contactId,
                     'firstName' => $givenName,
                     'lastName' => $surname,
-                    'extGuestId' => $entry['extracted_guest_id'] ?? null,
+                    'extGuestId' => $extGuestId,
                     'stayId' => $stayId,
                     'createDateTime' => ($timestamp = strtotime($entry['createdDateTime'])) ? strval($timestamp) : null,
                     'modifyDateTime' => ($timestamp = strtotime($entry['lastModifiedDateTime'])) ? strval($timestamp) : null,
-                    'extPMSConfNum' => $entry['confirmation_number'] ?? null,
+                    'extPMSConfNum' => $extPMSConfNum,
                     'dataSource' => 'HAPI',
                     'libRoomId' => $libRoomId,
                     'roomNumber' => $roomNumber,
@@ -1890,7 +1901,7 @@ function createArrReservationRoomDetails(
         $errorCount++;
         // Log the exception
         $errorTimestamp = date('Y-m-d H:i:s');
-        $errorLogMessage = "[{$errorTimestamp}] Error in createArrReservationRoomDetails: " . $e->getMessage() . PHP_EOL;
+        $errorLogMessage = "[{$errorTimestamp}] Error in createArrRESERVATIONroomDetails: " . $e->getMessage() . PHP_EOL;
         error_log($errorLogMessage, 3, $errorLogFile);
 
         // Optionally rethrow the exception if further handling is required

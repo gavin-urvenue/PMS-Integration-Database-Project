@@ -376,7 +376,7 @@ $arrSERVICESpayment = getTableAsAssociativeArray($destinationDBConnection,'SERVI
 // 4) SERVICESfolioOrders
 //Create grandchild associative arrays using the populated parent tables
 // 1) RESERVATIONroomDetails
-$arrRESERVATIONroomDetails = createArrReservationRoomDetails($normalizedData, $arrCUSTOMERcontact, $arrRESERVATIONstay,$arrRESERVATIONlibRoomType, $arrRESERVATIONlibRoomClass, $arrRESERVATIONlibRoom, $errorCount);
+$arrRESERVATIONroomDetails = createArrRESERVATIONroomDetails($normalizedData, $arrCUSTOMERcontact, $arrRESERVATIONstay,$arrRESERVATIONlibRoomType, $arrRESERVATIONlibRoomClass, $arrRESERVATIONlibRoom, $errorCount);
 // 2) RESERVATIONstayStatusStay
 // First, index $arrRESERVATIONstay
 $indexedArrRESERVATIONstay = indexArrReservationStay($arrRESERVATIONstay);
@@ -447,15 +447,15 @@ try {
 //print_r($arrRESERVATIONstay);
 //print_r($arrSERVICESfolioOrders);
 //
-//$output = var_export($arrSERVICESfolioOrders, true);
-//$filename = "arrSERVICESfolioOrders.txt";
+//$output = var_export($normalizedData, true);
+//$filename = "normalizedData.txt";
 //file_put_contents($filename, $output);
 //var_dump(array_slice($arrSERVICESfolioOrders, 0, 10, true));
-$csv_file = new SplFileObject('arrSERVICESfolioOrders.csv', 'w');
-
-foreach ($arrSERVICESfolioOrders as $folioOrders) {
-    $csv_file->fputcsv($folioOrders);
-}
+//$csv_file = new SplFileObject('arrSERVICESfolioOrders.csv', 'w');
+//
+//foreach ($arrSERVICESfolioOrders as $folioOrders) {
+//    $csv_file->fputcsv($folioOrders);
+//}
 
 
 
