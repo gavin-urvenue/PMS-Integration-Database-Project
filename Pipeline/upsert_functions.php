@@ -25,7 +25,7 @@ function upsertCustomerContactType($data, $dbConnection, &$errorCount) {
                 $dbConnection->begin_transaction();
 
                 // Prepare the check query
-                $checkQuery = "SELECT `id`, `dataSource` FROM `$tableName` WHERE `type` = ?";
+                $checkQuery = "SELECT 1 FROM `$tableName` WHERE `type` = ?";
                 $stmt = $dbConnection->prepare($checkQuery);
                 if (!$stmt) {
                     throw new Exception(" (".__FUNCTION__.") Failed to prepare statement: " . $dbConnection->error);
@@ -127,7 +127,7 @@ function upsertReservationLibRoom($data, $dbConnection, &$errorCount) {
             $dbConnection->begin_transaction();
 
             // Check for existing record
-            $checkQuery = "SELECT `id`, `dataSource`, `metaData` FROM `$tableName` WHERE `roomNumber` = ?";
+            $checkQuery = "SELECT 1 FROM `$tableName` WHERE `roomNumber` = ?";
             $stmt = $dbConnection->prepare($checkQuery);
             if (!$stmt) {
                 throw new Exception(" (".__FUNCTION__.") Failed to prepare statement: " . $dbConnection->error);
@@ -225,7 +225,7 @@ function upsertReservationLibSource($data, $dbConnection, &$errorCount) {
 
                 $dbConnection->begin_transaction();
 
-                $checkQuery = "SELECT `id`, `dataSource`, `metaData` FROM `$tableName` WHERE `sourceName` = ? AND `sourceType` = ?";
+                $checkQuery = "SELECT 1 FROM `$tableName` WHERE `sourceName` = ? AND `sourceType` = ?";
                 $stmt = $dbConnection->prepare($checkQuery);
                 if (!$stmt) {
                     throw new Exception(" (".__FUNCTION__.") Failed to prepare statement: " . $dbConnection->error);
@@ -323,7 +323,7 @@ function upsertReservationLibProperty($data, $dbConnection, &$errorCount) {
 
             $dbConnection->begin_transaction();
 
-            $checkQuery = "SELECT `id`, `dataSource`, `metaData` FROM `$tableName` WHERE `propertyCode` = ? AND `chainCode` = ?";
+            $checkQuery = "SELECT 1 FROM `$tableName` WHERE `propertyCode` = ? AND `chainCode` = ?";
             $stmt = $dbConnection->prepare($checkQuery);
             if (!$stmt) {
                 throw new Exception(" (".__FUNCTION__.") Failed to prepare statement: " . $dbConnection->error);
@@ -421,7 +421,7 @@ function upsertCustomerLibLoyaltyProgram($data, $dbConnection, &$errorCount) {
 
                 $dbConnection->begin_transaction();
 
-                $checkQuery = "SELECT `id`, `metaData`, `dataSource` FROM `$tableName` WHERE `name` = ? AND `source` = ?";
+                $checkQuery = "SELECT 1 FROM `$tableName` WHERE `name` = ? AND `source` = ?";
                 $stmt = $dbConnection->prepare($checkQuery);
                 if (!$stmt) {
                     throw new Exception(" (".__FUNCTION__.") Failed to prepare statement: " . $dbConnection->error);
@@ -517,7 +517,7 @@ function upsertServicesLibTender($data, $dbConnection, &$errorCount) {
 
             $dbConnection->begin_transaction();
 
-            $checkQuery = "SELECT `id`, `dataSource`, `metaData` FROM `$tableName` WHERE `paymentMethod` = ?";
+            $checkQuery = "SELECT 1 FROM `$tableName` WHERE `paymentMethod` = ?";
             $stmt = $dbConnection->prepare($checkQuery);
             if (!$stmt) {
                 throw new Exception("Failed to prepare statement: " . $dbConnection->error);
@@ -613,7 +613,7 @@ function upsertServicesLibServiceItems($data, $dbConnection, &$errorCount) {
 
             $dbConnection->begin_transaction();
 
-            $checkQuery = "SELECT `id`, `dataSource`, `metaData` FROM `$tableName` WHERE `itemName` = ? AND `itemCode` = ? AND `ratePlanCode` = ?";
+            $checkQuery = "SELECT 1 FROM `$tableName` WHERE `itemName` = ? AND `itemCode` = ? AND `ratePlanCode` = ?";
             $stmt = $dbConnection->prepare($checkQuery);
             if (!$stmt) {
                 throw new Exception("(".__FUNCTION__.") Failed to prepare statement: " . $dbConnection->error);
@@ -794,7 +794,7 @@ function upsertReservationGroup($data, $dbConnection, &$errorCount) {
 
                 $dbConnection->begin_transaction();
 
-                $stmt = $dbConnection->prepare("SELECT `id`, `metaData`, `dataSource` FROM `$tableName` WHERE `groupName` = ? AND `groupNumber` = ? AND (`groupStartDate` = ? OR `groupStartDate` IS NULL) AND (`groupEndDate` = ? OR `groupEndDate` IS NULL)");
+                $stmt = $dbConnection->prepare("SELECT 1 FROM `$tableName` WHERE `groupName` = ? AND `groupNumber` = ? AND (`groupStartDate` = ? OR `groupStartDate` IS NULL) AND (`groupEndDate` = ? OR `groupEndDate` IS NULL)");
                 if (!$stmt) {
                     throw new Exception("(".__FUNCTION__.") Failed to prepare statement: " . $dbConnection->error);
                 }
@@ -893,7 +893,7 @@ function upsertReservationLibStayStatus($data, $dbConnection, &$errorCount) {
                 $dbConnection->begin_transaction();
 
                 // Check if a record with this status name already exists
-                $checkQuery = "SELECT `id`, `dataSource`, `metaData` FROM `$tableName` WHERE `statusName` = ?";
+                $checkQuery = "SELECT 1 FROM `$tableName` WHERE `statusName` = ?";
                 $stmt = $dbConnection->prepare($checkQuery);
                 if (!$stmt) {
                     throw new Exception("(".__FUNCTION__.") Failed to prepare statement: " . $dbConnection->error);
@@ -995,7 +995,7 @@ function upsertReservationLibRoomType($data, $dbConnection, &$errorCount) {
                 $dbConnection->begin_transaction();
 
                 // Check if a record with this combination already exists
-                $checkQuery = "SELECT `id`, `dataSource`, `metaData` FROM `$tableName` WHERE `typeName` = ? AND `typeCode` = ?";
+                $checkQuery = "SELECT 1 FROM `$tableName` WHERE `typeName` = ? AND `typeCode` = ?";
                 $stmt = $dbConnection->prepare($checkQuery);
                 if (!$stmt) {
                     throw new Exception("(".__FUNCTION__.") Failed to prepare statement: " . $dbConnection->error);
@@ -1096,7 +1096,7 @@ function upsertReservationLibRoomClass($data, $dbConnection, &$errorCount) {
                 $dbConnection->begin_transaction();
 
                 // Check if a record with this class name already exists
-                $checkQuery = "SELECT `id`, `dataSource`, `metaData` FROM `$tableName` WHERE `className` = ?";
+                $checkQuery = "SELECT 1 FROM `$tableName` WHERE `className` = ?";
                 $stmt = $dbConnection->prepare($checkQuery);
                 if (!$stmt) {
                     throw new Exception("(".__FUNCTION__.") Failed to prepare statement: " . $dbConnection->error);
@@ -1203,13 +1203,13 @@ function upsertReservationStay($data, $dbConnection, &$errorCount) {
             $dbConnection->begin_transaction();
 
             // Check if a record with this combination already exists
-            $checkQuery = "SELECT `id`, `metaData`, `extPMSConfNum`, `dataSource`, `libSourceId`, `libPropertyId`, `createdBy` FROM `$tableName` WHERE `startDate` = ? AND `endDate` = ? AND `extGuestId` = ? AND `extPMSConfNum` = ?";
+            $checkQuery = "SELECT 1 FROM `$tableName` WHERE `extPMSConfNum` = ?  AND `libPropertyId` = ?";
             $stmt = $dbConnection->prepare($checkQuery);
             if (!$stmt) {
                 throw new Exception("(".__FUNCTION__.") Prepare failed: " . $dbConnection->error);
             }
 
-            $stmt->bind_param("ssis", $startDate, $endDate, $extGuestId, $extPMSConfNum);
+            $stmt->bind_param("si", $extPMSConfNum, $libPropertyId);
             $stmt->execute();
             $result = $stmt->get_result();
             $existingRecord = $result->fetch_assoc();
@@ -1302,7 +1302,7 @@ function upsertCustomerRelationship($data, $dbConnection, &$errorCount) {
 
         try {
             // Check if a record with this combination already exists
-            $checkQuery = "SELECT `id`, `isPrimaryGuest`, `dataSource`, `contactTypeId`, `contactId` FROM `$tableName` WHERE `isPrimaryGuest` = ? AND `dataSource` = ? AND `contactTypeId` = ? AND `contactId` = ?";
+            $checkQuery = "SELECT 1 FROM `$tableName` WHERE `isPrimaryGuest` = ? AND `dataSource` = ? AND `contactTypeId` = ? AND `contactId` = ?";
             $stmt = $dbConnection->prepare($checkQuery);
             $stmt->bind_param("issi", $isPrimaryGuest, $dataSource, $contactTypeId, $contactId);
             $stmt->execute();
@@ -1401,7 +1401,7 @@ function upsertCustomerMembership($data, $dbConnection, &$errorCount) {
 
         try {
             // Check if a record with this combination already exists
-            $checkQuery = "SELECT `id`, `level`, `membershipCode`, `dataSource`, `libLoyaltyProgramId`, `contactId` FROM `$tableName` WHERE `contactId` = ? AND `libLoyaltyProgramId` = ? AND `level` = ? AND `membershipCode` = ?";
+            $checkQuery = "SELECT 1 FROM `$tableName` WHERE `contactId` = ? AND `libLoyaltyProgramId` = ? AND `level` = ? AND `membershipCode` = ?";
             $stmt = $dbConnection->prepare($checkQuery);
             $stmt->bind_param("iiss", $contactId, $libLoyaltyProgramId, $level, $membershipCode);
             $stmt->execute();
@@ -1480,7 +1480,7 @@ function upsertCustomerMembership($data, $dbConnection, &$errorCount) {
 }
 
 
-function upsertServicesPayment($data, $dbConnection, &$errorCount) {
+function upsertSERVICESPayment($data, $dbConnection, &$errorCount) {
     $tableName = 'SERVICESpayment';
     // Define the error log file path and action log file path
     $errorLogFile = dirname(__FILE__) . '/error_log.txt';
@@ -1497,14 +1497,14 @@ function upsertServicesPayment($data, $dbConnection, &$errorCount) {
 
         try {
             // Construct the check query with consideration for NULL values
-            $checkQuery = "SELECT `id`, `paymentAmount`, `currencyCode`, `dataSource`, `libTenderId` FROM `$tableName` WHERE 
-                (`paymentAmount` = ? OR (? IS NULL AND `paymentAmount` IS NULL)) AND 
-                (`currencyCode` = ? OR (? IS NULL AND `currencyCode` IS NULL)) AND 
+            $checkQuery = "SELECT 1 FROM `$tableName` WHERE 
+                `paymentAmount` = ?  AND 
+                `currencyCode` = ?  AND 
                 `dataSource` = ? AND 
                 `libTenderId` = ?";
 
             $checkStmt = $dbConnection->prepare($checkQuery);
-            $checkStmt->bind_param("dssdsi", $paymentAmount, $paymentAmount, $currencyCode, $currencyCode, $dataSource, $libTenderId);
+            $checkStmt->bind_param("dssi", $paymentAmount, $currencyCode, $dataSource, $libTenderId);
             $checkStmt->execute();
             $result = $checkStmt->get_result();
             $existingRecord = $result->fetch_assoc();
@@ -1553,7 +1553,7 @@ function upsertServicesPayment($data, $dbConnection, &$errorCount) {
 
             // Log the error
             $errorTimestamp = date('Y-m-d H:i:s');
-            $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.")  " . $e->getMessage() . PHP_EOL;
+            $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.")  ". $e->getMessage() . PHP_EOL;
             error_log($errorLogMessage, 3, $errorLogFile);
 
             throw $e;
@@ -1589,7 +1589,7 @@ function upsertCustomerContact($data, $dbConnection, &$errorCount) {
 
         try {
             // Check if a record with this combination already exists
-            $checkQuery = "SELECT `id`, `title`, `email`, `birthDate`, `languageCode`, `languageFormat`, `metaData`, `dataSource` FROM `$tableName` WHERE `firstName` = ? AND `lastName` = ? AND `extGuestId` = ?";
+            $checkQuery = "SELECT 1 FROM `$tableName` WHERE `firstName` = ? AND `lastName` = ? AND `extGuestId` = ?";
             $stmt = $dbConnection->prepare($checkQuery);
             $stmt->bind_param("sss", $firstName, $lastName, $extGuestId);
             $stmt->execute();
@@ -1713,19 +1713,19 @@ function upsertReservationStayStatusStay($data, $dbConnection, &$errorCount) {
         $cancellationReasonText = $element['cancellationReasonText'] ?? null;
         $dataSource = $element['dataSource'] ?? null;
         $stayId = $element['stayId'];
-        $stayStatusId = $element['stayStatusId'] ?? null;
+        $libStayStatusId = $element['libStayStatusId'] ?? null;
 
         $dbConnection->begin_transaction();
 
         try {
             // Check if a record with this combination already exists
-            $checkQuery = "SELECT `id`, `cancelledBy`, `cancellationDateTime`, `cancellationReasonCode`, `cancellationReasonText`, `dataSource` FROM `$tableName` WHERE `stayId` = ? AND `stayStatusId` = ?";
+            $checkQuery = "SELECT 1 FROM `$tableName` WHERE `stayId` = ? AND `libStayStatusId` = ?";
             $stmt = $dbConnection->prepare($checkQuery);
             if (!$stmt) {
                 throw new Exception("(".__FUNCTION__.") Prepare failed: " . $dbConnection->error);
             }
 
-            $stmt->bind_param("ii", $stayId, $stayStatusId);
+            $stmt->bind_param("ii", $stayId, $libStayStatusId);
             $stmt->execute();
             $result = $stmt->get_result();
             $existingRecord = $result->fetch_assoc();
@@ -1741,13 +1741,13 @@ function upsertReservationStayStatusStay($data, $dbConnection, &$errorCount) {
                 $beforeState = json_encode($existingRecord);
 
                 // Update
-                $updateQuery = "UPDATE `$tableName` SET `cancelledBy` = ?, `cancellationDateTime` = ?, `cancellationReasonCode` = ?, `cancellationReasonText` = ?, `dataSource` = ? WHERE `stayId` = ? AND `stayStatusId` = ?";
+                $updateQuery = "UPDATE `$tableName` SET `cancelledBy` = ?, `cancellationDateTime` = ?, `cancellationReasonCode` = ?, `cancellationReasonText` = ?, `dataSource` = ? WHERE `stayId` = ? AND `libStayStatusId` = ?";
                 $updateStmt = $dbConnection->prepare($updateQuery);
                 if (!$updateStmt) {
                     throw new Exception("(".__FUNCTION__.") Prepare failed: " . $dbConnection->error);
                 }
 
-                $updateStmt->bind_param("sisssii", $cancelledBy, $cancellationDateTime, $cancellationReasonCode, $cancellationReasonText, $dataSource, $stayId, $stayStatusId);
+                $updateStmt->bind_param("sisssii", $cancelledBy, $cancellationDateTime, $cancellationReasonCode, $cancellationReasonText, $dataSource, $stayId, $libStayStatusId);
                 $updateStmt->execute();
                 if ($updateStmt->error) {
                     throw new Exception("(".__FUNCTION__.") Error in update operation: " . $updateStmt->error);
@@ -1760,7 +1760,7 @@ function upsertReservationStayStatusStay($data, $dbConnection, &$errorCount) {
                 // Save before state for insert
                 $beforeState = json_encode([
                     'stayId' => $stayId,
-                    'stayStatusId' => $stayStatusId,
+                    'libStayStatusId' => $libStayStatusId,
                     'cancelledBy' => null,
                     'cancellationDateTime' => null,
                     'cancellationReasonCode' => null,
@@ -1769,13 +1769,13 @@ function upsertReservationStayStatusStay($data, $dbConnection, &$errorCount) {
                 ]);
 
                 // Insert
-                $insertQuery = "INSERT INTO `$tableName` (`stayId`, `stayStatusId`, `cancelledBy`, `cancellationDateTime`, `cancellationReasonCode`, `cancellationReasonText`, `dataSource`) VALUES (?, ?, ?, ?, ?, ?, ?)";
+                $insertQuery = "INSERT INTO `$tableName` (`stayId`, `libStayStatusId`, `cancelledBy`, `cancellationDateTime`, `cancellationReasonCode`, `cancellationReasonText`, `dataSource`) VALUES (?, ?, ?, ?, ?, ?, ?)";
                 $insertStmt = $dbConnection->prepare($insertQuery);
                 if (!$insertStmt) {
                     throw new Exception("(".__FUNCTION__.") Prepare failed: " . $dbConnection->error);
                 }
 
-                $insertStmt->bind_param("iisssss", $stayId, $stayStatusId, $cancelledBy, $cancellationDateTime, $cancellationReasonCode, $cancellationReasonText, $dataSource);
+                $insertStmt->bind_param("iisssss", $stayId, $libStayStatusId, $cancelledBy, $cancellationDateTime, $cancellationReasonCode, $cancellationReasonText, $dataSource);
                 $insertStmt->execute();
                 if ($insertStmt->error) {
                     throw new Exception("(".__FUNCTION__.") Error in insert operation: " . $insertStmt->error);
@@ -1792,7 +1792,7 @@ function upsertReservationStayStatusStay($data, $dbConnection, &$errorCount) {
             // Save after state for insert or update
             $afterState = json_encode([
                 'stayId' => $stayId,
-                'stayStatusId' => $stayStatusId,
+                'libStayStatusId' => $libStayStatusId,
                 'cancelledBy' => $cancelledBy,
                 'cancellationDateTime' => $cancellationDateTime,
                 'cancellationReasonCode' => $cancellationReasonCode,
@@ -1802,7 +1802,7 @@ function upsertReservationStayStatusStay($data, $dbConnection, &$errorCount) {
 
             // Log the action with record identifier and rows affected
             $actionTimestamp = date('Y-m-d H:i:s');
-            $recordIdentifier = "stayId: {$stayId}, stayStatusId: {$stayStatusId}";
+            $recordIdentifier = "stayId: {$stayId}, libStayStatusId: {$libStayStatusId}";
             $actionLogMessage = "[{$actionTimestamp}] (".__FUNCTION__.") Action: {$action}, Record ID: {$recordIdentifier}, Rows Affected: {$rowsAffected}, Before State: {$beforeState}, After State: {$afterState}" . PHP_EOL;
             file_put_contents($actionLogFile, $actionLogMessage, FILE_APPEND);
 
@@ -1855,18 +1855,22 @@ function upsertReservationRoomDetails($arrRESERVATIONroomDetails, $dbConnection,
         $stayId = $element['stayId'];
         $libRoomTypeId = $element['libRoomTypeId'];
         $libRoomClassId = $element['libRoomClassId'];
+        $metaData = $element['metaData'];
 
         $dbConnection->begin_transaction();
 
         try {
             // Check if a record with this combination already exists
-            $checkQuery = "SELECT `id`, `startDate`, `endDate`, `amount`, `ratePlanCode`, `isBlocked`, `isComplimentary`, `isHouseUse`, `dataSource`, `libRoomTypeId`, `libRoomClassId` FROM `$tableName` WHERE `libRoomId` = ? AND `stayId` = ?";
+            $checkQuery = "SELECT 1 FROM `$tableName` WHERE `startDate` = ? AND `endDate` = ? AND `amount` = ? AND `ratePlanCode` = ? AND `isBlocked` = ?
+            AND `isComplimentary` = ? AND `isHouseUse` = ? AND `metaData` = ? AND `dataSource` = ? AND `libRoomId` = ? AND `stayId` = ? AND `libRoomTypeId` = ?
+            AND `libRoomClassId` = ?";
             $stmt = $dbConnection->prepare($checkQuery);
             if (!$stmt) {
                 throw new Exception("(".__FUNCTION__.") Prepare failed: " . $dbConnection->error);
             }
 
-            $stmt->bind_param("ii", $libRoomId, $stayId);
+            $stmt->bind_param("ssdsiiissiiii", $startDate, $endDate, $amount, $ratePlanCode, $isBlocked, $isComplimentary, $isHouseUse, $metaData, $dataSource, $libRoomId, $stayId, $libRoomTypeId,
+            $libRoomClassId);
             $stmt->execute();
             $result = $stmt->get_result();
             $existingRecord = $result->fetch_assoc();
@@ -1882,13 +1886,16 @@ function upsertReservationRoomDetails($arrRESERVATIONroomDetails, $dbConnection,
                 $beforeState = json_encode($existingRecord);
 
                 // Update
-                $updateQuery = "UPDATE `$tableName` SET `startDate` = ?, `endDate` = ?, `amount` = ?, `ratePlanCode` = ?, `isBlocked` = ?, `isComplimentary` = ?, `isHouseUse` = ?, `dataSource` = ?, `libRoomTypeId` = ?, `libRoomClassId` = ? WHERE `libRoomId` = ? AND `stayId` = ?";
+                $updateQuery = "UPDATE `$tableName` SET `startDate` = ? AND `endDate` = ? AND `amount` = ? AND `ratePlanCode` = ? AND `isBlocked` = ?
+            AND `isComplimentary` = ? AND `isHouseUse` = ? AND `metaData` = ? AND `dataSource` = ? AND `libRoomId` = ? AND `stayId` = ? AND `libRoomTypeId` = ?
+            AND `libRoomClassId` = ?";
                 $updateStmt = $dbConnection->prepare($updateQuery);
                 if (!$updateStmt) {
                     throw new Exception("(".__FUNCTION__.") Prepare failed: " . $dbConnection->error);
                 }
 
-                $updateStmt->bind_param("ssdsiiisiiii", $startDate, $endDate, $amount, $ratePlanCode, $isBlocked, $isComplimentary, $isHouseUse, $dataSource, $libRoomTypeId, $libRoomClassId, $libRoomId, $stayId);
+                $updateStmt->bind_param("ssdsiiissiiii", $startDate, $endDate, $amount, $ratePlanCode, $isBlocked, $isComplimentary, $isHouseUse, $metaData, $dataSource, $libRoomId, $stayId, $libRoomTypeId,
+                    $libRoomClassId);
                 $updateStmt->execute();
                 if ($updateStmt->error) {
                     throw new Exception("(".__FUNCTION__.") Error in update operation: " . $updateStmt->error);
@@ -1915,13 +1922,15 @@ function upsertReservationRoomDetails($arrRESERVATIONroomDetails, $dbConnection,
                 ]);
 
                 // Insert
-                $insertQuery = "INSERT INTO `$tableName` (`libRoomId`, `stayId`, `startDate`, `endDate`, `amount`, `ratePlanCode`, `isBlocked`, `isComplimentary`, `isHouseUse`, `dataSource`, `libRoomTypeId`, `libRoomClassId`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                $insertQuery = "INSERT INTO `$tableName` (`startDate`, `endDate`, `amount`, `ratePlanCode`, `isBlocked`, `isComplimentary`, `isHouseUse`,
+                     `metaData`, `dataSource`, `libRoomId`, `stayId`, `libRoomTypeId`, `libRoomClassId`)  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                 $insertStmt = $dbConnection->prepare($insertQuery);
                 if (!$insertStmt) {
                     throw new Exception("(".__FUNCTION__.") Prepare failed: " . $dbConnection->error);
                 }
 
-                $insertStmt->bind_param("iissdsiiisii", $libRoomId, $stayId, $startDate, $endDate, $amount, $ratePlanCode, $isBlocked, $isComplimentary, $isHouseUse, $dataSource, $libRoomTypeId, $libRoomClassId);
+                $insertStmt->bind_param("ssdsiiissiiii", $startDate, $endDate, $amount, $ratePlanCode, $isBlocked, $isComplimentary, $isHouseUse, $metaData, $dataSource, $libRoomId, $stayId, $libRoomTypeId,
+                    $libRoomClassId);
                 $insertStmt->execute();
                 if ($insertStmt->error) {
                     throw new Exception("(".__FUNCTION__.") Error in insert operation: " . $insertStmt->error);
@@ -1983,6 +1992,20 @@ function upsertSERVICESfolioOrders($arrSERVICESfolioOrders, $dbConnection, &$err
 
     foreach ($arrSERVICESfolioOrders as $order) {
         // Extract the fields that will be used for matching existing records
+        $folioOrderType = $order['folioOrderType'];
+        $unitCount = $order['unitCount'];
+        $unitPrice = $order['unitPrice'];
+        $fixedCost = $order['fixedCost'];
+        $amountBeforeTax = $order['amountBeforeTax'];
+        $amountAfterTax = $order['amountAfterTax'];
+        $postingFrequency = $order['postingFrequency'];
+        $startDate = $order['startDate'];
+        $endDate = $order['endDate'];
+        $fixedChargesQuantity = $order['fixedChargesQuantity'];
+        $transferId = $order['transferId'];
+        $transferDateTime = $order['transferDateTime'];
+        $transferOnArrival = $order['transferOnArrival'];
+        $isIncluded = $order['isIncluded'];
         $contactId = $order['contactId'];
         $stayId = $order['stayId'];
         $paymentId = $order['paymentId'];
@@ -1992,13 +2015,37 @@ function upsertSERVICESfolioOrders($arrSERVICESfolioOrders, $dbConnection, &$err
         $dbConnection->begin_transaction();
         try {
             // Check if a record with this combination already exists
-            $checkQuery = "SELECT `id`, `folioOrderType`, `unitCount`, `unitPrice`, `fixedCost`, `postingFrequency`, `startDate`, `endDate`, `amount`, `fixedChargesQuantity`, `ratePlanCode`, `transferId`, `transferDateTime`, `transferOnArrival`, `isIncluded`, `dataSource` FROM `$tableName` WHERE `contactId` = ? AND `stayId` = ? AND `paymentId` = ? AND `libServiceItemsId` = ?";
+            $checkQuery = "SELECT 1 FROM `$tableName` WHERE 
+            `folioOrderType` = ? AND
+            `unitCount` = ? AND
+            `unitPrice` = ? AND
+            `fixedCost` = ? AND
+            `amountBeforeTax` = ? AND
+            `amountAfterTax` = ? AND
+            `postingFrequency` = ? AND
+            `startDate` = ? AND
+            `endDate` = ? AND
+            `fixedChargesQuantity` = ? AND
+            `transferId` = ? AND
+            `transferDateTime` = ? AND
+            `transferOnArrival` = ? AND
+            `isIncluded` = ? AND
+            `contactId` = ? AND
+            `stayId` = ? AND
+            `paymentId` = ? AND
+            `libServiceItemsId` = ? AND
+            `metaData` = ?";
             $stmt = $dbConnection->prepare($checkQuery);
             if (!$stmt) {
                 throw new Exception("(".__FUNCTION__.") Prepare failed: " . $dbConnection->error);
             }
 
-            $stmt->bind_param("iiii", $contactId, $stayId, $paymentId, $libServiceItemsId);
+            $stmt->bind_param("siddddsssiisiiiiiis", $folioOrderType, $unitCount, $unitPrice, $fixedCost,
+                $amountBeforeTax, $amountAfterTax, $postingFrequency,
+                $startDate, $endDate, $fixedChargesQuantity,
+                $transferId, $transferDateTime, $transferOnArrival,
+                $isIncluded, $contactId, $stayId, $paymentId,
+                $libServiceItemsId, $metaData);
             $stmt->execute();
             $result = $stmt->get_result();
             $existingRecord = $result->fetch_assoc();
@@ -2039,6 +2086,8 @@ function upsertSERVICESfolioOrders($arrSERVICESfolioOrders, $dbConnection, &$err
                     $order['unitCount'],
                     $order['unitPrice'],
                     $order['fixedCost'],
+                    $order['amountBeforeTax'],
+                    $order['amountAfterTax'],
                     $order['postingFrequency'],
                     $order['startDate'],
                     $order['endDate'],
@@ -2161,7 +2210,7 @@ function upsertSERVICESfolioOrders($arrSERVICESfolioOrders, $dbConnection, &$err
 
             // Log the error
             $errorTimestamp = date('Y-m-d H:i:s');
-            $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Error: " . $e->getMessage() . PHP_EOL;
+            $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Error: stayId:". $stayId . $e->getMessage() . PHP_EOL;
             error_log($errorLogMessage, 3, $errorLogFile);
 
             throw $e;  // Re-throw the exception

@@ -9,25 +9,45 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-////Function to remove duplicate records from an array based on 2 fields
-function removeDuplicateRows2D($data, $key1, $key2)
-{
-    $uniqueKeys = [];
-
-    return array_filter($data, function ($item) use ($key1, $key2, &$uniqueKeys) {
-        $value1 = $item[$key1];
-        $value2 = $item[$key2];
-
-        $hash = md5($value1 . $value2);
-
-        if (!isset($uniqueKeys[$hash])) {
-            $uniqueKeys[$hash] = true;
-            return true;
-        }
-
-        return false;
-    });
-}
+//////Function to remove duplicate records from an array based on 2 fields
+//function removeDuplicateRows2D($data, $key1, $key2)
+//{
+//    $uniqueKeys = [];
+//
+//    return array_filter($data, function ($item) use ($key1, $key2, &$uniqueKeys) {
+//        $value1 = $item[$key1];
+//        $value2 = $item[$key2];
+//
+//        $hash = md5($value1 . $value2);
+//
+//        if (!isset($uniqueKeys[$hash])) {
+//            $uniqueKeys[$hash] = true;
+//            return true;
+//        }
+//
+//        return false;
+//    });
+//}
+//
+//function removeDuplicateRows3D($data, $key1, $key2, $key3)
+//{
+//    $uniqueKeys = [];
+//
+//    return array_filter($data, function ($item) use ($key1, $key2, $key3, &$uniqueKeys) {
+//        $value1 = $item[$key1];
+//        $value2 = $item[$key2];
+//        $value3 = $item[$key3];
+//
+//        $hash = md5($value1 . $value2 . $value3);
+//
+//        if (!isset($uniqueKeys[$hash])) {
+//            $uniqueKeys[$hash] = true;
+//            return true;
+//        }
+//
+//        return false;
+//    });
+//}
 // Function to fetch data from a MySQL table and store it in a PHP associative  array
 function getLatestEtlTimestamp($destinationDBConnection)
 {
@@ -49,7 +69,9 @@ function getLatestEtlTimestamp($destinationDBConnection)
 
 function fetchDataFromMySQLTable($tableName, $originDBConnection, $destinationDBConnection, &$insertCount, &$updateCount, &$errorCount) {
     $errorLogFile = 'error_log.txt'; // Define the error log file path
-
+    // Function to check connections to origin and destination databases and update the PMSDATABASEmisc
+    // table with info on the ETL and database schema. Also pulls data from origin database/table to an
+    // associative array
     try {
         // Check connection
         if ($originDBConnection->connect_error) {
@@ -74,6 +96,10 @@ function fetchDataFromMySQLTable($tableName, $originDBConnection, $destinationDB
         // Fetch data and store it in an array
         $data = [];
         while ($row = $result->fetch_assoc()) {
+            if (is_null($row['confirmation_number']))
+            {
+                continue;
+            }
             $data[] = $row;
 
             // Calculate insert and update counts
@@ -91,7 +117,7 @@ function fetchDataFromMySQLTable($tableName, $originDBConnection, $destinationDB
         // Log the number of records fetched
         $recordCount = count($data);
         $errorTimestamp = date('Y-m-d H:i:s'); // Format the date and time as you prefer
-        $successMessage = "[{$errorTimestamp}] Successfully fetched $recordCount records from $tableName" . PHP_EOL;
+        $successMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Successfully fetched $recordCount records from $tableName" . PHP_EOL;
         error_log($successMessage, 3, 'error_log.txt');
 
         return $data;
@@ -104,7 +130,7 @@ function fetchDataFromMySQLTable($tableName, $originDBConnection, $destinationDB
 
         // Log the error
         $errorTimestamp = date('Y-m-d H:i:s'); // Format the date and time as you prefer
-        $errorLogMessage = "[{$errorTimestamp}] fetchDataFromMySQLTable failed: " . $e->getMessage() . PHP_EOL;
+        $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") fetchDataFromMySQLTable failed: " . $e->getMessage() . PHP_EOL;
         error_log($errorLogMessage, 3, $errorLogFile);
         // Optionally rethrow the exception if you want to handle it further up the call stack
         throw $e;
@@ -137,7 +163,7 @@ function insertEtlTrackingInfo($destinationDBConnection, $insertCount, $updateCo
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully inserted tracking info into PMSDATABASEmisc for source: $etlSource" . PHP_EOL;
+        $successMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Successfully inserted tracking info into PMSDATABASEmisc for source: $etlSource" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
 
     } catch (Exception $e) {
@@ -145,7 +171,7 @@ function insertEtlTrackingInfo($destinationDBConnection, $insertCount, $updateCo
         $errorCount++;
         // Log the error with timestamp
         $errorTimestamp = date('Y-m-d H:i:s');
-        $errorLogMessage = "[{$errorTimestamp}] insertEtlTrackingInfo failed: " . $e->getMessage() . PHP_EOL;
+        $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") insertEtlTrackingInfo failed: " . $e->getMessage() . PHP_EOL;
         error_log($errorLogMessage, 3, $errorLogFile);
 
         // Rethrow the exception for further handling
@@ -192,20 +218,65 @@ function updateEtlDuration($destDBConnection, $errorCount)
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully updated ETL duration in PMSDATABASEmisc" . PHP_EOL;
+        $successMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Successfully updated ETL duration in PMSDATABASEmisc" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
 
     } catch (Exception $e) {
 
         // Log the error with timestamp
         $errorTimestamp = date('Y-m-d H:i:s');
-        $errorLogMessage = "[{$errorTimestamp}] updateEtlDuration failed: " . $e->getMessage() . PHP_EOL;
+        $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") updateEtlDuration failed: " . $e->getMessage() . PHP_EOL;
         error_log($errorLogMessage, 3, $errorLogFile);
 
         // Rethrow the exception for further handling
         throw $e;
     }
 }
+
+function removeDuplicateRows($array, &$errorCount) {
+    // Define the error log file path
+    $errorLogFile = dirname(__FILE__) . '/error_log.txt';
+
+    try {
+        if (!is_array($array) || empty($array)) {
+            throw new Exception("Invalid or empty array provided.");
+        }
+
+        // Serialize each array to a string
+        $serializedArray = array_map('serialize', $array);
+
+        // Remove duplicates
+        $uniqueArray = array_unique($serializedArray);
+
+        // Unserialize the unique array back to an array of arrays
+        $uniqueArray = array_map('unserialize', $uniqueArray);
+
+        // Re-index the array
+        $result = array_values($uniqueArray);
+
+        // Log the success message
+        $errorTimestamp = date('Y-m-d H:i:s');
+        $successMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Successfully removed duplicate rows" . PHP_EOL;
+        error_log($successMessage, 3, $errorLogFile);
+
+        return $result;
+
+    } catch (Exception $e) {
+        // Increment error counter
+        $errorCount++;
+
+        // Log the error
+        $errorTimestamp = date('Y-m-d H:i:s');
+        $errorMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Error in removeDuplicateRows: " . $e->getMessage() . PHP_EOL;
+        error_log($errorMessage, 3, $errorLogFile);
+
+        // Optionally rethrow or handle the exception further as needed
+        // throw $e;
+
+        return []; // Return an empty array or handle as per your application's error handling policy
+    }
+}
+
 
 
 function getFirstNonNullImportCode($originDBConnection, $tableName, &$errorCount)
@@ -234,7 +305,7 @@ function getFirstNonNullImportCode($originDBConnection, $tableName, &$errorCount
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully retrieved first non-null import_code from $tableName" . PHP_EOL;
+        $successMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Successfully retrieved first non-null import_code from $tableName" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
 
     } catch (Exception $e) {
@@ -242,7 +313,7 @@ function getFirstNonNullImportCode($originDBConnection, $tableName, &$errorCount
         $errorCount++;
         // Log the error with timestamp
         $errorTimestamp = date('Y-m-d H:i:s');
-        $errorLogMessage = "[{$errorTimestamp}] getFirstNonNullImportCode failed: " . $e->getMessage() . PHP_EOL;
+        $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") getFirstNonNullImportCode failed: " . $e->getMessage() . PHP_EOL;
         error_log($errorLogMessage, 3, $errorLogFile);
     }
 
@@ -327,7 +398,7 @@ function createReservationLibProperty($reservations, &$errorCount) {
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully processed reservationLibProperty" . PHP_EOL;
+        $successMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Successfully processed reservationLibProperty" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
 
         return $reservationLibProperty;
@@ -336,7 +407,7 @@ function createReservationLibProperty($reservations, &$errorCount) {
         $errorCount++;
         // Handle the exception
         $errorTimestamp = date('Y-m-d H:i:s');
-        $errorLogMessage = "[{$errorTimestamp}] Error in createReservationLibProperty: " . $e->getMessage() . PHP_EOL;
+        $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Error in createReservationLibProperty: " . $e->getMessage() . PHP_EOL;
         error_log($errorLogMessage, 3, $errorLogFile);
         // Optionally rethrow the exception if you need further handling outside this function
         throw $e;
@@ -426,7 +497,7 @@ function createReservationLibSource($data, &$errorCount) {
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully processed reservationLibSource" . PHP_EOL;
+        $successMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Successfully processed reservationLibSource" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
 
         return $result;
@@ -436,7 +507,7 @@ function createReservationLibSource($data, &$errorCount) {
         $errorCount++;
         // Log the error
         $errorTimestamp = date('Y-m-d H:i:s');
-        $errorLogMessage = "[{$errorTimestamp}] Error in createReservationLibSource: " . $e->getMessage() . PHP_EOL;
+        $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Error in createReservationLibSource: " . $e->getMessage() . PHP_EOL;
         error_log($errorLogMessage, 3, $errorLogFile);
 
         // Optionally rethrow the exception for further handling
@@ -496,7 +567,7 @@ function createReservationLibRoomType($data, &$errorCount) {
         $errorCount++;
         // Handle the exception
         $errorTimestamp = date('Y-m-d H:i:s');
-        $errorLogMessage = "[{$errorTimestamp}] Error in createReservationLibRoomType: " . $e->getMessage() . PHP_EOL;
+        $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Error in createReservationLibRoomType: " . $e->getMessage() . PHP_EOL;
         error_log($errorLogMessage, 3, $errorLogFile);
         // Optionally rethrow the exception if you need further handling outside this function
         throw $e;
@@ -545,7 +616,7 @@ function createReservationLibStayStatus($data, &$errorCount) {
         $errorCount++;
         // Handle the exception
         $errorTimestamp = date('Y-m-d H:i:s');
-        $errorLogMessage = "[{$errorTimestamp}] Error in createReservationLibStayStatus: " . $e->getMessage() . PHP_EOL;
+        $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Error in createReservationLibStayStatus: " . $e->getMessage() . PHP_EOL;
         error_log($errorLogMessage, 3, $errorLogFile);
         // Optionally rethrow the exception if you need further handling outside this function
         throw $e;
@@ -555,9 +626,7 @@ function createReservationLibStayStatus($data, &$errorCount) {
 
 
 ////Function to create and populate the ReservationGroup Table Associative Array
-/**
- * @throws Exception
- */
+
 function createReservationGroup($data, &$errorCount) {
     // Define the error log file path
     $errorLogFile = dirname(__FILE__) . '/error_log.txt';
@@ -606,7 +675,7 @@ function createReservationGroup($data, &$errorCount) {
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully processed ReservationGroup" . PHP_EOL;
+        $successMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Successfully processed ReservationGroup" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
 
         return $result;
@@ -615,7 +684,7 @@ function createReservationGroup($data, &$errorCount) {
         $errorCount++;
         // Handle the exception
         $errorTimestamp = date('Y-m-d H:i:s');
-        $errorLogMessage = "[{$errorTimestamp}] Error in createReservationGroup: " . $e->getMessage() . PHP_EOL;
+        $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Error in createReservationGroup: " . $e->getMessage() . PHP_EOL;
         error_log($errorLogMessage, 3, $errorLogFile);
         // Optionally rethrow the exception if needed
         throw $e;
@@ -651,7 +720,7 @@ function createReservationLibRoomClass($data, &$errorCount) {
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully processed ReservationLibRoomClass" . PHP_EOL;
+        $successMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Successfully processed ReservationLibRoomClass" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
 
         return $result;
@@ -660,7 +729,7 @@ function createReservationLibRoomClass($data, &$errorCount) {
         $errorCount++;
         // Handle the exception
         $errorTimestamp = date('Y-m-d H:i:s');
-        $errorLogMessage = "[{$errorTimestamp}] Error in createReservationLibRoomClass: " . $e->getMessage() . PHP_EOL;
+        $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Error in createReservationLibRoomClass: " . $e->getMessage() . PHP_EOL;
         error_log($errorLogMessage, 3, $errorLogFile);
 
         // Optionally rethrow the exception if needed
@@ -692,7 +761,7 @@ function createReservationLibRoom($array, &$errorCount) {
                 if (json_last_error() !== JSON_ERROR_NONE) {
                     // Log an error if JSON is not valid
                     $errorTimestamp = date('Y-m-d H:i:s');
-                    $errorLogMessage = "[{$errorTimestamp}] JSON decode error in occupiedUnits: " . json_last_error_msg() . PHP_EOL;
+                    $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") JSON decode error in occupiedUnits: " . json_last_error_msg() . PHP_EOL;
                     error_log($errorLogMessage, 3, $errorLogFile);
                     continue;
                 }
@@ -713,7 +782,7 @@ function createReservationLibRoom($array, &$errorCount) {
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully processed ReservationLibRoom" . PHP_EOL;
+        $successMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Successfully processed ReservationLibRoom" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
 
         return $reservationRooms;
@@ -722,7 +791,7 @@ function createReservationLibRoom($array, &$errorCount) {
         $errorCount++;
         // Log the exception
         $errorTimestamp = date('Y-m-d H:i:s');
-        $errorLogMessage = "[{$errorTimestamp}] Error in createReservationLibRoom: " . $e->getMessage() . PHP_EOL;
+        $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Error in createReservationLibRoom: " . $e->getMessage() . PHP_EOL;
         error_log($errorLogMessage, 3, $errorLogFile);
 
         // Optionally rethrow the exception if further handling is required
@@ -759,7 +828,7 @@ function createCUSTOMERloyaltyProgram(&$errorCount) {
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully created CUSTOMER loyalty program array" . PHP_EOL;
+        $successMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Successfully created CUSTOMER loyalty program array" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
 
         return $loyaltyProgramArray;
@@ -768,7 +837,7 @@ function createCUSTOMERloyaltyProgram(&$errorCount) {
         $errorCount++;
         // Log the exception
         $errorTimestamp = date('Y-m-d H:i:s');
-        $errorLogMessage = "[{$errorTimestamp}] Error in createCUSTOMERloyaltyProgram: " . $e->getMessage() . PHP_EOL;
+        $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Error in createCUSTOMERloyaltyProgram: " . $e->getMessage() . PHP_EOL;
         error_log($errorLogMessage, 3, $errorLogFile);
 
         // Optionally rethrow the exception if further handling is required
@@ -811,7 +880,7 @@ function createCUSTOMERContactType(&$errorCount) {
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully created CUSTOMER contact type array" . PHP_EOL;
+        $successMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Successfully created CUSTOMER contact type array" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
 
         return $contactTypeArray;
@@ -820,7 +889,7 @@ function createCUSTOMERContactType(&$errorCount) {
         $errorCount++;
         // Log the exception
         $errorTimestamp = date('Y-m-d H:i:s');
-        $errorLogMessage = "[{$errorTimestamp}] Error in createCUSTOMERContactType: " . $e->getMessage() . PHP_EOL;
+        $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Error in createCUSTOMERContactType: " . $e->getMessage() . PHP_EOL;
         error_log($errorLogMessage, 3, $errorLogFile);
 
         // Optionally rethrow the exception if further handling is required
@@ -866,7 +935,7 @@ function createSERVICESLibTender($data, &$errorCount) {
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully processed SERVICES LibTender" . PHP_EOL;
+        $successMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Successfully processed SERVICES LibTender" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
 
         return $result;
@@ -876,7 +945,7 @@ function createSERVICESLibTender($data, &$errorCount) {
 
         // Log the exception
         $errorTimestamp = date('Y-m-d H:i:s');
-        $errorLogMessage = "[{$errorTimestamp}] Error in createSERVICESLibTender: " . $e->getMessage() . PHP_EOL;
+        $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Error in createSERVICESLibTender: " . $e->getMessage() . PHP_EOL;
         error_log($errorLogMessage, 3, $errorLogFile);
 
         // Optionally rethrow the exception if further handling is required
@@ -902,7 +971,7 @@ function createSERVICESlibserviceitems($array, &$errorCount) {
             if (json_last_error() !== JSON_ERROR_NONE) {
                 // Log an error if JSON decoding fails
                 $errorTimestamp = date('Y-m-d H:i:s');
-                $errorLogMessage = "[{$errorTimestamp}] JSON decode error: " . json_last_error_msg() . PHP_EOL;
+                $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") JSON decode error: " . json_last_error_msg() . PHP_EOL;
                 error_log($errorLogMessage, 3, $errorLogFile);
                 continue;
             }
@@ -950,7 +1019,7 @@ function createSERVICESlibserviceitems($array, &$errorCount) {
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully processed SERVICES LibServiceItems" . PHP_EOL;
+        $successMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Successfully processed SERVICES LibServiceItems" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
 
         return $serviceItems;
@@ -959,7 +1028,7 @@ function createSERVICESlibserviceitems($array, &$errorCount) {
         $errorCount++;
         // Log the exception
         $errorTimestamp = date('Y-m-d H:i:s');
-        $errorLogMessage = "[{$errorTimestamp}] Error in createSERVICESlibserviceitems: " . $e->getMessage() . PHP_EOL;
+        $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Error in createSERVICESlibserviceitems: " . $e->getMessage() . PHP_EOL;
         error_log($errorLogMessage, 3, $errorLogFile);
 
         // Optionally rethrow the exception if further handling is required
@@ -1004,7 +1073,7 @@ function createSERVICESlibserviceitems($array, &$errorCount) {
 //
 //        // Log the success message
 //        $errorTimestamp = date('Y-m-d H:i:s');
-//        $successMessage = "[{$errorTimestamp}] Successfully processed SERVICES lib Folio Order Type array" . PHP_EOL;
+//        $successMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Successfully processed SERVICES lib Folio Order Type array" . PHP_EOL;
 //        error_log($successMessage, 3, $errorLogFile);
 //
 //        return $FolioOrderTypeArray;
@@ -1013,7 +1082,7 @@ function createSERVICESlibserviceitems($array, &$errorCount) {
 //        $errorCount++;
 //        // Log the exception
 //        $errorTimestamp = date('Y-m-d H:i:s');
-//        $errorLogMessage = "[{$errorTimestamp}] Error in createSERVICESlibFolioOrderType: " . $e->getMessage() . PHP_EOL;
+//        $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Error in createSERVICESlibFolioOrderType: " . $e->getMessage() . PHP_EOL;
 //        error_log($errorLogMessage, 3, $errorLogFile);
 //
 //        // Optionally rethrow the exception if further handling is required
@@ -1069,23 +1138,23 @@ function createArrCUSTOMERcontact($normalizedData, &$errorCount) {
                         foreach ($guestData['contactDetails'] as $contactDetail) {
                             if ($contactDetail['category'] === 'EMAIL' && isset($contactDetail['value'])) {
                                 $email = $contactDetail['value'];
-                                break; // Stop the l oop once email is found
+                                break; // Stop the loop once email is found
                             }
                         }
                     }
 
 
                     $contact = [
-                        'firstName' => $nameData['givenName'] ?? '',
-                        'lastName' => $nameData['surname'] ?? '',
-                        'title' => $nameData['title'] ?? '',
-                        'email' => $email, // Use the extracted email
+                        'firstName' => $nameData['givenName'] ?? null,
+                        'lastName' => $nameData['surname'] ?? null,
+                        'title' => $nameData['title'] ?? null,
+                        'email' => $email ?? '', // Use the extracted email
                         'birthDate' => $guestData['dateOfBirth'] ?? null,
-                        'languageCode' => $guestData['primaryLanguage']['code'] ?? '',
-                        'languageFormat' => $guestData['primaryLanguage']['format'] ?? '',
-                        'extGuestId' => $item['extracted_guest_id'] ?? '',
-                        'isPrimary' => $guest['isPrimary'] ?? '',
-                        'metaData' => $metaDataJson ?? '',
+                        'languageCode' => $guestData['primaryLanguage']['code'] ?? null,
+                        'languageFormat' => $guestData['primaryLanguage']['format'] ?? null,
+                        'extGuestId' => $item['extracted_guest_id'] ?? null,
+                        'isPrimary' => $guest['isPrimary'] ?? null,
+                        'metaData' => $metaDataJson ?? null,
                         'dataSource' => 'HAPI'
                     ];
 
@@ -1100,7 +1169,7 @@ function createArrCUSTOMERcontact($normalizedData, &$errorCount) {
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully processed CUSTOMER contacts" . PHP_EOL;
+        $successMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Successfully processed CUSTOMER contacts" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
 
         return $customerContacts;
@@ -1109,7 +1178,7 @@ function createArrCUSTOMERcontact($normalizedData, &$errorCount) {
         $errorCount++;
         // Log the exception
         $errorTimestamp = date('Y-m-d H:i:s');
-        $errorLogMessage = "[{$errorTimestamp}] Error in createCUSTOMERcontact: " . $e->getMessage() . PHP_EOL;
+        $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Error in createCUSTOMERcontact: " . $e->getMessage() . PHP_EOL;
         error_log($errorLogMessage, 3, $errorLogFile);
 
         // Optionally rethrow the exception if further handling is required
@@ -1162,6 +1231,10 @@ function createArrRESERVATIONstay(
         $propertyResult->free();
 
         foreach ($normalizedData as $entry) {
+            //check if confirmation nubmer is null, skip if null
+            if (is_null($entry['confirmation_number'])) {
+                continue;
+            };
             // Previously handled fields
             $createDateTime = $entry['createdDateTime'] ?? null;
             $modifyDateTime = $entry['lastModifiedDateTime'] ?? null;
@@ -1205,7 +1278,7 @@ function createArrRESERVATIONstay(
             $createdBy = $entry['createdBy'] ?? null;
             $extPMSConfNum = $entry['confirmation_number'] ?? null;
             $extReservationId = $entry['reservation_id'] ?? null;
-            $extGuestId = $entry['extracted_guest_id'] ?? null;
+            $extGuestId = $entry['extracted_guest_id'] ?? '';
             $propertyCode = isset($entry['propertyDetails']['propertyCode']) ? $entry['propertyDetails']['propertyCode'] : 'UNKNOWN';
             $chainCode = isset($entry['propertyDetails']['chainCode']) ? $entry['propertyDetails']['chainCode'] : 'UNKNOWN';
             $sourceName = $entry['profiles'][0]['names'][0]['name'] ?? 'UNKNOWN';
@@ -1241,7 +1314,7 @@ function createArrRESERVATIONstay(
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully processed ARR RESERVATION stay data" . PHP_EOL;
+        $successMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Successfully processed ARR RESERVATION stay data" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
 
         return $arrRESERVATIONStay;
@@ -1250,7 +1323,7 @@ function createArrRESERVATIONstay(
         $errorCount++;
         // Log the exception
         $errorTimestamp = date('Y-m-d H:i:s');
-        $errorLogMessage = "[{$errorTimestamp}] Error in createArrRESERVATIONstay: " . $e->getMessage() . PHP_EOL;
+        $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Error in createArrRESERVATIONstay: " . $e->getMessage() . PHP_EOL;
         error_log($errorLogMessage, 3, $errorLogFile);
 
         // Optionally rethrow the exception if further handling is required
@@ -1293,14 +1366,14 @@ function getTableAsAssociativeArray($connection, $tableName) {
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully fetched data from `$tableName`" . PHP_EOL;
+        $successMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Successfully fetched data from `$tableName`" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
 
         return $tableData;
     } catch (Exception $e) {
         // Log the exception
         $errorTimestamp = date('Y-m-d H:i:s');
-        $errorLogMessage = "[{$errorTimestamp}] Error in getTableAsAssociativeArray: " . $e->getMessage() . PHP_EOL;
+        $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Error in getTableAsAssociativeArray: " . $e->getMessage() . PHP_EOL;
         error_log($errorLogMessage, 3, $errorLogFile);
 
         // Optionally rethrow the exception if further handling is required
@@ -1335,6 +1408,8 @@ function createArrCUSTOMERrelationship($myDataSemiParsed, $arrCUSTOMERlibContact
         }
 
         foreach ($myDataSemiParsed as $entry) {
+
+
             $guestsData = json_decode($entry['guests'], true) ?? [];
             foreach ($guestsData as $guestData) {
                 $guestInfo = $guestData['guest'] ?? null;
@@ -1367,7 +1442,7 @@ function createArrCUSTOMERrelationship($myDataSemiParsed, $arrCUSTOMERlibContact
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully processed CUSTOMER relationship data" . PHP_EOL;
+        $successMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Successfully processed CUSTOMER relationship data" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
 
         return $arrCUSTOMERrelationship;
@@ -1376,7 +1451,7 @@ function createArrCUSTOMERrelationship($myDataSemiParsed, $arrCUSTOMERlibContact
         $errorCount++;
         // Log the exception
         $errorTimestamp = date('Y-m-d H:i:s');
-        $errorLogMessage = "[{$errorTimestamp}] Error in createArrCUSTOMERrelationship: " . $e->getMessage() . PHP_EOL;
+        $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Error in createArrCUSTOMERrelationship: " . $e->getMessage() . PHP_EOL;
         error_log($errorLogMessage, 3, $errorLogFile);
 
         // Optionally rethrow the exception if further handling is required
@@ -1409,7 +1484,7 @@ function createLookup($mysqli, $tableName, $keyField1, $keyField2, &$errorCount)
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully created lookup for $tableName" . PHP_EOL;
+        $successMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Successfully created lookup for $tableName" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
 
         return $lookup;
@@ -1418,7 +1493,7 @@ function createLookup($mysqli, $tableName, $keyField1, $keyField2, &$errorCount)
         $errorCount++;
         // Log the exception
         $errorTimestamp = date('Y-m-d H:i:s');
-        $errorLogMessage = "[{$errorTimestamp}] Error in createLookup for $tableName: " . $e->getMessage() . PHP_EOL;
+        $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Error in createLookup for $tableName: " . $e->getMessage() . PHP_EOL;
         error_log($errorLogMessage, 3, $errorLogFile);
 
         // Optionally rethrow the exception if further handling is required
@@ -1457,7 +1532,7 @@ function createArrCUSTOMERmembership($myDataSemiParsed, $arrCUSTOMERlibLoyaltyPr
             if (!empty($memberships) && $guestData) {
                 $firstName = $guestData['names'][0]['givenName'] ?? null;
                 $lastName = $guestData['names'][0]['surname'] ?? null;
-                $extGuestId = $entry['extracted_guest_id'] ?? null;
+                $extGuestId = $entry['extracted_guest_id'] ?? '';
 
                 foreach ($memberships as $membership) {
                     if (!empty($membership['membershipCode'])) {
@@ -1492,7 +1567,7 @@ function createArrCUSTOMERmembership($myDataSemiParsed, $arrCUSTOMERlibLoyaltyPr
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully processed CUSTOMER membership data" . PHP_EOL;
+        $successMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Successfully processed CUSTOMER membership data" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
 
         return $arrCUSTOMERmembership;
@@ -1501,7 +1576,7 @@ function createArrCUSTOMERmembership($myDataSemiParsed, $arrCUSTOMERlibLoyaltyPr
         $errorCount++;
         // Log the exception
         $errorTimestamp = date('Y-m-d H:i:s');
-        $errorLogMessage = "[{$errorTimestamp}] Error in createArrCUSTOMERmembership: " . $e->getMessage() . PHP_EOL;
+        $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Error in createArrCUSTOMERmembership: " . $e->getMessage() . PHP_EOL;
         error_log($errorLogMessage, 3, $errorLogFile);
 
         // Optionally rethrow the exception if further handling is required
@@ -1532,15 +1607,15 @@ function createArrSERVICESpayment($myDataSemiParsed, $arrSERVICESlibTender, &$er
 
         foreach ($myDataSemiParsed as $entry) {
             // Initialize default values
-            $paymentAmount = null; // Always null as specified
-            $currencyCode = isset($entry['currency']) ? json_decode($entry['currency'], true)['code'] : null;
+            $paymentAmount = 0; // Always null as specified
+            $currencyCode = isset($entry['currency']) ? json_decode($entry['currency'], true)['code'] : 'UNKNOWN';
             $dataSource = 'HAPI'; // Constant value 'HAPI'
             $paymentMethod = isset($entry['paymentMethod']) ? json_decode($entry['paymentMethod'], true)['code'] : null;
 
             if (json_last_error() !== JSON_ERROR_NONE) {
                 // Log an error if JSON decoding fails
                 $errorTimestamp = date('Y-m-d H:i:s');
-                $errorLogMessage = "[{$errorTimestamp}] JSON decode error in createArrSERVICESpayment: " . json_last_error_msg() . PHP_EOL;
+                $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") JSON decode error in createArrSERVICESpayment: " . json_last_error_msg() . PHP_EOL;
                 error_log($errorLogMessage, 3, $errorLogFile);
                 continue;
             }
@@ -1562,7 +1637,7 @@ function createArrSERVICESpayment($myDataSemiParsed, $arrSERVICESlibTender, &$er
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully processed SERVICES payment data" . PHP_EOL;
+        $successMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Successfully processed SERVICES payment data" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
 
         return $arrSERVICESpayment;
@@ -1571,7 +1646,7 @@ function createArrSERVICESpayment($myDataSemiParsed, $arrSERVICESlibTender, &$er
         $errorCount++;
         // Log the exception
         $errorTimestamp = date('Y-m-d H:i:s');
-        $errorLogMessage = "[{$errorTimestamp}] Error in createArrSERVICESpayment: " . $e->getMessage() . PHP_EOL;
+        $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Error in createArrSERVICESpayment: " . $e->getMessage() . PHP_EOL;
         error_log($errorLogMessage, 3, $errorLogFile);
 
         // Optionally rethrow the exception if further handling is required
@@ -1640,7 +1715,7 @@ function createArrRESERVATIONgroupStay($arrRESERVATIONstay, $arrRESERVATIONgroup
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully processed RESERVATION group stay data" . PHP_EOL;
+        $successMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Successfully processed RESERVATION group stay data" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
 
         return $arrRESERVATIONgroupStay;
@@ -1649,7 +1724,7 @@ function createArrRESERVATIONgroupStay($arrRESERVATIONstay, $arrRESERVATIONgroup
         $errorCount++;
         // Log the exception
         $errorTimestamp = date('Y-m-d H:i:s');
-        $errorLogMessage = "[{$errorTimestamp}] Error in createArrRESERVATIONgroupStay: " . $e->getMessage() . PHP_EOL;
+        $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Error in createArrRESERVATIONgroupStay: " . $e->getMessage() . PHP_EOL;
         error_log($errorLogMessage, 3, $errorLogFile);
 
         // Optionally rethrow the exception if further handling is required
@@ -1680,29 +1755,32 @@ function createArrRESERVATIONstayStatusStay($normalizedData, $arrRESERVATIONstay
         // Indexing reservation stays for fast lookup
         $indexedReservationStays = [];
         foreach ($arrRESERVATIONstay as $stay) {
-            $index = $stay['createDateTime'] . '|' . $stay['modifyDateTime'] . '|' . $stay['startDate'] . '|' . $stay['endDate']  . '|' . $stay['extGuestId'] . '|' . $stay['extPMSConfNum'];
+            $index = $stay['extPMSConfNum'];
             $indexedReservationStays[$index] = $stay['id'];
         }
 
         foreach ($normalizedData as $entry) {
+            if (is_null($entry['confirmation_number'])){
+                continue;
+            }
             $createDateTime = strval(strtotime($entry['createdDateTime'])) ?? null;
             $modifyDateTime = strval(strtotime($entry['lastModifiedDateTime'])) ?? null;
 
-            $stayStatusId = null;
+            $libStayStatusId = null;
             foreach ($arrRESERVATIONlibStayStatus as $status) {
                 if ($status['statusName'] === ($entry['ext_status'] ?? 'UNKNOWN')) {
-                    $stayStatusId = $status['id'];
+                    $libStayStatusId = $status['id'];
                     break;
                 }
             }
 
             $startDate = $entry['arrival'] ?? null; // Assuming these are already in the correct format
             $endDate = $entry['departure'] ?? null;
-            $extGuestId = $entry['extracted_guest_id'] ?? null;
+            $extGuestId = $entry['extracted_guest_id'] ?? '';
             $extPMSConfNum = $entry['confirmation_number'] ?? null;
 
             // Create index for stay lookup
-            $stayIndex = $createDateTime . '|' . $modifyDateTime . '|' . $startDate . '|' . $endDate . '|' . $extGuestId . '|' . $extPMSConfNum;
+            $stayIndex = $extPMSConfNum;
             // Lookup for stayId using the index
             if (isset($indexedReservationStays[$stayIndex])) {
                 $stayId = is_array($indexedReservationStays[$stayIndex])
@@ -1726,14 +1804,14 @@ function createArrRESERVATIONstayStatusStay($normalizedData, $arrRESERVATIONstay
                 'endDate' => $endDate,
                 'extGuestId' => $extGuestId,
                 'extPMSConfNum' => $extPMSConfNum,
-                'stayStatusId' => $stayStatusId,
+                'libStayStatusId' => $libStayStatusId,
                 'statusName' => $entry['ext_status'] ?? 'UNKNOWN'
             ];
         }
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully processed RESERVATION stay status data" . PHP_EOL;
+        $successMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Successfully processed RESERVATION stay status data" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
 
         return $arrRESERVATIONstayStatusStay;
@@ -1742,7 +1820,7 @@ function createArrRESERVATIONstayStatusStay($normalizedData, $arrRESERVATIONstay
         $errorCount++;
         // Log the exception
         $errorTimestamp = date('Y-m-d H:i:s');
-        $errorLogMessage = "[{$errorTimestamp}] Error in createArrRESERVATIONstayStatusStay: " . $e->getMessage() . PHP_EOL;
+        $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Error in createArrRESERVATIONstayStatusStay: " . $e->getMessage() . PHP_EOL;
         error_log($errorLogMessage, 3, $errorLogFile);
 
         // Optionally rethrow the exception if further handling is required
@@ -1774,7 +1852,7 @@ function createArrRESERVATIONroomDetails(
     // Indexing reservation stays for fast lookup
     $indexedReservationStays = [];
     foreach ($arrRESERVATIONstay as $stay) {
-        $index = $stay['createDateTime'] . '|' . $stay['modifyDateTime'] . '|' . $stay['startDate'] . '|' . $stay['endDate']  . '|' . $stay['extGuestId'] . '|' . $stay['extPMSConfNum'];
+        $index = $stay['extPMSConfNum'];
         $indexedReservationStays[$index] = $stay['id'];
     }
 
@@ -1805,6 +1883,11 @@ function createArrRESERVATIONroomDetails(
     try {
         $arrRESERVATIONroomDetails = [];
         foreach ($normalizedData as $entry) {
+            //skip where confirmation number is null
+            if(is_null($entry['confirmation_number'])){
+                continue;
+            }
+
             // Existing logic to decode and extract guest details...
 
             // New logic to decode and extract prices and ratePlans
@@ -1847,12 +1930,29 @@ function createArrRESERVATIONroomDetails(
                 $endDate = $entry['departure'] ?? null;
                 $createDateTime = strtotime($entry['createdDateTime']);
                 $modifyDateTime = strtotime($entry['lastModifiedDateTime']);
-                $extGuestId = $entry['extracted_guest_id'] ?? null;
+                $extGuestId = $entry['extracted_guest_id'] ?? '';
                 $extPMSConfNum = $entry['confirmation_number'] ?? null;
 
 
+                //metaData
+                $metaDataArray = [
+                    'id' => $entry['id'] ?? null,
+                    'import_code' => $entry['import_code'] ?? null,
+                    'lastModifiedBy' => $entry['lastModifiedBy'] ?? null,
+                    'lastModifiedDateTime' => $entry['lastModifiedDateTime'] ?? null,
+                    'lastModifiedDateTime_repo' => $entry['lastModifiedDateTime_repo'] ?? null,
+                    'notificationType' => $entry['import_code'] ?? null,
+                    'occupancyDetails' => $entry['lastModifiedDateTime_repo'] ?? null,
+                    'blocks' => $entry['lastModifiedDateTime_repo'] ?? null,
+                    'profiles' => $entry['import_code'] ?? null,
+                    'occupiedUnits' => $entry['occupiedUnits'] ?? null
+
+                ];
+                $metaDataJson = json_encode($metaDataArray);
+
+
                 // Create index for stay lookup
-                $stayIndex = $createDateTime . '|' . $modifyDateTime . '|' . $startDate . '|' . $endDate . '|' . $extGuestId . '|' . $extPMSConfNum;
+                $stayIndex = $extPMSConfNum;
                 // Lookup for stayId using the index
                 if (isset($indexedReservationStays[$stayIndex])) {
                     $stayId = is_array($indexedReservationStays[$stayIndex])
@@ -1876,6 +1976,7 @@ function createArrRESERVATIONroomDetails(
                     'isBlocked' => isset($entry['blocks']) && !$entry['blocks']['isempty'] ? 1 : 0,
                     'isComplimentary' => intval($entry['isComplimentary']) ?? null,
                     'isHouseUse' => $entry['isHouseUse'] ?? 0,
+                    'metaData' => $metaDataJson,
                     'contactId' => $contactId,
                     'firstName' => $givenName,
                     'lastName' => $surname,
@@ -1901,7 +2002,7 @@ function createArrRESERVATIONroomDetails(
         $errorCount++;
         // Log the exception
         $errorTimestamp = date('Y-m-d H:i:s');
-        $errorLogMessage = "[{$errorTimestamp}] Error in createArrRESERVATIONroomDetails: " . $e->getMessage() . PHP_EOL;
+        $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Error in createArrRESERVATIONroomDetails: " . $e->getMessage() . PHP_EOL;
         error_log($errorLogMessage, 3, $errorLogFile);
 
         // Optionally rethrow the exception if further handling is required
@@ -1926,14 +2027,14 @@ function createArrSERVICESfolioOrders($normalizedData, $arrCUSTOMERcontact, $arr
         // Indexing reservation stays for fast lookup
         $indexedReservationStays = [];
         foreach ($arrRESERVATIONstay as $stay) {
-            $index = $stay['createDateTime'] . '|' . $stay['modifyDateTime'] . '|' . $stay['startDate'] . '|' . $stay['endDate']  . '|' . $stay['extGuestId'] . '|' . $stay['extPMSConfNum'];
+            $index = $stay['extGuestId'] . '|' . $stay['extPMSConfNum'];
             $indexedReservationStays[$index] = $stay['id'];
         }
 
         // Indexing payments for fast lookup
         $indexedPayments = [];
         foreach ($arrSERVICESpayment as $payment) {
-            $index = $payment['paymentAmount'] . '|' . $payment['currencyCode'];
+            $index = doubleval($payment['paymentAmount']) . '|' . $payment['currencyCode'];
             $indexedPayments[$index] = $payment['id'];
         }
 
@@ -1956,15 +2057,15 @@ function createArrSERVICESfolioOrders($normalizedData, $arrCUSTOMERcontact, $arr
 
         foreach ($normalizedData as $data) {
             $guestDetails = $data['guests'][0]['guest'] ?? null;
-            $firstName = $guestDetails['names'][0]['givenName'] ?? 'UNKNOWN';
-            $lastName = $guestDetails['names'][0]['surname'] ?? 'UNKNOWN';
-            $extGuestId = $data['extracted_guest_id'] ?? null;
+            $firstName = $guestDetails['names'][0]['givenName'] ?? '';
+            $lastName = $guestDetails['names'][0]['surname'] ?? '';
+            $extGuestId = $data['extracted_guest_id'] ?? '';
             $createDateTime = strtotime($data['createdDateTime']) ?? null;
             $modifyDateTime = strtotime($data['lastModifiedDateTime']) ?? null;
             $startDate = $data['arrival'] ?? null; // Assuming these are already in the correct format
             $endDate = $data['departure'] ?? null;
             $createdBy = $data['createdBy'] ?? null;
-            $extPMSConfNum = $data['confirmation_number'] ?? null;
+            $extPMSConfNum = $data['confirmation_number'] ?? '';
             $stayId = $indexedCustomerContacts[$extGuestId] ?? null; // Lookup for stayId
             // Populate libServiceItemsId using itemCode and ratePlanCode
             $itemCode = $data['services'][0]['code'] ?? 'UNKNOWN';
@@ -1975,19 +2076,94 @@ function createArrSERVICESfolioOrders($normalizedData, $arrCUSTOMERcontact, $arr
             // Determine the folioOrderType here
 //            $folioOrderType = null;
 
+
+            $segmentations = array_map(function($segmentation) {
+                return [
+                    'Code' => $segmentation['code'] ?? null,
+                    'End' => $segmentation['end'] ?? null,
+                    'Name' => $segmentation['name'] ?? null, // Assuming 'name' exists
+                    'Start' => $segmentation['start'] ?? null,
+                    'Type' => $segmentation['type'] ?? null,
+                ];
+            }, $data['segmentations'] ?? []);
+
+            $taxes = array_map(function($tax) {
+                return [
+                    'TaxAmount' => $tax['amount'] ?? null, // Assuming 'amount' exists
+                    'TaxCode' => $tax['code'] ?? null,
+                ];
+            }, $data['taxes'] ?? []);
+
+            $discounts = array_map(function($discount) {
+                return [
+                    'DiscountAmount' => $discount['amount'] ?? null, // Assuming 'amount' exists
+                    'DiscountIsIncluded' => $discount['isIncluded'] ?? null,
+                    'DiscountStartDateTime' => $discount['start'] ?? null, // Assuming 'start' exists
+                    'DiscountEndDateTime' => $discount['end'] ?? null, // Assuming 'end' exists
+                ];
+            }, $data['discounts'] ?? []);
             //metaData
             $metaDataArray = [
-                'id' => $data['id'] ?? null,
-                'import_code' => $data['import_code'] ?? null,
+                'createdBy' => $data['createdBy'] ?? null,
+                'createdDateTime' => $data['createdDateTime'] ?? null,
+                'createdDateTime_repo' => $data['createdDateTime_repo'] ?? null,
+                'Departure' => $data['departure'] ?? null,
+                'doNotDisplayPrice' => $data['doNotDisplayPrice'] ?? null,
+                'estimatedDateTimeOfArrival' => $data['estimatedDateTimeOfArrival'] ?? null,
+                'estimatedDateTimeOfDeparture' => $data['estimatedDateTimeOfDeparture'] ?? null,
+                'Ext_id' => $data['ext_id'] ?? null,
+                'Ext_status' => $data['ext_status'] ?? null,
+                'guaranteeCode' => $data['guaranteeCode'] ?? null,
+                'OptionDate' => $data['optionDate'] ?? null,
+                'PaymentMethod' => [
+                    'Code' => $data['paymentMethod']['code'] ?? null,
+                ],
+                'Prices' => array_map(function($price) {
+                    return [
+                        'End' => $price['end'] ?? null,
+                        'Start' => $price['start'] ?? null,
+                    ];
+                }, $data['prices'] ?? []),
+                'ProcessStamp' => $data['procesststamp'] ?? null,
+                'PromotionCode' => $data['promotionCode'] ?? null,
+                'PurposeOfStay' => $data['purposeOfStay'] ?? null,
+                // Assume ratePlans is similar structure to Prices
+                'ratePlans' => array_map(function($plan) {
+                    return [
+                        'Code' => $plan['code'] ?? null,
+                        'Description' => $plan['description'] ?? null, // Assuming description exists
+                        'End' => $plan['end'] ?? null,
+                        'Start' => $plan['start'] ?? null,
+                    ];
+                }, $data['ratePlans'] ?? []),
+                'receivedDateTime' => $data['receivedDateTime'] ?? null,
+                // Similar mapping for referenceIDs, AdditionalData, etc.
+                // Due to complexity, these mappings are simplified examples
+                'Command_id' => $data['command_id'] ?? null,
                 'lastModifiedBy' => $data['lastModifiedBy'] ?? null,
+                'isGuestViewable' => $data['isGuestViewable'] ?? null,
                 'lastModifiedDateTime' => $data['lastModifiedDateTime'] ?? null,
-                'lastModifiedDateTime_repo' => $data['lastModifiedDateTime_repo'] ?? null,
-                'notificationType' => $data['import_code'] ?? null,
-                'occupancyDetails' => $data['lastModifiedDateTime_repo'] ?? null,
-                'blocks' => $data['lastModifiedDateTime_repo'] ?? null,
-                'profiles' => $data['import_code'] ?? null,
-                'occupiedUnits' => $data['occupiedUnits'] ?? null
-
+                // Assuming shareIds structure and extracting as needed
+                'shareIds' => array_map(function($shareId) {
+                    return [
+                        'Id' => $shareId['id'] ?? null,
+                        'IdType' => $shareId['idType'] ?? null,
+                        'SystemId' => $shareId['systemId'] ?? null,
+                        'SystemType' => $shareId['systemType'] ?? null,
+                    ];
+                }, $entry['shareIds'] ?? []),
+                'requestedDeposits' => array_map(function($deposit) {
+                    // Assuming structure and extracting as needed
+                    return [
+                        'Amount' => $deposit['amount'] ?? null, // Assuming 'amount' exists
+                        'Currency' => $deposit['currency'] ?? null, // Assuming 'currency' exists
+                    ];
+                }, $data['requestedDeposits'] ?? []),
+                'Alerts' => $data['alerts'] ?? [], // Assuming simple array or further mapping required
+                'contacts' => $data['contacts'] ?? [], // Assuming simple array or further mapping required
+                'Segmentations' => $segmentations,
+                'Taxes' => $taxes,
+                'Discounts' => $discounts
             ];
             $metaDataJson = json_encode($metaDataArray);
 
@@ -1997,32 +2173,31 @@ function createArrSERVICESfolioOrders($normalizedData, $arrCUSTOMERcontact, $arr
 
 
             // Create index for the contact id lookup
-            $contactIndex = $firstName . '|' . $lastName . '|' . $extGuestId;
-            // Lookup for stayId using the index
+            $contactIndex = $firstName . '|' . $lastName . '|' .  $extGuestId;
+            // Lookup for contact id using the index
             if (isset($indexedCustomerContacts[$contactIndex])) {
                 $contactId = is_array($indexedCustomerContacts[$contactIndex])
                     ? reset($indexedCustomerContacts[$contactIndex])
                     : $indexedCustomerContacts[$contactIndex];
             } else {
-                $contactId = null;
+                $contactId = 0;
             }
 
 
             // Create index for stay lookup
-            $stayIndex = $createDateTime . '|' . $modifyDateTime . '|' . $startDate . '|' . $endDate . '|' . $extGuestId . '|' . $extPMSConfNum;
+            $stayIndex = $extGuestId . '|' . $extPMSConfNum;
             // Lookup for stayId using the index
             if (isset($indexedReservationStays[$stayIndex])) {
                 $stayId = is_array($indexedReservationStays[$stayIndex])
                     ? reset($indexedReservationStays[$stayIndex])
                     : $indexedReservationStays[$stayIndex];
             } else {
-                $stayId = null;
-            }
+                $stayId = null;            }
 
 
             // Populate paymentId using paymentAmount and currencyCode
-            $paymentAmount = null;
-            $currencyCode = $data['currency']['code'] ?? null;
+            $paymentAmount = 0;
+            $currencyCode = $data['currency']['code'] ?? 'UNKNOWN';
             $paymentIndex = $paymentAmount . '|' . $currencyCode;
             $paymentId = $indexedPayments[$paymentIndex] ?? null;
 
@@ -2043,8 +2218,8 @@ function createArrSERVICESfolioOrders($normalizedData, $arrCUSTOMERcontact, $arr
                 'createDateTime' => $createDateTime ?? null,
                 'modifyDateTime' => $modifyDateTime ?? null,
                 'paymentId' => $paymentId,
-                'paymentAmount' =>  $paymentAmount,
-                'currencyCode' => $currencyCode,
+                'paymentAmount' =>  doubleval($paymentAmount) ?? 0,
+                'currencyCode' => $currencyCode ?? null,
                 'libServiceItemsId' => $libServiceItemsId,
                 'itemCode' => $data['services'][0]['code'] ?? 'UNKNOWN',
                 'ratePlanCode' => $data['prices'][0]['ratePlanCode'] ?? 'UNKNOWN',
@@ -2055,7 +2230,7 @@ function createArrSERVICESfolioOrders($normalizedData, $arrCUSTOMERcontact, $arr
 
 
             // SERVICE type folio order
-            if (isset($data['services'])) {
+            if (!is_null($data['services'])) {
                 foreach ($data['services'] as $service) {
                     $serviceOrder = $commonFields;
                     $serviceOrder['folioOrderType'] = 'SERVICE';
@@ -2081,7 +2256,7 @@ function createArrSERVICESfolioOrders($normalizedData, $arrCUSTOMERcontact, $arr
             }
 
             // RESERVATION type folio order
-            if (isset($data['bookedUnits'])) {
+            if (!is_null($data['confirmation_number'])) {
                 $reservationOrder = $commonFields;
                 $reservationOrder['folioOrderType'] = 'RESERVATION';
                 $reservationOrder['unitCount'] = null; // Determine if needed
@@ -2104,7 +2279,7 @@ function createArrSERVICESfolioOrders($normalizedData, $arrCUSTOMERcontact, $arr
             }
 
             // OTHER type folio order
-            if (isset($data['fixedCharges'])) {
+            if (!is_null($data['fixedCharges'])) {
                 foreach ($data['fixedCharges'] as $fixedCharge) {
                     $otherOrder = $commonFields;
                     $otherOrder['folioOrderType'] = 'OTHERS';
@@ -2113,7 +2288,7 @@ function createArrSERVICESfolioOrders($normalizedData, $arrCUSTOMERcontact, $arr
                     $otherOrder['fixedCost'] = ($otherOrder['unitCount'] ?? 0) * ($otherOrder['unitPrice'] ?? 0);
                     // Additional OTHER specific fields go here...
                     $otherOrder['amountBeforeTax'] = $data['prices'][0]['amount'] ?? null;
-                    $otherOrder['amountAfterTax'] = $data['prices'][0]['amount'] + $data['taxes'][0]['amount'] ?? 0;
+                    $otherOrder['amountAfterTax'] = $data['prices'][0]['amount'] + $data['taxes'][0]['amount'] ?? null;
                     $otherOrder['postingFrequency'] = $data['fixedCharges']['postingFrequency'] ?? null;
                     $otherOrder['startDate'] = $data['fixedCharges']['start'] ?? null;
                     $otherOrder['endDate']  = $data['fixedCharges']['end'] ?? null;
@@ -2128,23 +2303,26 @@ function createArrSERVICESfolioOrders($normalizedData, $arrCUSTOMERcontact, $arr
                 }
 
             }
-            // Add UNKNOWN type folio order if none of the above apply
-            if (empty($arrSERVICESfolioOrders)) {
-                $unknownOrder = $commonFields;
-    //            $unknownOrder['folioOrderType'] = 'UNKNOWN';
-                // Add default/unknown values for all other fields
-                $arrSERVICESfolioOrders[] = $unknownOrder;
-            }
+//            // Add UNKNOWN type folio order if none of the above apply
+//            if (empty($arrSERVICESfolioOrders)) {
+//                $unknownOrder = $commonFields;
+////            $unknownOrder['folioOrderType'] = 'UNKNOWN';
+//                // Add default/unknown values for all other fields
+//                $arrSERVICESfolioOrders[] = $unknownOrder;
+//            }
 
         }
 //        populateLibFolioOrdersTypeId($arrSERVICESfolioOrders, $arrSERVICESlibFolioOrdersType, $errorCount);
 
-
+        //Remove any duplicate records
+        removeDuplicateRows($arrSERVICESfolioOrders,$errorCount);
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully processed SERVICES folio orders" . PHP_EOL;
+        $successMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Successfully processed SERVICES folio orders" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
+
+
 
         return $arrSERVICESfolioOrders;
     } catch (Exception $e) {
@@ -2152,7 +2330,7 @@ function createArrSERVICESfolioOrders($normalizedData, $arrCUSTOMERcontact, $arr
         $errorCount++;
         // Log the main function exception
         $errorTimestamp = date('Y-m-d H:i:s');
-        $errorLogMessage = "[{$errorTimestamp}] Error in createArrSERVICESfolioOrders: " . $e->getMessage() . PHP_EOL;
+        $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Error in createArrSERVICESfolioOrders: " . $e->getMessage() . PHP_EOL;
         error_log($errorLogMessage, 3, $errorLogFile);
 
         // Optionally rethrow the exception if further handling is required
@@ -2185,7 +2363,7 @@ function createArrSERVICESfolioOrders($normalizedData, $arrCUSTOMERcontact, $arr
 //
 //        // Log the success message
 //        $errorTimestamp = date('Y-m-d H:i:s');
-//        $successMessage = "[{$errorTimestamp}] Successfully populated libFolioOrdersTypeId in folio orders" . PHP_EOL;
+//        $successMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Successfully populated libFolioOrdersTypeId in folio orders" . PHP_EOL;
 //        error_log($successMessage, 3, $errorLogFile);
 //    } catch (Exception $e) {
 //        // Increment error counter
@@ -2193,7 +2371,7 @@ function createArrSERVICESfolioOrders($normalizedData, $arrCUSTOMERcontact, $arr
 //
 //        // Log the exception
 //        $errorTimestamp = date('Y-m-d H:i:s');
-//        $errorLogMessage = "[{$errorTimestamp}] Error in populateLibFolioOrdersTypeId: " . $e->getMessage() . PHP_EOL;
+//        $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Error in populateLibFolioOrdersTypeId: " . $e->getMessage() . PHP_EOL;
 //        error_log($errorLogMessage, 3, $errorLogFile);
 //
 //        // Optionally rethrow the exception if further handling is required
@@ -2219,7 +2397,7 @@ function removeDuplicateOrders($arrSERVICESfolioOrders) {
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
-        $successMessage = "[{$errorTimestamp}] Successfully removed duplicate folio orders" . PHP_EOL;
+        $successMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Successfully removed duplicate folio orders" . PHP_EOL;
         error_log($successMessage, 3, $errorLogFile);
 
         return $uniqueOrders;
@@ -2229,7 +2407,7 @@ function removeDuplicateOrders($arrSERVICESfolioOrders) {
 
         // Log the exception
         $errorTimestamp = date('Y-m-d H:i:s');
-        $errorLogMessage = "[{$errorTimestamp}] Error in removeDuplicateOrders: " . $e->getMessage() . PHP_EOL;
+        $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Error in removeDuplicateOrders: " . $e->getMessage() . PHP_EOL;
         error_log($errorLogMessage, 3, $errorLogFile);
 
         // Optionally rethrow the exception if further handling is required
@@ -2258,7 +2436,7 @@ function normalizeMyDataSemiParsed($myDataSemiParsed)
                 } else {
                     // Log a message if there is a JSON error
                     $errorTimestamp = date('Y-m-d H:i:s');
-                    $errorLogMessage = "[{$errorTimestamp}] JSON decode error in normalizeMyDataSemiParsed for key {$entryKey}: " . json_last_error_msg() . PHP_EOL;
+                    $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") JSON decode error in normalizeMyDataSemiParsed for key {$entryKey}: " . json_last_error_msg() . PHP_EOL;
                     error_log($errorLogMessage, 3, $errorLogFile);
 
                     $normalizedData[$entryKey] = $entryValue;
@@ -2274,7 +2452,7 @@ function normalizeMyDataSemiParsed($myDataSemiParsed)
         }
         // Log the success message
 //        $errorTimestamp = date('Y-m-d H:i:s');
-//        $successMessage = "[{$errorTimestamp}] Successfully normalized semi-parsed data" . PHP_EOL;
+//        $successMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Successfully normalized semi-parsed data" . PHP_EOL;
 //        error_log($successMessage, 3, $errorLogFile);
 
         return $normalizedData;
@@ -2282,13 +2460,45 @@ function normalizeMyDataSemiParsed($myDataSemiParsed)
 
         // Log the exception
         $errorTimestamp = date('Y-m-d H:i:s');
-        $errorLogMessage = "[{$errorTimestamp}] Error in normalizeMyDataSemiParsed: " . $e->getMessage() . PHP_EOL;
+        $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Error in normalizeMyDataSemiParsed: " . $e->getMessage() . PHP_EOL;
         error_log($errorLogMessage, 3, $errorLogFile);
 
         // Optionally rethrow the exception if further handling is required
         throw $e;
     }
 }
+
+function cleanLogs($daysToKeep, $logFilePath) {
+    // Check if log file exists
+    if (!file_exists($logFilePath)) {
+        throw new Exception("Log file does not exist: $logFilePath");
+    }
+
+    // Read the contents of the log file
+    $logEntries = file($logFilePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    if (!$logEntries) {
+        // Log file is empty or unreadable
+        return;
+    }
+
+    // Determine the cutoff date
+    $cutoffDate = new DateTime();
+    $cutoffDate->modify("-$daysToKeep days");
+
+    // Filter out old log entries
+    $filteredEntries = array_filter($logEntries, function($entry) use ($cutoffDate) {
+        // Extract the timestamp from the log entry
+        preg_match("/^\[(.*?)\]/", $entry, $matches);
+        $entryDate = DateTime::createFromFormat('Y-m-d H:i:s', $matches[1] ?? '');
+
+        // Keep the entry if its date is after the cutoff date
+        return $entryDate >= $cutoffDate;
+    });
+
+    // Rewrite the log file with the filtered entries
+    file_put_contents($logFilePath, implode(PHP_EOL, $filteredEntries) . PHP_EOL);
+}
+
 
 function isJson($string) {
     json_decode($string);

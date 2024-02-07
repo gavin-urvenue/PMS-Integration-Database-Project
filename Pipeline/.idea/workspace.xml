@@ -9,13 +9,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b609d737-ca15-4432-ade7-d7b0de94926d" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/50c6a3b1-94d8-403c-8ed4-75c665b685b5.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/50c6a3b1-94d8-403c-8ed4-75c665b685b5.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Hapi ETL_PHP.php" beforeDir="false" afterPath="$PROJECT_DIR$/Hapi ETL_PHP.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Hapi Integration ETL Helper Scripts.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/action_log.txt" beforeDir="false" afterPath="$PROJECT_DIR$/action_log.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/array_functions.php" beforeDir="false" afterPath="$PROJECT_DIR$/array_functions.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/error_log.txt" beforeDir="false" afterPath="$PROJECT_DIR$/error_log.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/normalizedData.txt" beforeDir="false" afterPath="$PROJECT_DIR$/normalizedData.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config.php" beforeDir="false" afterPath="$PROJECT_DIR$/config.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/upsert_functions.php" beforeDir="false" afterPath="$PROJECT_DIR$/upsert_functions.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,7 +50,9 @@
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
     "run.code.analysis.last.selected.profile": "pProject Default",
+    "settings.editor.selected.configurable": "preferences.lookFeel",
     "vue.rearranger.settings.migration": "true"
   },
   "keyToStringList": {
@@ -79,21 +81,12 @@
       <updated>1703792593145</updated>
       <workItem from="1703792594158" duration="98495000" />
       <workItem from="1704331159522" duration="78944000" />
+      <workItem from="1706838754474" duration="16252000" />
+      <workItem from="1707161193643" duration="42814000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="php">
-          <url>file://$PROJECT_DIR$/array_functions.php</url>
-          <line>836</line>
-          <option name="timeStamp" value="4" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>

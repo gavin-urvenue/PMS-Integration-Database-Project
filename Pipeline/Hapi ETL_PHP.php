@@ -10,6 +10,9 @@
 //and then an insert into grandchild tables, with the child tables being dependent on the parent tables and the
 //grandchild tables being dependent on the child tables.
 
+//*Note: The original dataset is transformed into 2 datasets and used throughout this script, myDataSemiParsed and normalizedData
+//*They're both associate arrays but myDataSemiParsed has some JSON in it while normalizedData does not.
+
 //Setting up Error Logging
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
@@ -37,9 +40,10 @@ $destinationDBName = DESTINATION_DB_NAME;
 
 // Create connections
 $destinationDBConnection = new mysqli($destinationHost, $destinationUsername, $destinationPassword, $destinationDBName);
-
 $originDBConnection = new mysqli($originHost, $originUsername, $originPassword, $originDatabase);
 
+//Miscellaneous
+$daysToKeepLogs = DAYS_TO_KEEP_LOGS;
 
 
 
@@ -69,7 +73,7 @@ $importCode = getFirstNonNullImportCode($originDBConnection, 'hapi_raw_reservati
 
 //Pull latest EtlTimestamp if exists from PMSDATABASEmisc
 try {
-    $etlStartTStamp = getLatestEtlTimestamp($destinationDBConnection, $errorCount);
+    $etlStartTStamp = getLatestEtlTimestamp($destinationDBConnection);
 }
 catch (Exception $e)
 {
@@ -100,7 +104,7 @@ if (empty($myDataSemiParsed))
         }
 
         try {
-            updateEtlDuration($destinationDBConnection);
+            updateEtlDuration($destinationDBConnection, $errorCount);
         } catch (Exception $e) {
             echo 'Error: ' . $e->getMessage();
         }
@@ -353,11 +357,11 @@ try {
 }
 // 4) SERVICESpayment
 try {
-    upsertSERVICESpayment($arrSERVICESpayment, $destinationDBConnection, $errorCount);
+    upsertSERVICESPayment($arrSERVICESpayment, $destinationDBConnection, $errorCount);
 } catch (Exception $e) {
     echo 'Error: ' . $e->getMessage();
 }
-
+//
 // Get Child table associative arrays with new primary keys to prepare for upsert of grandchild tables
 // Update $arrRESERVATIONstay
 $arrRESERVATIONstay = getTableAsAssociativeArray($destinationDBConnection,'RESERVATIONstay');
@@ -433,17 +437,19 @@ try {
 }
 //// 3) RESERVATIONgroupStay
 ////skipped since HAPI is not offering any group data
-//// 4) SERVICESfolioOrders
+// 4) SERVICESfolioOrders
 try {
     $arrSERVICESfolioOrders = getTableAsAssociativeArray($destinationDBConnection, 'SERVICESfolioOrders', $errorCount);
 } catch (Exception $e) {
 }
 
 //Populate grandchild tables
-//var_dump(array_slice($arrRESERVATIONstay, 0, 10, true));
+//var_dump(array_slice($arrroom, 0, 1000, true));
+
+//var_dump(array_slice($arrSERVICESpayment, 0, 10, true));
 //
-//var_dump(array_slice($arrRESERVATIONstayStatusStay, 0, 10, true));
-//print_r($normalizedData);
+//var_dump(array_slice($arrRESERVATIONroomDetails, 0, 10, true));
+//print_r($arrSERVICESfolioOrders);
 //print_r($arrRESERVATIONstay);
 //print_r($arrSERVICESfolioOrders);
 //
@@ -458,12 +464,26 @@ try {
 //}
 
 
-
+//Update PMSDATABASEmisc
 try {
     updateEtlDuration($destinationDBConnection, $errorCount);
 } catch (Exception $e) {
     echo 'Error: ' . $e->getMessage();
 }
 
+//Clear old log entries
+try {
+    cleanLogs($daysToKeepLogs, dirname(__FILE__) . '/error_log.txt');
+    echo "\nError log cleanup successful.";
+} catch (Exception $e) {
+    echo "\nError during error log cleanup: " . $e->getMessage() . "\n";
+}
+
+try {
+    cleanLogs($daysToKeepLogs, dirname(__FILE__) . '/action_log.txt');
+    echo "\nAction log cleanup successful.";
+} catch (Exception $e) {
+    echo "\nError during action log cleanup: " . $e->getMessage() . "\n";
+}
 
 ?>

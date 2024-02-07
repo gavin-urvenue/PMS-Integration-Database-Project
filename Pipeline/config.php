@@ -2,7 +2,7 @@
 
 //Constants
     //schema aversion
-define('SCHEMA_VERSION', '1.42');
+define('SCHEMA_VERSION', '1.43');
 // Database Connections:
     //origin
 define('ORIGIN_TABLE_NAME', 'hapi_raw_reservations');
@@ -15,6 +15,9 @@ define('DESTINATION_HOST', 'localhost:3306');
 define('DESTINATION_USERNAME', 'urvenue');
 define('DESTINATION_PASSWORD', 'Password1!');
 define('DESTINATION_DB_NAME', 'pms_db');
+
+//Miscellaneous
+define('DAYS_TO_KEEP_LOGS', 14);
 
 
 ?>
