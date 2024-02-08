@@ -1231,7 +1231,7 @@ function createArrRESERVATIONstay(
         $propertyResult->free();
 
         foreach ($normalizedData as $entry) {
-            //check if confirmation nubmer is null, skip if null
+            //check if confirmation number is null, skip if null
             if (is_null($entry['confirmation_number'])) {
                 continue;
             };
@@ -1279,8 +1279,8 @@ function createArrRESERVATIONstay(
             $extPMSConfNum = $entry['confirmation_number'] ?? null;
             $extReservationId = $entry['reservation_id'] ?? null;
             $extGuestId = $entry['extracted_guest_id'] ?? '';
-            $propertyCode = isset($entry['propertyDetails']['propertyCode']) ? $entry['propertyDetails']['propertyCode'] : 'UNKNOWN';
-            $chainCode = isset($entry['propertyDetails']['chainCode']) ? $entry['propertyDetails']['chainCode'] : 'UNKNOWN';
+            $propertyCode = $entry['extracted_property_code'] ?? 'UNKNOWN';
+            $chainCode = $entry['extracted_chain_code'] ?? 'UNKNOWN';
             $sourceName = $entry['profiles'][0]['names'][0]['name'] ?? 'UNKNOWN';
             $sourceType = $entry['profiles'][0]['type'] ?? 'UNKNOWN';
 
@@ -2066,7 +2066,6 @@ function createArrSERVICESfolioOrders($normalizedData, $arrCUSTOMERcontact, $arr
             $endDate = $data['departure'] ?? null;
             $createdBy = $data['createdBy'] ?? null;
             $extPMSConfNum = $data['confirmation_number'] ?? '';
-            $stayId = $indexedCustomerContacts[$extGuestId] ?? null; // Lookup for stayId
             // Populate libServiceItemsId using itemCode and ratePlanCode
             $itemCode = $data['services'][0]['code'] ?? 'UNKNOWN';
             $ratePlanCode = $data['prices'][0]['ratePlanCode'] ?? 'UNKNOWN';
@@ -2226,13 +2225,12 @@ function createArrSERVICESfolioOrders($normalizedData, $arrCUSTOMERcontact, $arr
                 'metaData' => $metaDataJson
 
             ];
-
+            $arrSERVICESfolioOrders[] = $commonFields;
 
 
             // SERVICE type folio order
-            if (!is_null($data['services'])) {
+            if (!empty($data['services'])) {
                 foreach ($data['services'] as $service) {
-                    $serviceOrder = $commonFields;
                     $serviceOrder['folioOrderType'] = 'SERVICE';
                     $serviceOrder['unitCount'] = $service['quantity'] ?? null;
                     $serviceOrder['unitPrice'] = null; // Calculate if needed
@@ -2256,8 +2254,7 @@ function createArrSERVICESfolioOrders($normalizedData, $arrCUSTOMERcontact, $arr
             }
 
             // RESERVATION type folio order
-            if (!is_null($data['confirmation_number'])) {
-                $reservationOrder = $commonFields;
+            if ($extPMSConfNum != null) {
                 $reservationOrder['folioOrderType'] = 'RESERVATION';
                 $reservationOrder['unitCount'] = null; // Determine if needed
                 $reservationOrder['unitPrice'] = null; // Calculate if needed
@@ -2279,9 +2276,8 @@ function createArrSERVICESfolioOrders($normalizedData, $arrCUSTOMERcontact, $arr
             }
 
             // OTHER type folio order
-            if (!is_null($data['fixedCharges'])) {
+            if (!empty($data['fixedCharges'])) {
                 foreach ($data['fixedCharges'] as $fixedCharge) {
-                    $otherOrder = $commonFields;
                     $otherOrder['folioOrderType'] = 'OTHERS';
                     $otherOrder['unitCount'] = $fixedCharge['quantity'] ?? null;
                     $otherOrder['unitPrice'] = $fixedCharge['amount'] ?? null;
@@ -2315,7 +2311,7 @@ function createArrSERVICESfolioOrders($normalizedData, $arrCUSTOMERcontact, $arr
 //        populateLibFolioOrdersTypeId($arrSERVICESfolioOrders, $arrSERVICESlibFolioOrdersType, $errorCount);
 
         //Remove any duplicate records
-        removeDuplicateRows($arrSERVICESfolioOrders,$errorCount);
+        $arrSERVICESfolioOrders = removeDuplicateRows($arrSERVICESfolioOrders,$errorCount);
 
         // Log the success message
         $errorTimestamp = date('Y-m-d H:i:s');
