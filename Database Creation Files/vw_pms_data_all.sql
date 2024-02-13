@@ -2,10 +2,10 @@
 
 CREATE OR REPLACE VIEW vw_pms_data_all AS
 Select  s.createDateTime, s.modifyDateTime, s.startDate stayStartDate, s.endDate stayEndDate, s.createdBy, s.MetaData stayMetaData, s.extPMSConfNum, s.extGuestId, s.dataSource, rrc.className, rr.roomNumber, rrt.typeName, rrt.typeCode,
-rss.status, rss.statusName, rs.sourceName, rs.sourceType, rp.chainCode, rp.propertyCode, fo.amount, fo.fixedChargesQuantity, fo.ratePlanCode folioOrderRatePlanCode, fo.isIncluded, 
+rss.status, rss.statusName, rs.sourceName, rs.sourceType, rp.chainCode, rp.propertyCode, fo.amountBeforeTax, fo.amountAfterTax, fo.amount, fo.fixedChargesQuantity, fo.ratePlanCode folioOrderRatePlanCode, fo.isIncluded, 
 fo.startDate folioOrderStartDate, fo.endDate folioOrderEndDate, fo.folioOrderType, fo.unitCount, fo.unitPrice, fo.metaData folioOrderMetaData, p.paymentAmount,  p.currencyCode, t.paymentMethod,
 si.itemName, si.itemCode, si.ratePlanCode serviceItemRatePlanCode, c.firstName, c.lastName, c.title, c.email, c.birthDate, c.languageCode, c.languageFormat, c.extGuestId customerGuestId,
-c.metaData customerMetaData, r.isPrimaryGuest, ct.`type`, m.`level`, m.membershipCode, lp.name, lp.source 
+c.metaData customerMetaData, fo.isPrimaryGuest, ct.`type`, m.`level`, m.membershipCode, lp.name, lp.source 
 from pms_db.RESERVATIONstay s
 left join RESERVATIONroomDetails rd  on s.id = rd.stayId
 left join RESERVATIONlibRoomClass rrc on rd.libRoomClassId  = rrc.id 

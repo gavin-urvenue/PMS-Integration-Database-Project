@@ -1112,56 +1112,59 @@ function createArrCUSTOMERcontact($normalizedData, &$errorCount) {
 
         $uniqueCheck = []; // Array to keep track of existing contacts to prevent duplicates
 
+
         foreach ($normalizedData as $item) {
             if (isset($item['guests']) && !empty($item['guests'])) {
                 foreach ($item['guests'] as $guest) {
-                    if (!isset($guest['guest']) || !isset($guest['guest']['names'][0])) {
-                        continue;
-                    }
-                    $guestData = $guest['guest'];
-                    $nameData = $guestData['names'][0];
-                    //metaData
-                    $metaDataArray = [
-                        'addresses' => $guest['addresses'] ?? null,
-                        'createdBy' => $guest['createdBy'] ?? null,
-                        'createdDateTime' => $guest['createdDateTime_repo'] ?? null,
-                        'guest' => $guest['guest'],
-                        'contactDetails' => $guest['contactDetails']
+                    foreach ($item['guests'] as $guest_ind) {
+                        if (!isset($guest_ind['guest']) || !isset($guest_ind['guest']['names'][0])) {
+                            continue;
+                        }
+                        $guestData = $guest_ind['guest'];
+                        $nameData = $guestData['names'][0];
+                        //metaData
+                        $metaDataArray = [
+                            'addresses' => $guest_ind['addresses'] ?? null,
+                            'createdBy' => $guest_ind['createdBy'] ?? null,
+                            'createdDateTime' => $guest_ind['createdDateTime_repo'] ?? null,
+                            'guest' => $guest_ind['guest'],
+                            'contactDetails' => $guest_ind['contactDetails']
 
-                    ];
-                    $metaDataJson = json_encode($metaDataArray);
-                    // Initialize email as empty string
-                    $email = '';
+                        ];
+                        $metaDataJson = json_encode($metaDataArray);
+                        // Initialize email as empty string
+                        $email = '';
 
-                    // Iterate through contact details to find email
-                    if (isset($guestData['contactDetails']) && is_array($guestData['contactDetails'])) {
-                        foreach ($guestData['contactDetails'] as $contactDetail) {
-                            if ($contactDetail['category'] === 'EMAIL' && isset($contactDetail['value'])) {
-                                $email = $contactDetail['value'];
-                                break; // Stop the loop once email is found
+                        // Iterate through contact details to find email
+                        if (isset($guestData['contactDetails']) && is_array($guestData['contactDetails'])) {
+                            foreach ($guestData['contactDetails'] as $contactDetail) {
+                                if ($contactDetail['category'] === 'EMAIL' && isset($contactDetail['value'])) {
+                                    $email = $contactDetail['value'];
+                                    break; // Stop the loop once email is found
+                                }
                             }
                         }
-                    }
 
 
-                    $contact = [
-                        'firstName' => $nameData['givenName'] ?? null,
-                        'lastName' => $nameData['surname'] ?? null,
-                        'title' => $nameData['title'] ?? null,
-                        'email' => $email ?? '', // Use the extracted email
-                        'birthDate' => $guestData['dateOfBirth'] ?? null,
-                        'languageCode' => $guestData['primaryLanguage']['code'] ?? null,
-                        'languageFormat' => $guestData['primaryLanguage']['format'] ?? null,
-                        'extGuestId' => $item['extracted_guest_id'] ?? null,
-                        'isPrimary' => $guest['isPrimary'] ?? null,
-                        'metaData' => $metaDataJson ?? null,
-                        'dataSource' => 'HAPI'
-                    ];
+                        $contact = [
+                            'firstName' => $nameData['givenName'] ?? null,
+                            'lastName' => $nameData['surname'] ?? null,
+                            'title' => $nameData['title'] ?? null,
+                            'email' => $email ?? '', // Use the extracted email
+                            'birthDate' => $guestData['dateOfBirth'] ?? null,
+                            'languageCode' => $guestData['primaryLanguage']['code'] ?? null,
+                            'languageFormat' => $guestData['primaryLanguage']['format'] ?? null,
+                            'extGuestId' => $item['extracted_guest_id'] ?? null,
+                            'isPrimary' => $guest['isPrimary'] ?? null,
+                            'metaData' => $metaDataJson ?? null,
+                            'dataSource' => 'HAPI'
+                        ];
 
-                    $uniqueId = $contact['firstName'] . '|' . $contact['lastName'] . '|' . $contact['extGuestId'];
-                    if (!isset($uniqueCheck[$uniqueId])) {
-                        $customerContacts[] = $contact;
-                        $uniqueCheck[$uniqueId] = true;
+                        $uniqueId = $contact['firstName'] . '|' . $contact['lastName'] . '|' . $contact['extGuestId'];
+                        if (!isset($uniqueCheck[$uniqueId])) {
+                            $customerContacts[] = $contact;
+                            $uniqueCheck[$uniqueId] = true;
+                        }
                     }
                 }
             }
@@ -1185,6 +1188,115 @@ function createArrCUSTOMERcontact($normalizedData, &$errorCount) {
         throw $e;
     }
 }
+
+//function createArrCUSTOMERcontact($normalizedData, &$errorCount) {
+//    $errorLogFile = dirname(__FILE__) . '/error_log.txt';
+//
+//    try {
+//        $customerContacts = [
+//            [
+//                'firstName' => 'UNKNOWN',
+//                'lastName' => 'UNKNOWN',
+//                'title' => 'UNKNOWN',
+//                'email' => 'UNKNOWN',
+//                'languageCode' => 'UNKNOWN',
+//                'languageFormat' => 'UNKNOWN',
+//                'extGuestId' => 'UNKNOWN',
+//                'dataSource' => 'HAPI'
+//            ]
+//        ];
+//
+//        $uniqueCheck = [];
+//
+//        foreach ($normalizedData as $item) {
+//            $firstGuestAttributes = []; // To store the first guest's email, phone, and address
+//
+//            if (isset($item['guests']) && !empty($item['guests'])) {
+//                foreach ($item['guests'] as $index => $guest_ind) {
+//                    if (!isset($guest_ind['guest']) || !isset($guest_ind['guest']['names'][0])) {
+//                        continue;
+//                    }
+//                    $guestData = $guest_ind['guest'];
+//                    $nameData = $guestData['names'][0];
+//
+//                    $metaDataArray = [
+//                        'addresses' => $guest_ind['addresses'] ?? null,
+//                        'createdBy' => $guest_ind['createdBy'] ?? null,
+//                        'createdDateTime' => $guest_ind['createdDateTime_repo'] ?? null,
+//                        'guest' => $guest_ind['guest'],
+//                        'contactDetails' => $guest_ind['contactDetails']
+//                    ];
+//                    $metaDataJson = json_encode($metaDataArray);
+//
+//                    $email = '';
+//                    $phone = '';
+//                    $address = '';
+//
+//                    if ($index === 0 || !isset($guestData['contactDetails']) || empty($guestData['contactDetails'])) {
+//                        // Process contact details for the first guest or if subsequent guests lack details
+//                        if (isset($guestData['contactDetails']) && is_array($guestData['contactDetails'])) {
+//                            foreach ($guestData['contactDetails'] as $contactDetail) {
+//                                if ($contactDetail['category'] === 'EMAIL' && isset($contactDetail['value'])) {
+//                                    $email = $contactDetail['value'];
+//                                } elseif ($contactDetail['category'] === 'PHONE' && isset($contactDetail['value'])) {
+//                                    $phone = $contactDetail['value'];
+//                                }
+//                            }
+//                        }
+//                        if (isset($guestData['addresses']) && is_array($guestData['addresses']) && !empty($guestData['addresses'][0])) {
+//                            $address = $guestData['addresses'][0]; // Assuming first address is the primary one
+//                        }
+//
+//                        if ($index === 0) {
+//                            $firstGuestAttributes = ['email' => $email, 'phone' => $phone, 'address' => $address];
+//                        }
+//                    } else {
+//                        // For subsequent guests without their own details, use the first guest's details
+//                        $email = $firstGuestAttributes['email'] ?? '';
+//                        $phone = $firstGuestAttributes['phone'] ?? '';
+//                        $address = $firstGuestAttributes['address'] ?? '';
+//                    }
+//
+//                    $contact = [
+//                        'firstName' => $nameData['givenName'] ?? null,
+//                        'lastName' => $nameData['surname'] ?? null,
+//                        'title' => $nameData['title'] ?? null,
+//                        'email' => $email, // Use the determined email
+//                        'phone' => $phone, // Use the determined phone
+//                        'address' => $address, // Use the determined address
+//                        'birthDate' => $guestData['dateOfBirth'] ?? null,
+//                        'languageCode' => $guestData['primaryLanguage']['code'] ?? null,
+//                        'languageFormat' => $guestData['primaryLanguage']['format'] ?? null,
+//                        'extGuestId' => $item['extracted_guest_id'] ?? null,
+//                        'isPrimary' => $guest_ind['isPrimary'] ?? null,
+//                        'metaData' => $metaDataJson ?? null,
+//                        'dataSource' => 'HAPI'
+//                    ];
+//
+//                    $uniqueId = $contact['firstName'] . '|' . $contact['lastName'] . '|' . $contact['extGuestId'];
+//                    if (!isset($uniqueCheck[$uniqueId])) {
+//                        $customerContacts[] = $contact;
+//                        $uniqueCheck[$uniqueId] = true;
+//                    }
+//                }
+//            }
+//        }
+//
+//        $errorTimestamp = date('Y-m-d H:i:s');
+//        $successMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Successfully processed CUSTOMER contacts" . PHP_EOL;
+//        error_log($successMessage, 3, $errorLogFile);
+//
+//        return $customerContacts;
+//    } catch (Exception $e) {
+//        $errorCount++;
+//        $errorTimestamp = date('Y-m-d H:i:s');
+//        $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Error in createCUSTOMERcontact: " . $e->getMessage() . PHP_EOL;
+//        error_log($errorLogMessage, 3, $errorLogFile);
+//
+//        throw $e;
+//    }
+//}
+
 
 function createArrRESERVATIONstay(
     $connection,
@@ -1414,7 +1526,7 @@ function createArrCUSTOMERrelationship($myDataSemiParsed, $arrCUSTOMERlibContact
             foreach ($guestsData as $guestData) {
                 $guestInfo = $guestData['guest'] ?? null;
                 if ($guestInfo) {
-                    $isPrimary = isset($guestData['isPrimary']) ? (int)$guestData['isPrimary'] : 0;
+//                    $isPrimary = isset($guestData['isPrimary']) ? (int)$guestData['isPrimary'] : 0;
                     $firstName = $guestInfo['names'][0]['givenName'] ?? null;
                     $lastName = $guestInfo['names'][0]['surname'] ?? null;
                     $extGuestId = $entry['extracted_guest_id'] ?? '';
@@ -1426,7 +1538,7 @@ function createArrCUSTOMERrelationship($myDataSemiParsed, $arrCUSTOMERlibContact
 
                     if ($contactTypeId !== null && $contactId !== null) {
                         $arrCUSTOMERrelationship[] = [
-                            'isPrimaryGuest' => $isPrimary,
+//                            'isPrimary' => $isPrimary,
                             'contactTypeId' => $contactTypeId,
                             'type' => 'GUEST',
                             'contactId' => $contactId,
@@ -2056,249 +2168,257 @@ function createArrSERVICESfolioOrders($normalizedData, $arrCUSTOMERcontact, $arr
         $arrSERVICESfolioOrders = [];
 
         foreach ($normalizedData as $data) {
-            $guestDetails = $data['guests'][0]['guest'] ?? null;
-            $firstName = $guestDetails['names'][0]['givenName'] ?? '';
-            $lastName = $guestDetails['names'][0]['surname'] ?? '';
-            $extGuestId = $data['extracted_guest_id'] ?? '';
-            $createDateTime = strtotime($data['createdDateTime']) ?? null;
-            $modifyDateTime = strtotime($data['lastModifiedDateTime']) ?? null;
-            $startDate = $data['arrival'] ?? null; // Assuming these are already in the correct format
-            $endDate = $data['departure'] ?? null;
-            $createdBy = $data['createdBy'] ?? null;
-            $extPMSConfNum = $data['confirmation_number'] ?? '';
-            // Populate libServiceItemsId using itemCode and ratePlanCode
-            $itemCode = $data['services'][0]['code'] ?? 'UNKNOWN';
-            $ratePlanCode = $data['prices'][0]['ratePlanCode'] ?? 'UNKNOWN';
-            $libServiceItemsIndex = $itemCode . '|' . $ratePlanCode;
-            $libServiceItemsId = $indexedLibServiceItems[$libServiceItemsIndex] ?? $indexedLibServiceItems['UNKNOWN' . '|' . 'UNKNOWN'];
-            // Retrieve the libFolioOrdersTypeId using the folioOrderType
-            // Determine the folioOrderType here
-//            $folioOrderType = null;
+            foreach ($data['guests'] as $guest) {
 
 
-            $segmentations = array_map(function($segmentation) {
-                return [
-                    'Code' => $segmentation['code'] ?? null,
-                    'End' => $segmentation['end'] ?? null,
-                    'Name' => $segmentation['name'] ?? null, // Assuming 'name' exists
-                    'Start' => $segmentation['start'] ?? null,
-                    'Type' => $segmentation['type'] ?? null,
+                $guestDetails = $guest['guest'] ?? null;
+                $firstName = $guestDetails['names'][0]['givenName'] ?? 'UNKNOWN';
+                $lastName = $guestDetails['names'][0]['surname'] ?? 'UNKNOWN';
+                $extGuestId = $data['extracted_guest_id'] ?? 'UNKNOWN';
+
+
+//                $isPrimary = isset($guestData['isPrimary']) ? (int)$guestData['isPrimary'] : 0;
+                $isPrimary = $guest['isPrimary'] ?? 0;
+                $createDateTime = strtotime($data['createdDateTime']) ?? null;
+                $modifyDateTime = strtotime($data['lastModifiedDateTime']) ?? null;
+                $startDate = $data['arrival'] ?? null; // Assuming these are already in the correct format
+                $endDate = $data['departure'] ?? null;
+                $createdBy = $data['createdBy'] ?? null;
+                $extPMSConfNum = $data['confirmation_number'] ?? '';
+                // Populate libServiceItemsId using itemCode and ratePlanCode
+                $itemCode = $data['services'][0]['code'] ?? 'UNKNOWN';
+                $ratePlanCode = $data['prices'][0]['ratePlanCode'] ?? 'UNKNOWN';
+
+
+                // Create index for the contact id lookup
+                $contactIndex = $firstName . '|' . $lastName . '|' . $extGuestId;
+                // Lookup for contact id using the index
+                if (isset($indexedCustomerContacts[$contactIndex])) {
+                    $contactId = is_array($indexedCustomerContacts[$contactIndex])
+                        ? reset($indexedCustomerContacts[$contactIndex])
+                        : $indexedCustomerContacts[$contactIndex];
+                } else {
+                    $contactId = $indexedCustomerContacts['UNKNOWN' . '|' . 'UNKNOWN' . '|' . 'UNKNOWN'];
+                }
+
+
+                // Create index for stay lookup
+                $stayIndex = $extGuestId . '|' . $extPMSConfNum;
+                // Lookup for stayId using the index
+                if (isset($indexedReservationStays[$stayIndex])) {
+                    $stayId = is_array($indexedReservationStays[$stayIndex])
+                        ? reset($indexedReservationStays[$stayIndex])
+                        : $indexedReservationStays[$stayIndex];
+                } else {
+                    // skip this entry if the record doesn't have a confirmation number or guest Id attached
+                    continue;
+                }
+
+
+                $libServiceItemsIndex = $itemCode . '|' . $ratePlanCode;
+                $libServiceItemsIdUnKnown = $indexedLibServiceItems[$libServiceItemsIndex] ?? $indexedLibServiceItems['UNKNOWN' . '|' . 'UNKNOWN'];
+                // Retrieve the libFolioOrdersTypeId using the folioOrderType
+
+
+                $segmentations = array_map(function ($segmentation) {
+                    return [
+                        'Code' => $segmentation['code'] ?? null,
+                        'End' => $segmentation['end'] ?? null,
+                        'Name' => $segmentation['name'] ?? null, // Assuming 'name' exists
+                        'Start' => $segmentation['start'] ?? null,
+                        'Type' => $segmentation['type'] ?? null,
+                    ];
+                }, $data['segmentations'] ?? []);
+
+                $taxes = array_map(function ($tax) {
+                    return [
+                        'TaxAmount' => $tax['amount'] ?? null, // Assuming 'amount' exists
+                        'TaxCode' => $tax['code'] ?? null,
+                    ];
+                }, $data['taxes'] ?? []);
+
+                $discounts = array_map(function ($discount) {
+                    return [
+                        'DiscountAmount' => $discount['amount'] ?? null, // Assuming 'amount' exists
+                        'DiscountIsIncluded' => $discount['isIncluded'] ?? null,
+                        'DiscountStartDateTime' => $discount['start'] ?? null, // Assuming 'start' exists
+                        'DiscountEndDateTime' => $discount['end'] ?? null, // Assuming 'end' exists
+                    ];
+                }, $data['discounts'] ?? []);
+                //metaData
+                $metaDataArray = [
+                    'createdBy' => $data['createdBy'] ?? null,
+                    'createdDateTime' => $data['createdDateTime'] ?? null,
+                    'createdDateTime_repo' => $data['createdDateTime_repo'] ?? null,
+                    'Departure' => $data['departure'] ?? null,
+                    'doNotDisplayPrice' => $data['doNotDisplayPrice'] ?? null,
+                    'estimatedDateTimeOfArrival' => $data['estimatedDateTimeOfArrival'] ?? null,
+                    'estimatedDateTimeOfDeparture' => $data['estimatedDateTimeOfDeparture'] ?? null,
+                    'Ext_id' => $data['ext_id'] ?? null,
+                    'Ext_status' => $data['ext_status'] ?? null,
+                    'guaranteeCode' => $data['guaranteeCode'] ?? null,
+                    'OptionDate' => $data['optionDate'] ?? null,
+                    'PaymentMethod' => [
+                        'Code' => $data['paymentMethod']['code'] ?? null,
+                    ],
+                    'Prices' => array_map(function ($price) {
+                        return [
+                            'End' => $price['end'] ?? null,
+                            'Start' => $price['start'] ?? null,
+                        ];
+                    }, $data['prices'] ?? []),
+                    'ProcessStamp' => $data['procesststamp'] ?? null,
+                    'PromotionCode' => $data['promotionCode'] ?? null,
+                    'PurposeOfStay' => $data['purposeOfStay'] ?? null,
+                    // Assume ratePlans is similar structure to Prices
+                    'ratePlans' => array_map(function ($plan) {
+                        return [
+                            'Code' => $plan['code'] ?? null,
+                            'Description' => $plan['description'] ?? null, // Assuming description exists
+                            'End' => $plan['end'] ?? null,
+                            'Start' => $plan['start'] ?? null,
+                        ];
+                    }, $data['ratePlans'] ?? []),
+                    'receivedDateTime' => $data['receivedDateTime'] ?? null,
+                    // Similar mapping for referenceIDs, AdditionalData, etc.
+                    // Due to complexity, these mappings are simplified examples
+                    'Command_id' => $data['command_id'] ?? null,
+                    'lastModifiedBy' => $data['lastModifiedBy'] ?? null,
+                    'isGuestViewable' => $data['isGuestViewable'] ?? null,
+                    'lastModifiedDateTime' => $data['lastModifiedDateTime'] ?? null,
+                    // Assuming shareIds structure and extracting as needed
+                    'shareIds' => array_map(function ($shareId) {
+                        return [
+                            'Id' => $shareId['id'] ?? null,
+                            'IdType' => $shareId['idType'] ?? null,
+                            'SystemId' => $shareId['systemId'] ?? null,
+                            'SystemType' => $shareId['systemType'] ?? null,
+                        ];
+                    }, $entry['shareIds'] ?? []),
+                    'requestedDeposits' => array_map(function ($deposit) {
+                        // Assuming structure and extracting as needed
+                        return [
+                            'Amount' => $deposit['amount'] ?? null, // Assuming 'amount' exists
+                            'Currency' => $deposit['currency'] ?? null, // Assuming 'currency' exists
+                        ];
+                    }, $data['requestedDeposits'] ?? []),
+                    'Alerts' => $data['alerts'] ?? [], // Assuming simple array or further mapping required
+                    'contacts' => $data['contacts'] ?? [], // Assuming simple array or further mapping required
+                    'Segmentations' => $segmentations,
+                    'Taxes' => $taxes,
+                    'Discounts' => $discounts
                 ];
-            }, $data['segmentations'] ?? []);
-
-            $taxes = array_map(function($tax) {
-                return [
-                    'TaxAmount' => $tax['amount'] ?? null, // Assuming 'amount' exists
-                    'TaxCode' => $tax['code'] ?? null,
-                ];
-            }, $data['taxes'] ?? []);
-
-            $discounts = array_map(function($discount) {
-                return [
-                    'DiscountAmount' => $discount['amount'] ?? null, // Assuming 'amount' exists
-                    'DiscountIsIncluded' => $discount['isIncluded'] ?? null,
-                    'DiscountStartDateTime' => $discount['start'] ?? null, // Assuming 'start' exists
-                    'DiscountEndDateTime' => $discount['end'] ?? null, // Assuming 'end' exists
-                ];
-            }, $data['discounts'] ?? []);
-            //metaData
-            $metaDataArray = [
-                'createdBy' => $data['createdBy'] ?? null,
-                'createdDateTime' => $data['createdDateTime'] ?? null,
-                'createdDateTime_repo' => $data['createdDateTime_repo'] ?? null,
-                'Departure' => $data['departure'] ?? null,
-                'doNotDisplayPrice' => $data['doNotDisplayPrice'] ?? null,
-                'estimatedDateTimeOfArrival' => $data['estimatedDateTimeOfArrival'] ?? null,
-                'estimatedDateTimeOfDeparture' => $data['estimatedDateTimeOfDeparture'] ?? null,
-                'Ext_id' => $data['ext_id'] ?? null,
-                'Ext_status' => $data['ext_status'] ?? null,
-                'guaranteeCode' => $data['guaranteeCode'] ?? null,
-                'OptionDate' => $data['optionDate'] ?? null,
-                'PaymentMethod' => [
-                    'Code' => $data['paymentMethod']['code'] ?? null,
-                ],
-                'Prices' => array_map(function($price) {
-                    return [
-                        'End' => $price['end'] ?? null,
-                        'Start' => $price['start'] ?? null,
-                    ];
-                }, $data['prices'] ?? []),
-                'ProcessStamp' => $data['procesststamp'] ?? null,
-                'PromotionCode' => $data['promotionCode'] ?? null,
-                'PurposeOfStay' => $data['purposeOfStay'] ?? null,
-                // Assume ratePlans is similar structure to Prices
-                'ratePlans' => array_map(function($plan) {
-                    return [
-                        'Code' => $plan['code'] ?? null,
-                        'Description' => $plan['description'] ?? null, // Assuming description exists
-                        'End' => $plan['end'] ?? null,
-                        'Start' => $plan['start'] ?? null,
-                    ];
-                }, $data['ratePlans'] ?? []),
-                'receivedDateTime' => $data['receivedDateTime'] ?? null,
-                // Similar mapping for referenceIDs, AdditionalData, etc.
-                // Due to complexity, these mappings are simplified examples
-                'Command_id' => $data['command_id'] ?? null,
-                'lastModifiedBy' => $data['lastModifiedBy'] ?? null,
-                'isGuestViewable' => $data['isGuestViewable'] ?? null,
-                'lastModifiedDateTime' => $data['lastModifiedDateTime'] ?? null,
-                // Assuming shareIds structure and extracting as needed
-                'shareIds' => array_map(function($shareId) {
-                    return [
-                        'Id' => $shareId['id'] ?? null,
-                        'IdType' => $shareId['idType'] ?? null,
-                        'SystemId' => $shareId['systemId'] ?? null,
-                        'SystemType' => $shareId['systemType'] ?? null,
-                    ];
-                }, $entry['shareIds'] ?? []),
-                'requestedDeposits' => array_map(function($deposit) {
-                    // Assuming structure and extracting as needed
-                    return [
-                        'Amount' => $deposit['amount'] ?? null, // Assuming 'amount' exists
-                        'Currency' => $deposit['currency'] ?? null, // Assuming 'currency' exists
-                    ];
-                }, $data['requestedDeposits'] ?? []),
-                'Alerts' => $data['alerts'] ?? [], // Assuming simple array or further mapping required
-                'contacts' => $data['contacts'] ?? [], // Assuming simple array or further mapping required
-                'Segmentations' => $segmentations,
-                'Taxes' => $taxes,
-                'Discounts' => $discounts
-            ];
-            $metaDataJson = json_encode($metaDataArray);
+                $metaDataJson = json_encode($metaDataArray);
 
 
 //            // Now use the determined folioOrderType for the lookup
 //            $libFolioOrdersTypeId = isset($indexedLibFolioOrdersType[$folioOrderType]) ? $indexedLibFolioOrdersType[$folioOrderType] : null;
 
 
-            // Create index for the contact id lookup
-            $contactIndex = $firstName . '|' . $lastName . '|' .  $extGuestId;
-            // Lookup for contact id using the index
-            if (isset($indexedCustomerContacts[$contactIndex])) {
-                $contactId = is_array($indexedCustomerContacts[$contactIndex])
-                    ? reset($indexedCustomerContacts[$contactIndex])
-                    : $indexedCustomerContacts[$contactIndex];
-            } else {
-                $contactId = 0;
-            }
+                // Populate paymentId using paymentAmount and currencyCode
+                $paymentAmount = 0;
+                $currencyCode = $data['currency']['code'] ?? 'UNKNOWN';
+                $paymentIndex = $paymentAmount . '|' . $currencyCode;
+                $paymentId = $indexedPayments[$paymentIndex] ?? null;
 
 
-            // Create index for stay lookup
-            $stayIndex = $extGuestId . '|' . $extPMSConfNum;
-            // Lookup for stayId using the index
-            if (isset($indexedReservationStays[$stayIndex])) {
-                $stayId = is_array($indexedReservationStays[$stayIndex])
-                    ? reset($indexedReservationStays[$stayIndex])
-                    : $indexedReservationStays[$stayIndex];
-            } else {
-                $stayId = null;            }
+                // Common fields for all folio orders
+                $commonFields = [
+                    'dataSource' => 'HAPI',
+                    'contactId' => $contactId,
+                    'firstName' => $firstName,
+                    'lastName' => $lastName,
+                    'extGuestId' => $extGuestId,
+                    'isPrimary' => $isPrimary,
+                    'stayId' => $stayId,
+                    'startDateLookup' => $startDate,
+                    'endDateLookup' => $endDate,
+                    'extPMSConfNum' => $data['confirmation_number'] ?? null,
+                    'createDateTime' => $createDateTime ?? null,
+                    'modifyDateTime' => $modifyDateTime ?? null,
+                    'paymentId' => $paymentId,
+                    'paymentAmount' => doubleval($paymentAmount) ?? 0,
+                    'currencyCode' => $currencyCode ?? null,
+                    'libServiceItemsId' => $libServiceItemsId ?? $libServiceItemsIdUnKnown,
+                    'itemCode' => $data['services'][0]['code'] ?? 'UNKNOWN',
+                    'ratePlanCode' => $data['prices'][0]['ratePlanCode'] ?? 'UNKNOWN',
+                    'metaData' => $metaDataJson
+
+                ];
 
 
-            // Populate paymentId using paymentAmount and currencyCode
-            $paymentAmount = 0;
-            $currencyCode = $data['currency']['code'] ?? 'UNKNOWN';
-            $paymentIndex = $paymentAmount . '|' . $currencyCode;
-            $paymentId = $indexedPayments[$paymentIndex] ?? null;
+                // SERVICE type folio order
+                if (!empty($data['services'])) {
+                    foreach ($data['services'] as $service) {
+                        $serviceOrder = $commonFields;
+                        $serviceOrder['folioOrderType'] = 'SERVICE';
+                        $serviceOrder['unitCount'] = $service['quantity'] ?? null;
+                        $serviceOrder['unitPrice'] = null; // Calculate if needed
+                        $serviceOrder['fixedCost'] = null; // Calculate if needed
+                        $serviceOrder['amountBeforeTax'] = null; // Calculate if needed
+                        $serviceOrder['amountAfterTax'] = null; // Calculate if needed
+                        $serviceOrder['postingFrequency'] = null;
+                        $serviceOrder['startDate'] = $data['bookedUnits'][0]['start'] ?? $startDate;
+                        $serviceOrder['endDate'] = $data['bookedUnits'][0]['start'] ?? $endDate;
+                        $serviceOrder['amount'] = null;
+                        $serviceOrder['fixedChargesQuantity'] = null;
+                        $serviceOrder['transferId'] = null;
+                        $serviceOrder['transferDateTime'] = null;
+                        $serviceOrder['transferOnArrival'] = null;
+                        $serviceOrder['isIncluded'] = $service[0]['isIncluded'] ?? 0;
+                        // Additional SERVICE specific fields go here...
+                        $arrSERVICESfolioOrders[] = $commonFields;
+                        $arrSERVICESfolioOrders[] = $serviceOrder;
+                    }
 
-
-
-
-            // Common fields for all folio orders
-            $commonFields = [
-                'dataSource' => 'HAPI',
-                'contactId' => $contactId,
-                'firstName' => $firstName,
-                'lastName' => $lastName,
-                'extGuestId' => $extGuestId,
-                'stayId' => $stayId,
-                'startDateLookup' => $startDate,
-                'endDateLookup' => $endDate,
-                'extPMSConfNum' => $data['confirmation_number'] ?? null,
-                'createDateTime' => $createDateTime ?? null,
-                'modifyDateTime' => $modifyDateTime ?? null,
-                'paymentId' => $paymentId,
-                'paymentAmount' =>  doubleval($paymentAmount) ?? 0,
-                'currencyCode' => $currencyCode ?? null,
-                'libServiceItemsId' => $libServiceItemsId,
-                'itemCode' => $data['services'][0]['code'] ?? 'UNKNOWN',
-                'ratePlanCode' => $data['prices'][0]['ratePlanCode'] ?? 'UNKNOWN',
-                'metaData' => $metaDataJson
-
-            ];
-            $arrSERVICESfolioOrders[] = $commonFields;
-
-
-            // SERVICE type folio order
-            if (!empty($data['services'])) {
-                foreach ($data['services'] as $service) {
-                    $serviceOrder['folioOrderType'] = 'SERVICE';
-                    $serviceOrder['unitCount'] = $service['quantity'] ?? null;
-                    $serviceOrder['unitPrice'] = null; // Calculate if needed
-                    $serviceOrder['fixedCost'] = null; // Calculate if needed
-                    $serviceOrder['amountBeforeTax'] = null; // Calculate if needed
-                    $serviceOrder['amountAfterTax'] = null; // Calculate if needed
-                    $serviceOrder['postingFrequency'] = null;
-                    $serviceOrder['startDate'] = null;
-                    $serviceOrder['endDate']  = null;
-                    $serviceOrder['amount']  = null;
-                    $serviceOrder['fixedChargesQuantity']  = null;
-                    $serviceOrder['transferId']  =  null;
-                    $serviceOrder['transferDateTime']  =  null;
-                    $serviceOrder['transferOnArrival']  =  null;
-                    $serviceOrder['isIncluded']  =  $data['services']['isIncluded'] ?? null;
-                    // Additional SERVICE specific fields go here...
-
-                    $arrSERVICESfolioOrders[] = $serviceOrder;
                 }
 
-            }
+                // RESERVATION type folio order
+                if ($extPMSConfNum != null) {
+                    $reservationOrder = $commonFields;
+                    $reservationOrder['folioOrderType'] = 'RESERVATION';
+                    $reservationOrder['unitCount'] = null; // Determine if needed
+                    $reservationOrder['unitPrice'] = null; // Calculate if needed
+                    $reservationOrder['fixedCost'] = $data['prices'][0]['amount'] ?? null;
+                    $reservationOrder['amountBeforeTax'] = $data['reservationTotal']['amountBeforeTax'] ?? $data['prices'][0]['amount'];
+                    $reservationOrder['amountAfterTax'] = $data['reservationTotal']['amountAfterTax'] ?? $data['prices'][0]['amount'] + $data['taxes'][0]['amount'];
+                    $reservationOrder['postingFrequency'] = null;
+                    $reservationOrder['startDate'] = $data['bookedUnits'][0]['start'] ?? $startDate;
+                    $reservationOrder['endDate'] = $data['bookedUnits'][0]['end'] ?? $endDate;
+                    $reservationOrder['amount'] = $data['prices'][0]['amount'] ?? null;
+                    $reservationOrder['fixedChargesQuantity'] = null;
+                    $reservationOrder['transferId'] = $data['transfer']['id'] ?? null;
+                    $reservationOrder['transferDateTime'] = $data['transferDateTime']['dateTime'] ?? null;
+                    $reservationOrder['transferOnArrival'] = $data['transferOnArrival']['isOnArrival'] ?? null;
+                    $reservationOrder['isIncluded'] = 0;
 
-            // RESERVATION type folio order
-            if ($extPMSConfNum != null) {
-                $reservationOrder['folioOrderType'] = 'RESERVATION';
-                $reservationOrder['unitCount'] = null; // Determine if needed
-                $reservationOrder['unitPrice'] = null; // Calculate if needed
-                $reservationOrder['fixedCost'] = $data['prices'][0]['amount'] ?? null;
-                $reservationOrder['amountBeforeTax'] = $data['reservationTotal']['amountBeforeTax'] ?? $data['prices'][0]['amount'];
-                $reservationOrder['amountAfterTax'] = $data['reservationTotal']['amountAfterTax'] ?? $data['prices'][0]['amount'] + $data['taxes'][0]['amount'];
-                $reservationOrder['postingFrequency'] = null;
-                $reservationOrder['startDate'] = $data['bookedUnits'][0]['start'] ?? null;
-                $reservationOrder['endDate']  = $data['bookedUnits'][0]['end'] ?? null;
-                $reservationOrder['amount']  = $data['prices'][0]['amount'] ?? null;
-                $reservationOrder['fixedChargesQuantity']  = null;
-                $reservationOrder['transferId']  =  $data['transferId']['id'] ?? null;
-                $reservationOrder['transferDateTime']  =  $data['transferDateTime']['dateTime'] ?? null;
-                $reservationOrder['transferOnArrival']  =  $data['transferOnArrival']['isOnArrival'] ?? null;
-                $reservationOrder['isIncluded']  =  null;
-                // Additional RESERVATION specific fields go here...
-
-                $arrSERVICESfolioOrders[] = $reservationOrder;
-            }
-
-            // OTHER type folio order
-            if (!empty($data['fixedCharges'])) {
-                foreach ($data['fixedCharges'] as $fixedCharge) {
-                    $otherOrder['folioOrderType'] = 'OTHERS';
-                    $otherOrder['unitCount'] = $fixedCharge['quantity'] ?? null;
-                    $otherOrder['unitPrice'] = $fixedCharge['amount'] ?? null;
-                    $otherOrder['fixedCost'] = ($otherOrder['unitCount'] ?? 0) * ($otherOrder['unitPrice'] ?? 0);
-                    // Additional OTHER specific fields go here...
-                    $otherOrder['amountBeforeTax'] = $data['prices'][0]['amount'] ?? null;
-                    $otherOrder['amountAfterTax'] = $data['prices'][0]['amount'] + $data['taxes'][0]['amount'] ?? null;
-                    $otherOrder['postingFrequency'] = $data['fixedCharges']['postingFrequency'] ?? null;
-                    $otherOrder['startDate'] = $data['fixedCharges']['start'] ?? null;
-                    $otherOrder['endDate']  = $data['fixedCharges']['end'] ?? null;
-                    $otherOrder['amount']  = null;
-                    $otherOrder['fixedChargesQuantity']  = null;
-                    $otherOrder['transferId']  =  null;
-                    $otherOrder['transferDateTime']  =  null;
-                    $otherOrder['transferOnArrival']  =  null;
-                    $otherOrder['isIncluded']  =  null;
-
-                    $arrSERVICESfolioOrders[] = $otherOrder;
+                    $arrSERVICESfolioOrders[] = $reservationOrder;
                 }
 
-            }
+                // OTHER type folio order
+                if (!empty($data['fixedCharges'])) {
+                    foreach ($data['fixedCharges'] as $fixedCharge) {
+                        $otherOrder = $commonFields;
+                        $otherOrder['folioOrderType'] = 'OTHERS';
+                        $otherOrder['unitCount'] = $fixedCharge['quantity'] ?? null;
+                        $otherOrder['unitPrice'] = $fixedCharge['amount'] ?? null;
+                        $otherOrder['fixedCost'] = ($otherOrder['unitCount'] ?? 0) * ($otherOrder['unitPrice'] ?? 0);
+                        // Additional OTHER specific fields go here...
+                        $otherOrder['amountBeforeTax'] = $data['prices'][0]['amount'] ?? null;
+                        $otherOrder['amountAfterTax'] = $data['prices'][0]['amount'] + $data['taxes'][0]['amount'] ?? null;
+                        $otherOrder['postingFrequency'] = $data['fixedCharges'][0]['postingFrequency'] ?? null;
+                        $otherOrder['startDate'] = $data['fixedCharges'][0]['start'] ?? $startDate;
+                        $otherOrder['endDate'] = $data['fixedCharges'][0]['end'] ?? $endDate;
+                        $otherOrder['amount'] = $data['fixedCharges'][0]['amount'] ?? null;
+                        $otherOrder['fixedChargesQuantity'] = $data['fixedCharges'][0]['quantity'] ?? null;
+                        $otherOrder['transfer'] = null;
+                        $otherOrder['transferDateTime'] = null;
+                        $otherOrder['transferOnArrival'] = 0;
+                        $otherOrder['isIncluded'] = 0;
+                        $arrSERVICESfolioOrders[] = $otherOrder;
+                    }
+
+                }
 //            // Add UNKNOWN type folio order if none of the above apply
 //            if (empty($arrSERVICESfolioOrders)) {
 //                $unknownOrder = $commonFields;
@@ -2306,7 +2426,7 @@ function createArrSERVICESfolioOrders($normalizedData, $arrCUSTOMERcontact, $arr
 //                // Add default/unknown values for all other fields
 //                $arrSERVICESfolioOrders[] = $unknownOrder;
 //            }
-
+            }
         }
 //        populateLibFolioOrdersTypeId($arrSERVICESfolioOrders, $arrSERVICESlibFolioOrdersType, $errorCount);
 

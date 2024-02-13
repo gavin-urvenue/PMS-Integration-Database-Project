@@ -1,1192 +1,586 @@
-[2024-02-07 01:34:51] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
-[2024-02-07 01:34:51] (fetchDataFromMySQLTable) Successfully fetched 500 records from hapi_raw_reservations
-[2024-02-07 01:34:51] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
-[2024-02-07 01:34:56] (createArrCUSTOMERcontact) Successfully processed CUSTOMER contacts
-[2024-02-07 01:34:56] (createCUSTOMERContactType) Successfully created CUSTOMER contact type array
-[2024-02-07 01:34:56] (createCUSTOMERloyaltyProgram) Successfully created CUSTOMER loyalty program array
-[2024-02-07 01:34:56] (createSERVICESLibTender) Successfully processed SERVICES LibTender
-[2024-02-07 01:34:56] (createSERVICESlibserviceitems) Successfully processed SERVICES LibServiceItems
-[2024-02-07 01:34:56] (createReservationLibProperty) Successfully processed reservationLibProperty
-[2024-02-07 01:34:56] (createReservationLibSource) Successfully processed reservationLibSource
-[2024-02-07 01:34:56] (createReservationLibRoomClass) Successfully processed ReservationLibRoomClass
-[2024-02-07 01:34:56] (createReservationGroup) Successfully processed ReservationGroup
-[2024-02-07 01:34:56] (createReservationLibRoom) Successfully processed ReservationLibRoom
-[2024-02-07 01:34:57] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibContactType`
-[2024-02-07 01:34:57] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERcontact`
-[2024-02-07 01:34:57] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibLoyaltyProgram`
-[2024-02-07 01:34:57] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoom`
-[2024-02-07 01:34:57] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONLibRoomType`
-[2024-02-07 01:34:57] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoomClass`
-[2024-02-07 01:34:57] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibProperty`
-[2024-02-07 01:34:57] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONgroup`
-[2024-02-07 01:34:57] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibsource`
-[2024-02-07 01:34:57] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibstaystatus`
-[2024-02-07 01:34:57] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibTender`
-[2024-02-07 01:34:57] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibServiceItems`
-[2024-02-07 01:34:57] (createArrRESERVATIONstay) Successfully processed ARR RESERVATION stay data
-[2024-02-07 01:34:57] (createArrCUSTOMERrelationship) Successfully processed CUSTOMER relationship data
-[2024-02-07 01:35:03] (createArrCUSTOMERmembership) Successfully processed CUSTOMER membership data
-[2024-02-07 01:35:03] (createArrSERVICESpayment) Successfully processed SERVICES payment data
-[2024-02-07 01:35:04] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstay`
-[2024-02-07 01:35:04] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERrelationship`
-[2024-02-07 01:35:04] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERmembership`
-[2024-02-07 01:35:04] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESpayment`
-[2024-02-07 01:35:05] (createArrRESERVATIONstayStatusStay) Successfully processed RESERVATION stay status data
-[2024-02-07 01:35:26] (removeDuplicateRows) Successfully removed duplicate rows
-[2024-02-07 01:35:26] (createArrSERVICESfolioOrders) Successfully processed SERVICES folio orders
-[2024-02-07 01:35:26] (removeDuplicateOrders) Successfully removed duplicate folio orders
-[2024-02-07 01:35:27] (upsertSERVICESfolioOrders) Error: Column 'contactId' cannot be null
-[2024-02-07 01:35:27] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONroomDetails`
-[2024-02-07 01:35:27] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstayStatusStay`
-[2024-02-07 01:35:27] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESfolioOrders`
-[2024-02-07 01:35:27] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
-[2024-02-07 01:41:26] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
-[2024-02-07 01:41:26] (fetchDataFromMySQLTable) Successfully fetched 500 records from hapi_raw_reservations
-[2024-02-07 01:41:26] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
-[2024-02-07 01:41:31] (createArrCUSTOMERcontact) Successfully processed CUSTOMER contacts
-[2024-02-07 01:41:31] (createCUSTOMERContactType) Successfully created CUSTOMER contact type array
-[2024-02-07 01:41:31] (createCUSTOMERloyaltyProgram) Successfully created CUSTOMER loyalty program array
-[2024-02-07 01:41:31] (createSERVICESLibTender) Successfully processed SERVICES LibTender
-[2024-02-07 01:41:31] (createSERVICESlibserviceitems) Successfully processed SERVICES LibServiceItems
-[2024-02-07 01:41:31] (createReservationLibProperty) Successfully processed reservationLibProperty
-[2024-02-07 01:41:31] (createReservationLibSource) Successfully processed reservationLibSource
-[2024-02-07 01:41:31] (createReservationLibRoomClass) Successfully processed ReservationLibRoomClass
-[2024-02-07 01:41:31] (createReservationGroup) Successfully processed ReservationGroup
-[2024-02-07 01:41:31] (createReservationLibRoom) Successfully processed ReservationLibRoom
-[2024-02-07 01:41:32] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibContactType`
-[2024-02-07 01:41:32] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERcontact`
-[2024-02-07 01:41:32] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibLoyaltyProgram`
-[2024-02-07 01:41:32] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoom`
-[2024-02-07 01:41:32] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONLibRoomType`
-[2024-02-07 01:41:32] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoomClass`
-[2024-02-07 01:41:32] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibProperty`
-[2024-02-07 01:41:32] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONgroup`
-[2024-02-07 01:41:32] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibsource`
-[2024-02-07 01:41:32] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibstaystatus`
-[2024-02-07 01:41:32] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibTender`
-[2024-02-07 01:41:32] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibServiceItems`
-[2024-02-07 01:41:32] (createArrRESERVATIONstay) Successfully processed ARR RESERVATION stay data
-[2024-02-07 01:41:32] (createArrCUSTOMERrelationship) Successfully processed CUSTOMER relationship data
-[2024-02-07 01:41:38] (createArrCUSTOMERmembership) Successfully processed CUSTOMER membership data
-[2024-02-07 01:41:38] (createArrSERVICESpayment) Successfully processed SERVICES payment data
-[2024-02-07 01:41:39] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstay`
-[2024-02-07 01:41:39] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERrelationship`
-[2024-02-07 01:41:39] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERmembership`
-[2024-02-07 01:41:39] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESpayment`
-[2024-02-07 01:41:40] (createArrRESERVATIONstayStatusStay) Successfully processed RESERVATION stay status data
-[2024-02-07 01:42:01] (removeDuplicateRows) Successfully removed duplicate rows
-[2024-02-07 01:42:01] (createArrSERVICESfolioOrders) Successfully processed SERVICES folio orders
-[2024-02-07 01:42:01] (removeDuplicateOrders) Successfully removed duplicate folio orders
-[2024-02-07 01:42:02] (upsertSERVICESfolioOrders) Error: Column 'contactId' cannot be null
-[2024-02-07 01:42:02] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONroomDetails`
-[2024-02-07 01:42:02] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstayStatusStay`
-[2024-02-07 01:42:02] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESfolioOrders`
-[2024-02-07 01:42:02] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
-[2024-02-07 01:47:50] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
-[2024-02-07 01:47:50] (fetchDataFromMySQLTable) Successfully fetched 415 records from hapi_raw_reservations
-[2024-02-07 01:47:50] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
-[2024-02-07 01:47:55] (createArrCUSTOMERcontact) Successfully processed CUSTOMER contacts
-[2024-02-07 01:47:55] (createCUSTOMERContactType) Successfully created CUSTOMER contact type array
-[2024-02-07 01:47:55] (createCUSTOMERloyaltyProgram) Successfully created CUSTOMER loyalty program array
-[2024-02-07 01:47:55] (createSERVICESLibTender) Successfully processed SERVICES LibTender
-[2024-02-07 01:47:55] (createSERVICESlibserviceitems) Successfully processed SERVICES LibServiceItems
-[2024-02-07 01:47:55] (createReservationLibProperty) Successfully processed reservationLibProperty
-[2024-02-07 01:47:55] (createReservationLibSource) Successfully processed reservationLibSource
-[2024-02-07 01:47:55] (createReservationLibRoomClass) Successfully processed ReservationLibRoomClass
-[2024-02-07 01:47:55] (createReservationGroup) Successfully processed ReservationGroup
-[2024-02-07 01:47:55] (createReservationLibRoom) Successfully processed ReservationLibRoom
-[2024-02-07 01:47:55] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibContactType`
-[2024-02-07 01:47:55] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERcontact`
-[2024-02-07 01:47:55] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibLoyaltyProgram`
-[2024-02-07 01:47:55] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoom`
-[2024-02-07 01:47:55] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONLibRoomType`
-[2024-02-07 01:47:55] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoomClass`
-[2024-02-07 01:47:55] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibProperty`
-[2024-02-07 01:47:55] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONgroup`
-[2024-02-07 01:47:55] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibsource`
-[2024-02-07 01:47:55] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibstaystatus`
-[2024-02-07 01:47:55] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibTender`
-[2024-02-07 01:47:55] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibServiceItems`
-[2024-02-07 01:47:55] (createArrRESERVATIONstay) Successfully processed ARR RESERVATION stay data
-[2024-02-07 01:47:56] (createArrCUSTOMERrelationship) Successfully processed CUSTOMER relationship data
-[2024-02-07 01:48:00] (createArrCUSTOMERmembership) Successfully processed CUSTOMER membership data
-[2024-02-07 01:48:00] (createArrSERVICESpayment) Successfully processed SERVICES payment data
-[2024-02-07 01:48:01] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstay`
-[2024-02-07 01:48:01] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERrelationship`
-[2024-02-07 01:48:01] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERmembership`
-[2024-02-07 01:48:01] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESpayment`
-[2024-02-07 01:48:03] (createArrRESERVATIONstayStatusStay) Successfully processed RESERVATION stay status data
-[2024-02-07 01:48:24] (removeDuplicateRows) Successfully removed duplicate rows
-[2024-02-07 01:48:24] (createArrSERVICESfolioOrders) Successfully processed SERVICES folio orders
-[2024-02-07 01:48:24] (removeDuplicateOrders) Successfully removed duplicate folio orders
-[2024-02-07 01:48:24] (upsertSERVICESfolioOrders) Error: Column 'contactId' cannot be null
-[2024-02-07 01:48:24] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONroomDetails`
-[2024-02-07 01:48:24] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstayStatusStay`
-[2024-02-07 01:48:24] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESfolioOrders`
-[2024-02-07 01:48:24] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
-[2024-02-07 01:52:42] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
-[2024-02-07 01:52:42] (fetchDataFromMySQLTable) Successfully fetched 415 records from hapi_raw_reservations
-[2024-02-07 01:52:42] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
-[2024-02-07 01:52:46] (createArrCUSTOMERcontact) Successfully processed CUSTOMER contacts
-[2024-02-07 01:52:46] (createCUSTOMERContactType) Successfully created CUSTOMER contact type array
-[2024-02-07 01:52:46] (createCUSTOMERloyaltyProgram) Successfully created CUSTOMER loyalty program array
-[2024-02-07 01:52:46] (createSERVICESLibTender) Successfully processed SERVICES LibTender
-[2024-02-07 01:52:46] (createSERVICESlibserviceitems) Successfully processed SERVICES LibServiceItems
-[2024-02-07 01:52:46] (createReservationLibProperty) Successfully processed reservationLibProperty
-[2024-02-07 01:52:46] (createReservationLibSource) Successfully processed reservationLibSource
-[2024-02-07 01:52:46] (createReservationLibRoomClass) Successfully processed ReservationLibRoomClass
-[2024-02-07 01:52:46] (createReservationGroup) Successfully processed ReservationGroup
-[2024-02-07 01:52:46] (createReservationLibRoom) Successfully processed ReservationLibRoom
-[2024-02-07 01:52:47] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibContactType`
-[2024-02-07 01:52:47] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERcontact`
-[2024-02-07 01:52:47] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibLoyaltyProgram`
-[2024-02-07 01:52:47] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoom`
-[2024-02-07 01:52:47] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONLibRoomType`
-[2024-02-07 01:52:47] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoomClass`
-[2024-02-07 01:52:47] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibProperty`
-[2024-02-07 01:52:47] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONgroup`
-[2024-02-07 01:52:47] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibsource`
-[2024-02-07 01:52:47] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibstaystatus`
-[2024-02-07 01:52:47] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibTender`
-[2024-02-07 01:52:47] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibServiceItems`
-[2024-02-07 01:52:47] (createArrRESERVATIONstay) Successfully processed ARR RESERVATION stay data
-[2024-02-07 01:52:47] (createArrCUSTOMERrelationship) Successfully processed CUSTOMER relationship data
-[2024-02-07 01:52:51] (createArrCUSTOMERmembership) Successfully processed CUSTOMER membership data
-[2024-02-07 01:52:51] (createArrSERVICESpayment) Successfully processed SERVICES payment data
-[2024-02-07 01:52:53] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstay`
-[2024-02-07 01:52:53] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERrelationship`
-[2024-02-07 01:52:53] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERmembership`
-[2024-02-07 01:52:53] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESpayment`
-[2024-02-07 01:52:54] (createArrRESERVATIONstayStatusStay) Successfully processed RESERVATION stay status data
-[2024-02-07 01:53:15] (removeDuplicateRows) Successfully removed duplicate rows
-[2024-02-07 01:53:15] (createArrSERVICESfolioOrders) Successfully processed SERVICES folio orders
-[2024-02-07 01:53:15] (removeDuplicateOrders) Successfully removed duplicate folio orders
-[2024-02-07 01:53:16] (upsertSERVICESfolioOrders) Error: Column 'contactId' cannot be null
-[2024-02-07 01:53:16] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONroomDetails`
-[2024-02-07 01:53:16] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstayStatusStay`
-[2024-02-07 01:53:16] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESfolioOrders`
-[2024-02-07 01:53:16] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
-[2024-02-07 16:52:57] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
-[2024-02-07 16:52:57] (fetchDataFromMySQLTable) Successfully fetched 415 records from hapi_raw_reservations
-[2024-02-07 16:52:57] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
-[2024-02-07 16:53:01] (createArrCUSTOMERcontact) Successfully processed CUSTOMER contacts
-[2024-02-07 16:53:01] (createCUSTOMERContactType) Successfully created CUSTOMER contact type array
-[2024-02-07 16:53:01] (createCUSTOMERloyaltyProgram) Successfully created CUSTOMER loyalty program array
-[2024-02-07 16:53:01] (createSERVICESLibTender) Successfully processed SERVICES LibTender
-[2024-02-07 16:53:01] (createSERVICESlibserviceitems) Successfully processed SERVICES LibServiceItems
-[2024-02-07 16:53:01] (createReservationLibProperty) Successfully processed reservationLibProperty
-[2024-02-07 16:53:01] (createReservationLibSource) Successfully processed reservationLibSource
-[2024-02-07 16:53:01] (createReservationLibRoomClass) Successfully processed ReservationLibRoomClass
-[2024-02-07 16:53:01] (createReservationGroup) Successfully processed ReservationGroup
-[2024-02-07 16:53:01] (createReservationLibRoom) Successfully processed ReservationLibRoom
-[2024-02-07 16:53:02] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibContactType`
-[2024-02-07 16:53:02] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERcontact`
-[2024-02-07 16:53:02] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibLoyaltyProgram`
-[2024-02-07 16:53:02] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoom`
-[2024-02-07 16:53:02] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONLibRoomType`
-[2024-02-07 16:53:02] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoomClass`
-[2024-02-07 16:53:02] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibProperty`
-[2024-02-07 16:53:02] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONgroup`
-[2024-02-07 16:53:02] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibsource`
-[2024-02-07 16:53:02] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibstaystatus`
-[2024-02-07 16:53:02] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibTender`
-[2024-02-07 16:53:02] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibServiceItems`
-[2024-02-07 16:53:02] (createArrRESERVATIONstay) Successfully processed ARR RESERVATION stay data
-[2024-02-07 16:53:02] (createArrCUSTOMERrelationship) Successfully processed CUSTOMER relationship data
-[2024-02-07 16:53:07] (createArrCUSTOMERmembership) Successfully processed CUSTOMER membership data
-[2024-02-07 16:53:07] (createArrSERVICESpayment) Successfully processed SERVICES payment data
-[2024-02-07 16:53:08] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstay`
-[2024-02-07 16:53:08] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERrelationship`
-[2024-02-07 16:53:08] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERmembership`
-[2024-02-07 16:53:08] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESpayment`
-[2024-02-07 16:53:09] (createArrRESERVATIONstayStatusStay) Successfully processed RESERVATION stay status data
-[2024-02-07 16:53:30] (removeDuplicateRows) Successfully removed duplicate rows
-[2024-02-07 16:53:30] (createArrSERVICESfolioOrders) Successfully processed SERVICES folio orders
-[2024-02-07 16:53:30] (removeDuplicateOrders) Successfully removed duplicate folio orders
-[2024-02-07 16:53:31] (upsertSERVICESfolioOrders) Error: Column 'contactId' cannot be null
-[2024-02-07 16:53:31] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONroomDetails`
-[2024-02-07 16:53:31] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstayStatusStay`
-[2024-02-07 16:53:31] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESfolioOrders`
-[2024-02-07 16:53:31] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
-[2024-02-07 17:10:13] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
-[2024-02-07 17:10:13] (fetchDataFromMySQLTable) Successfully fetched 0 records from hapi_raw_reservations
-[2024-02-07 17:10:13] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
-[2024-02-07 17:10:13] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
-[2024-02-07 17:20:53] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
-[2024-02-07 17:20:54] (fetchDataFromMySQLTable) Successfully fetched 415 records from hapi_raw_reservations
-[2024-02-07 17:20:54] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
-[2024-02-07 17:20:58] (createArrCUSTOMERcontact) Successfully processed CUSTOMER contacts
-[2024-02-07 17:20:58] (createCUSTOMERContactType) Successfully created CUSTOMER contact type array
-[2024-02-07 17:20:58] (createCUSTOMERloyaltyProgram) Successfully created CUSTOMER loyalty program array
-[2024-02-07 17:20:58] (createSERVICESLibTender) Successfully processed SERVICES LibTender
-[2024-02-07 17:20:58] (createSERVICESlibserviceitems) Successfully processed SERVICES LibServiceItems
-[2024-02-07 17:20:58] (createReservationLibProperty) Successfully processed reservationLibProperty
-[2024-02-07 17:20:58] (createReservationLibSource) Successfully processed reservationLibSource
-[2024-02-07 17:20:58] (createReservationLibRoomClass) Successfully processed ReservationLibRoomClass
-[2024-02-07 17:20:58] (createReservationGroup) Successfully processed ReservationGroup
-[2024-02-07 17:20:58] (createReservationLibRoom) Successfully processed ReservationLibRoom
-[2024-02-07 17:20:59] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibContactType`
-[2024-02-07 17:20:59] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERcontact`
-[2024-02-07 17:20:59] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibLoyaltyProgram`
-[2024-02-07 17:20:59] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoom`
-[2024-02-07 17:20:59] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONLibRoomType`
-[2024-02-07 17:20:59] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoomClass`
-[2024-02-07 17:20:59] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibProperty`
-[2024-02-07 17:20:59] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONgroup`
-[2024-02-07 17:20:59] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibsource`
-[2024-02-07 17:20:59] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibstaystatus`
-[2024-02-07 17:20:59] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibTender`
-[2024-02-07 17:20:59] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibServiceItems`
-[2024-02-07 17:20:59] (createArrRESERVATIONstay) Successfully processed ARR RESERVATION stay data
-[2024-02-07 17:20:59] (createArrCUSTOMERrelationship) Successfully processed CUSTOMER relationship data
-[2024-02-07 17:21:03] (createArrCUSTOMERmembership) Successfully processed CUSTOMER membership data
-[2024-02-07 17:21:03] (createArrSERVICESpayment) Successfully processed SERVICES payment data
-[2024-02-07 17:21:04] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstay`
-[2024-02-07 17:21:04] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERrelationship`
-[2024-02-07 17:21:04] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERmembership`
-[2024-02-07 17:21:04] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESpayment`
-[2024-02-07 17:21:05] (createArrRESERVATIONstayStatusStay) Successfully processed RESERVATION stay status data
-[2024-02-07 17:21:26] (removeDuplicateRows) Successfully removed duplicate rows
-[2024-02-07 17:21:26] (createArrSERVICESfolioOrders) Successfully processed SERVICES folio orders
-[2024-02-07 17:21:26] (removeDuplicateOrders) Successfully removed duplicate folio orders
-[2024-02-07 17:21:27] (upsertSERVICESfolioOrders) Error: Column 'contactId' cannot be null
-[2024-02-07 17:21:27] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONroomDetails`
-[2024-02-07 17:21:27] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstayStatusStay`
-[2024-02-07 17:21:27] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESfolioOrders`
-[2024-02-07 17:21:27] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
-[2024-02-07 17:39:43] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
-[2024-02-07 17:39:43] (fetchDataFromMySQLTable) Successfully fetched 415 records from hapi_raw_reservations
-[2024-02-07 17:39:43] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
-[2024-02-07 17:39:47] (createArrCUSTOMERcontact) Successfully processed CUSTOMER contacts
-[2024-02-07 17:39:47] (createCUSTOMERContactType) Successfully created CUSTOMER contact type array
-[2024-02-07 17:39:47] (createCUSTOMERloyaltyProgram) Successfully created CUSTOMER loyalty program array
-[2024-02-07 17:39:47] (createSERVICESLibTender) Successfully processed SERVICES LibTender
-[2024-02-07 17:39:47] (createSERVICESlibserviceitems) Successfully processed SERVICES LibServiceItems
-[2024-02-07 17:39:47] (createReservationLibProperty) Successfully processed reservationLibProperty
-[2024-02-07 17:39:47] (createReservationLibSource) Successfully processed reservationLibSource
-[2024-02-07 17:39:47] (createReservationLibRoomClass) Successfully processed ReservationLibRoomClass
-[2024-02-07 17:39:47] (createReservationGroup) Successfully processed ReservationGroup
-[2024-02-07 17:39:47] (createReservationLibRoom) Successfully processed ReservationLibRoom
-[2024-02-07 17:39:47] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibContactType`
-[2024-02-07 17:39:47] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERcontact`
-[2024-02-07 17:39:47] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibLoyaltyProgram`
-[2024-02-07 17:39:47] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoom`
-[2024-02-07 17:39:47] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONLibRoomType`
-[2024-02-07 17:39:47] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoomClass`
-[2024-02-07 17:39:47] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibProperty`
-[2024-02-07 17:39:47] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONgroup`
-[2024-02-07 17:39:47] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibsource`
-[2024-02-07 17:39:47] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibstaystatus`
-[2024-02-07 17:39:47] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibTender`
-[2024-02-07 17:39:47] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibServiceItems`
-[2024-02-07 17:39:47] (createArrRESERVATIONstay) Successfully processed ARR RESERVATION stay data
-[2024-02-07 17:39:48] (createArrCUSTOMERrelationship) Successfully processed CUSTOMER relationship data
-[2024-02-07 17:39:52] (createArrCUSTOMERmembership) Successfully processed CUSTOMER membership data
-[2024-02-07 17:39:52] (createArrSERVICESpayment) Successfully processed SERVICES payment data
-[2024-02-07 17:39:53] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstay`
-[2024-02-07 17:39:53] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERrelationship`
-[2024-02-07 17:39:53] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERmembership`
-[2024-02-07 17:39:53] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESpayment`
-[2024-02-07 17:39:54] (createArrRESERVATIONstayStatusStay) Successfully processed RESERVATION stay status data
-[2024-02-07 17:40:15] (removeDuplicateRows) Successfully removed duplicate rows
-[2024-02-07 17:40:15] (createArrSERVICESfolioOrders) Successfully processed SERVICES folio orders
-[2024-02-07 17:40:15] (removeDuplicateOrders) Successfully removed duplicate folio orders
-[2024-02-07 17:40:16] (upsertSERVICESfolioOrders) Error: Cannot add or update a child row: a foreign key constraint fails (`pms_db`.`servicesfolioorders`, CONSTRAINT `fk_SERVICESfolioorders_CUSTOMERcontact1` FOREIGN KEY (`contactId`) REFERENCES `customercontact` (`id`))
-[2024-02-07 17:40:16] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONroomDetails`
-[2024-02-07 17:40:16] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstayStatusStay`
-[2024-02-07 17:40:16] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESfolioOrders`
-[2024-02-07 17:40:16] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
-[2024-02-07 17:41:20] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
-[2024-02-07 17:41:20] (fetchDataFromMySQLTable) Successfully fetched 0 records from hapi_raw_reservations
-[2024-02-07 17:41:20] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
-[2024-02-07 17:41:20] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
-[2024-02-07 17:41:27] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
-[2024-02-07 17:41:27] (fetchDataFromMySQLTable) Successfully fetched 415 records from hapi_raw_reservations
-[2024-02-07 17:41:27] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
-[2024-02-07 17:41:31] (createArrCUSTOMERcontact) Successfully processed CUSTOMER contacts
-[2024-02-07 17:41:31] (createCUSTOMERContactType) Successfully created CUSTOMER contact type array
-[2024-02-07 17:41:31] (createCUSTOMERloyaltyProgram) Successfully created CUSTOMER loyalty program array
-[2024-02-07 17:41:31] (createSERVICESLibTender) Successfully processed SERVICES LibTender
-[2024-02-07 17:41:31] (createSERVICESlibserviceitems) Successfully processed SERVICES LibServiceItems
-[2024-02-07 17:41:31] (createReservationLibProperty) Successfully processed reservationLibProperty
-[2024-02-07 17:41:31] (createReservationLibSource) Successfully processed reservationLibSource
-[2024-02-07 17:41:31] (createReservationLibRoomClass) Successfully processed ReservationLibRoomClass
-[2024-02-07 17:41:31] (createReservationGroup) Successfully processed ReservationGroup
-[2024-02-07 17:41:31] (createReservationLibRoom) Successfully processed ReservationLibRoom
-[2024-02-07 17:41:32] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibContactType`
-[2024-02-07 17:41:32] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERcontact`
-[2024-02-07 17:41:32] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibLoyaltyProgram`
-[2024-02-07 17:41:32] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoom`
-[2024-02-07 17:41:32] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONLibRoomType`
-[2024-02-07 17:41:32] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoomClass`
-[2024-02-07 17:41:32] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibProperty`
-[2024-02-07 17:41:32] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONgroup`
-[2024-02-07 17:41:32] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibsource`
-[2024-02-07 17:41:32] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibstaystatus`
-[2024-02-07 17:41:32] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibTender`
-[2024-02-07 17:41:32] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibServiceItems`
-[2024-02-07 17:41:32] (createArrRESERVATIONstay) Successfully processed ARR RESERVATION stay data
-[2024-02-07 17:41:32] (createArrCUSTOMERrelationship) Successfully processed CUSTOMER relationship data
-[2024-02-07 17:41:37] (createArrCUSTOMERmembership) Successfully processed CUSTOMER membership data
-[2024-02-07 17:41:37] (createArrSERVICESpayment) Successfully processed SERVICES payment data
-[2024-02-07 17:41:38] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstay`
-[2024-02-07 17:41:38] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERrelationship`
-[2024-02-07 17:41:38] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERmembership`
-[2024-02-07 17:41:38] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESpayment`
-[2024-02-07 17:41:39] (createArrRESERVATIONstayStatusStay) Successfully processed RESERVATION stay status data
-[2024-02-07 17:42:00] (removeDuplicateRows) Successfully removed duplicate rows
-[2024-02-07 17:42:00] (createArrSERVICESfolioOrders) Successfully processed SERVICES folio orders
-[2024-02-07 17:42:00] (removeDuplicateOrders) Successfully removed duplicate folio orders
-[2024-02-07 17:42:01] (upsertSERVICESfolioOrders) Error: Cannot add or update a child row: a foreign key constraint fails (`pms_db`.`servicesfolioorders`, CONSTRAINT `fk_SERVICESfolioorders_CUSTOMERcontact1` FOREIGN KEY (`contactId`) REFERENCES `customercontact` (`id`))
-[2024-02-07 17:42:01] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONroomDetails`
-[2024-02-07 17:42:01] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstayStatusStay`
-[2024-02-07 17:42:01] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESfolioOrders`
-[2024-02-07 17:42:01] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
-[2024-02-07 18:22:36] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
-[2024-02-07 18:22:36] (fetchDataFromMySQLTable) Successfully fetched 415 records from hapi_raw_reservations
-[2024-02-07 18:22:36] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
-[2024-02-07 18:22:40] (createArrCUSTOMERcontact) Successfully processed CUSTOMER contacts
-[2024-02-07 18:22:40] (createCUSTOMERContactType) Successfully created CUSTOMER contact type array
-[2024-02-07 18:22:40] (createCUSTOMERloyaltyProgram) Successfully created CUSTOMER loyalty program array
-[2024-02-07 18:22:40] (createSERVICESLibTender) Successfully processed SERVICES LibTender
-[2024-02-07 18:22:40] (createSERVICESlibserviceitems) Successfully processed SERVICES LibServiceItems
-[2024-02-07 18:22:40] (createReservationLibProperty) Successfully processed reservationLibProperty
-[2024-02-07 18:22:40] (createReservationLibSource) Successfully processed reservationLibSource
-[2024-02-07 18:22:40] (createReservationLibRoomClass) Successfully processed ReservationLibRoomClass
-[2024-02-07 18:22:40] (createReservationGroup) Successfully processed ReservationGroup
-[2024-02-07 18:22:40] (createReservationLibRoom) Successfully processed ReservationLibRoom
-[2024-02-07 18:22:41] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibContactType`
-[2024-02-07 18:22:41] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERcontact`
-[2024-02-07 18:22:41] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibLoyaltyProgram`
-[2024-02-07 18:22:41] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoom`
-[2024-02-07 18:22:41] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONLibRoomType`
-[2024-02-07 18:22:41] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoomClass`
-[2024-02-07 18:22:41] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibProperty`
-[2024-02-07 18:22:41] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONgroup`
-[2024-02-07 18:22:41] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibsource`
-[2024-02-07 18:22:41] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibstaystatus`
-[2024-02-07 18:22:41] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibTender`
-[2024-02-07 18:22:41] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibServiceItems`
-[2024-02-07 18:22:41] (createArrRESERVATIONstay) Successfully processed ARR RESERVATION stay data
-[2024-02-07 18:22:41] (createArrCUSTOMERrelationship) Successfully processed CUSTOMER relationship data
-[2024-02-07 18:22:45] (createArrCUSTOMERmembership) Successfully processed CUSTOMER membership data
-[2024-02-07 18:22:45] (createArrSERVICESpayment) Successfully processed SERVICES payment data
-[2024-02-07 18:22:46] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstay`
-[2024-02-07 18:22:46] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERrelationship`
-[2024-02-07 18:22:46] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERmembership`
-[2024-02-07 18:22:46] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESpayment`
-[2024-02-07 18:22:48] (createArrRESERVATIONstayStatusStay) Successfully processed RESERVATION stay status data
-[2024-02-07 18:22:54] (removeDuplicateRows) Successfully removed duplicate rows
-[2024-02-07 18:22:54] (createArrSERVICESfolioOrders) Successfully processed SERVICES folio orders
-[2024-02-07 18:22:54] (removeDuplicateOrders) Successfully removed duplicate folio orders
-[2024-02-07 18:22:54] (upsertSERVICESfolioOrders) Error: Cannot add or update a child row: a foreign key constraint fails (`pms_db`.`servicesfolioorders`, CONSTRAINT `fk_SERVICESfolioorders_CUSTOMERcontact1` FOREIGN KEY (`contactId`) REFERENCES `customercontact` (`id`))
-[2024-02-07 18:22:54] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONroomDetails`
-[2024-02-07 18:22:54] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstayStatusStay`
-[2024-02-07 18:22:54] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESfolioOrders`
-[2024-02-07 18:22:54] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
-[2024-02-07 19:15:00] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
-[2024-02-07 19:15:00] (fetchDataFromMySQLTable) Successfully fetched 0 records from hapi_raw_reservations
-[2024-02-07 19:15:00] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
-[2024-02-07 19:15:00] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
-[2024-02-07 19:26:59] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
-[2024-02-07 19:26:59] (fetchDataFromMySQLTable) Successfully fetched 415 records from hapi_raw_reservations
-[2024-02-07 19:26:59] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
-[2024-02-07 19:27:04] (createArrCUSTOMERcontact) Successfully processed CUSTOMER contacts
-[2024-02-07 19:27:04] (createCUSTOMERContactType) Successfully created CUSTOMER contact type array
-[2024-02-07 19:27:04] (createCUSTOMERloyaltyProgram) Successfully created CUSTOMER loyalty program array
-[2024-02-07 19:27:04] (createSERVICESLibTender) Successfully processed SERVICES LibTender
-[2024-02-07 19:27:04] (createSERVICESlibserviceitems) Successfully processed SERVICES LibServiceItems
-[2024-02-07 19:27:04] (createReservationLibProperty) Successfully processed reservationLibProperty
-[2024-02-07 19:27:04] (createReservationLibSource) Successfully processed reservationLibSource
-[2024-02-07 19:27:04] (createReservationLibRoomClass) Successfully processed ReservationLibRoomClass
-[2024-02-07 19:27:04] (createReservationGroup) Successfully processed ReservationGroup
-[2024-02-07 19:27:04] (createReservationLibRoom) Successfully processed ReservationLibRoom
-[2024-02-07 19:27:05] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibContactType`
-[2024-02-07 19:27:05] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERcontact`
-[2024-02-07 19:27:05] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibLoyaltyProgram`
-[2024-02-07 19:27:05] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoom`
-[2024-02-07 19:27:05] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONLibRoomType`
-[2024-02-07 19:27:05] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoomClass`
-[2024-02-07 19:27:05] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibProperty`
-[2024-02-07 19:27:05] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONgroup`
-[2024-02-07 19:27:05] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibsource`
-[2024-02-07 19:27:05] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibstaystatus`
-[2024-02-07 19:27:05] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibTender`
-[2024-02-07 19:27:05] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibServiceItems`
-[2024-02-07 19:27:05] (createArrRESERVATIONstay) Successfully processed ARR RESERVATION stay data
-[2024-02-07 19:27:05] (createArrCUSTOMERrelationship) Successfully processed CUSTOMER relationship data
-[2024-02-07 19:27:10] (createArrCUSTOMERmembership) Successfully processed CUSTOMER membership data
-[2024-02-07 19:27:10] (createArrSERVICESpayment) Successfully processed SERVICES payment data
-[2024-02-07 19:27:11] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstay`
-[2024-02-07 19:27:11] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERrelationship`
-[2024-02-07 19:27:11] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERmembership`
-[2024-02-07 19:27:11] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESpayment`
-[2024-02-07 19:27:13] (createArrRESERVATIONstayStatusStay) Successfully processed RESERVATION stay status data
-[2024-02-07 19:27:20] (removeDuplicateRows) Successfully removed duplicate rows
-[2024-02-07 19:27:20] (createArrSERVICESfolioOrders) Successfully processed SERVICES folio orders
-[2024-02-07 19:27:20] (removeDuplicateOrders) Successfully removed duplicate folio orders
-[2024-02-07 19:27:21] (upsertSERVICESfolioOrders) Error: Cannot add or update a child row: a foreign key constraint fails (`pms_db`.`servicesfolioorders`, CONSTRAINT `fk_SERVICESfolioorders_CUSTOMERcontact1` FOREIGN KEY (`contactId`) REFERENCES `customercontact` (`id`))
-[2024-02-07 19:27:21] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONroomDetails`
-[2024-02-07 19:27:21] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstayStatusStay`
-[2024-02-07 19:27:21] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
-[2024-02-07 19:31:05] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
-[2024-02-07 19:31:05] (fetchDataFromMySQLTable) Successfully fetched 415 records from hapi_raw_reservations
-[2024-02-07 19:31:05] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
-[2024-02-07 19:31:10] (createArrCUSTOMERcontact) Successfully processed CUSTOMER contacts
-[2024-02-07 19:31:10] (createCUSTOMERContactType) Successfully created CUSTOMER contact type array
-[2024-02-07 19:31:10] (createCUSTOMERloyaltyProgram) Successfully created CUSTOMER loyalty program array
-[2024-02-07 19:31:10] (createSERVICESLibTender) Successfully processed SERVICES LibTender
-[2024-02-07 19:31:10] (createSERVICESlibserviceitems) Successfully processed SERVICES LibServiceItems
-[2024-02-07 19:31:10] (createReservationLibProperty) Successfully processed reservationLibProperty
-[2024-02-07 19:31:10] (createReservationLibSource) Successfully processed reservationLibSource
-[2024-02-07 19:31:10] (createReservationLibRoomClass) Successfully processed ReservationLibRoomClass
-[2024-02-07 19:31:10] (createReservationGroup) Successfully processed ReservationGroup
-[2024-02-07 19:31:10] (createReservationLibRoom) Successfully processed ReservationLibRoom
-[2024-02-07 19:31:11] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibContactType`
-[2024-02-07 19:31:11] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERcontact`
-[2024-02-07 19:31:11] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibLoyaltyProgram`
-[2024-02-07 19:31:11] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoom`
-[2024-02-07 19:31:11] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONLibRoomType`
-[2024-02-07 19:31:11] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoomClass`
-[2024-02-07 19:31:11] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibProperty`
-[2024-02-07 19:31:11] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONgroup`
-[2024-02-07 19:31:11] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibsource`
-[2024-02-07 19:31:11] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibstaystatus`
-[2024-02-07 19:31:11] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibTender`
-[2024-02-07 19:31:11] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibServiceItems`
-[2024-02-07 19:31:11] (createArrRESERVATIONstay) Successfully processed ARR RESERVATION stay data
-[2024-02-07 19:31:11] (createArrCUSTOMERrelationship) Successfully processed CUSTOMER relationship data
-[2024-02-07 19:31:16] (createArrCUSTOMERmembership) Successfully processed CUSTOMER membership data
-[2024-02-07 19:31:16] (createArrSERVICESpayment) Successfully processed SERVICES payment data
-[2024-02-07 19:31:17] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstay`
-[2024-02-07 19:31:17] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERrelationship`
-[2024-02-07 19:31:17] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERmembership`
-[2024-02-07 19:31:17] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESpayment`
-[2024-02-07 19:31:18] (createArrRESERVATIONstayStatusStay) Successfully processed RESERVATION stay status data
-[2024-02-07 19:31:24] (removeDuplicateRows) Successfully removed duplicate rows
-[2024-02-07 19:31:24] (createArrSERVICESfolioOrders) Successfully processed SERVICES folio orders
-[2024-02-07 19:31:24] (removeDuplicateOrders) Successfully removed duplicate folio orders
-[2024-02-07 19:31:25] (upsertSERVICESfolioOrders) Error: Cannot add or update a child row: a foreign key constraint fails (`pms_db`.`servicesfolioorders`, CONSTRAINT `fk_SERVICESfolioorders_CUSTOMERcontact1` FOREIGN KEY (`contactId`) REFERENCES `customercontact` (`id`))
-[2024-02-07 19:31:25] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONroomDetails`
-[2024-02-07 19:31:25] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstayStatusStay`
-[2024-02-07 19:31:25] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
-[2024-02-07 19:36:06] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
-[2024-02-07 19:36:06] (fetchDataFromMySQLTable) Successfully fetched 415 records from hapi_raw_reservations
-[2024-02-07 19:36:06] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
-[2024-02-07 19:36:10] (createArrCUSTOMERcontact) Successfully processed CUSTOMER contacts
-[2024-02-07 19:36:10] (createCUSTOMERContactType) Successfully created CUSTOMER contact type array
-[2024-02-07 19:36:10] (createCUSTOMERloyaltyProgram) Successfully created CUSTOMER loyalty program array
-[2024-02-07 19:36:10] (createSERVICESLibTender) Successfully processed SERVICES LibTender
-[2024-02-07 19:36:10] (createSERVICESlibserviceitems) Successfully processed SERVICES LibServiceItems
-[2024-02-07 19:36:10] (createReservationLibProperty) Successfully processed reservationLibProperty
-[2024-02-07 19:36:10] (createReservationLibSource) Successfully processed reservationLibSource
-[2024-02-07 19:36:10] (createReservationLibRoomClass) Successfully processed ReservationLibRoomClass
-[2024-02-07 19:36:10] (createReservationGroup) Successfully processed ReservationGroup
-[2024-02-07 19:36:10] (createReservationLibRoom) Successfully processed ReservationLibRoom
-[2024-02-07 19:36:11] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibContactType`
-[2024-02-07 19:36:11] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERcontact`
-[2024-02-07 19:36:11] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibLoyaltyProgram`
-[2024-02-07 19:36:11] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoom`
-[2024-02-07 19:36:11] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONLibRoomType`
-[2024-02-07 19:36:11] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoomClass`
-[2024-02-07 19:36:11] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibProperty`
-[2024-02-07 19:36:11] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONgroup`
-[2024-02-07 19:36:11] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibsource`
-[2024-02-07 19:36:11] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibstaystatus`
-[2024-02-07 19:36:11] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibTender`
-[2024-02-07 19:36:11] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibServiceItems`
-[2024-02-07 19:36:11] (createArrRESERVATIONstay) Successfully processed ARR RESERVATION stay data
-[2024-02-07 19:36:11] (createArrCUSTOMERrelationship) Successfully processed CUSTOMER relationship data
-[2024-02-07 19:36:15] (createArrCUSTOMERmembership) Successfully processed CUSTOMER membership data
-[2024-02-07 19:36:15] (createArrSERVICESpayment) Successfully processed SERVICES payment data
-[2024-02-07 19:36:17] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstay`
-[2024-02-07 19:36:17] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERrelationship`
-[2024-02-07 19:36:17] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERmembership`
-[2024-02-07 19:36:17] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESpayment`
-[2024-02-07 19:36:18] (createArrRESERVATIONstayStatusStay) Successfully processed RESERVATION stay status data
-[2024-02-07 19:36:24] (removeDuplicateRows) Successfully removed duplicate rows
-[2024-02-07 19:36:24] (createArrSERVICESfolioOrders) Successfully processed SERVICES folio orders
-[2024-02-07 19:36:24] (removeDuplicateOrders) Successfully removed duplicate folio orders
-[2024-02-07 19:36:25] (upsertSERVICESfolioOrders) Error: Cannot add or update a child row: a foreign key constraint fails (`pms_db`.`servicesfolioorders`, CONSTRAINT `fk_SERVICESfolioorders_CUSTOMERcontact1` FOREIGN KEY (`contactId`) REFERENCES `customercontact` (`id`))
-[2024-02-07 19:36:25] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONroomDetails`
-[2024-02-07 19:36:25] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstayStatusStay`
-[2024-02-07 19:36:25] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
-[2024-02-07 19:44:06] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
-[2024-02-07 19:44:06] (fetchDataFromMySQLTable) Successfully fetched 0 records from hapi_raw_reservations
-[2024-02-07 19:44:06] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
-[2024-02-07 19:44:06] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
-[2024-02-07 19:44:23] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
-[2024-02-07 19:44:23] (fetchDataFromMySQLTable) Successfully fetched 415 records from hapi_raw_reservations
-[2024-02-07 19:44:23] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
-[2024-02-07 19:44:27] (createArrCUSTOMERcontact) Successfully processed CUSTOMER contacts
-[2024-02-07 19:44:27] (createCUSTOMERContactType) Successfully created CUSTOMER contact type array
-[2024-02-07 19:44:27] (createCUSTOMERloyaltyProgram) Successfully created CUSTOMER loyalty program array
-[2024-02-07 19:44:27] (createSERVICESLibTender) Successfully processed SERVICES LibTender
-[2024-02-07 19:44:27] (createSERVICESlibserviceitems) Successfully processed SERVICES LibServiceItems
-[2024-02-07 19:44:27] (createReservationLibProperty) Successfully processed reservationLibProperty
-[2024-02-07 19:44:27] (createReservationLibSource) Successfully processed reservationLibSource
-[2024-02-07 19:44:27] (createReservationLibRoomClass) Successfully processed ReservationLibRoomClass
-[2024-02-07 19:44:27] (createReservationGroup) Successfully processed ReservationGroup
-[2024-02-07 19:44:27] (createReservationLibRoom) Successfully processed ReservationLibRoom
-[2024-02-07 19:44:28] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibContactType`
-[2024-02-07 19:44:28] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERcontact`
-[2024-02-07 19:44:28] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibLoyaltyProgram`
-[2024-02-07 19:44:28] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoom`
-[2024-02-07 19:44:28] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONLibRoomType`
-[2024-02-07 19:44:28] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoomClass`
-[2024-02-07 19:44:28] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibProperty`
-[2024-02-07 19:44:28] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONgroup`
-[2024-02-07 19:44:28] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibsource`
-[2024-02-07 19:44:28] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibstaystatus`
-[2024-02-07 19:44:28] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibTender`
-[2024-02-07 19:44:28] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibServiceItems`
-[2024-02-07 19:44:28] (createArrRESERVATIONstay) Successfully processed ARR RESERVATION stay data
-[2024-02-07 19:44:28] (createArrCUSTOMERrelationship) Successfully processed CUSTOMER relationship data
-[2024-02-07 19:44:32] (createArrCUSTOMERmembership) Successfully processed CUSTOMER membership data
-[2024-02-07 19:44:32] (createArrSERVICESpayment) Successfully processed SERVICES payment data
-[2024-02-07 19:44:34] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstay`
-[2024-02-07 19:44:34] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERrelationship`
-[2024-02-07 19:44:34] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERmembership`
-[2024-02-07 19:44:34] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESpayment`
-[2024-02-07 19:44:35] (createArrRESERVATIONstayStatusStay) Successfully processed RESERVATION stay status data
-[2024-02-07 19:44:41] (removeDuplicateRows) Successfully removed duplicate rows
-[2024-02-07 19:44:41] (createArrSERVICESfolioOrders) Successfully processed SERVICES folio orders
-[2024-02-07 19:44:41] (removeDuplicateOrders) Successfully removed duplicate folio orders
-[2024-02-07 19:44:41] (upsertSERVICESfolioOrders) Error: Cannot add or update a child row: a foreign key constraint fails (`pms_db`.`servicesfolioorders`, CONSTRAINT `fk_SERVICESfolioorders_CUSTOMERcontact1` FOREIGN KEY (`contactId`) REFERENCES `customercontact` (`id`))
-[2024-02-07 19:44:41] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONroomDetails`
-[2024-02-07 19:44:41] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstayStatusStay`
-[2024-02-07 19:44:41] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
-[2024-02-07 21:11:30] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
-[2024-02-07 21:11:30] (fetchDataFromMySQLTable) Successfully fetched 415 records from hapi_raw_reservations
-[2024-02-07 21:11:30] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
-[2024-02-07 21:11:35] (createArrCUSTOMERcontact) Successfully processed CUSTOMER contacts
-[2024-02-07 21:11:35] (createCUSTOMERContactType) Successfully created CUSTOMER contact type array
-[2024-02-07 21:11:35] (createCUSTOMERloyaltyProgram) Successfully created CUSTOMER loyalty program array
-[2024-02-07 21:11:35] (createSERVICESLibTender) Successfully processed SERVICES LibTender
-[2024-02-07 21:11:35] (createSERVICESlibserviceitems) Successfully processed SERVICES LibServiceItems
-[2024-02-07 21:11:35] (createReservationLibProperty) Successfully processed reservationLibProperty
-[2024-02-07 21:11:35] (createReservationLibSource) Successfully processed reservationLibSource
-[2024-02-07 21:11:35] (createReservationLibRoomClass) Successfully processed ReservationLibRoomClass
-[2024-02-07 21:11:35] (createReservationGroup) Successfully processed ReservationGroup
-[2024-02-07 21:11:35] (createReservationLibRoom) Successfully processed ReservationLibRoom
-[2024-02-07 21:11:35] (upsertCustomerContact)  Incorrect date value: '' for column 'birthDate' at row 1
-[2024-02-07 21:11:35] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibContactType`
-[2024-02-07 21:11:35] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERcontact`
-[2024-02-07 21:11:35] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibLoyaltyProgram`
-[2024-02-07 21:11:35] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoom`
-[2024-02-07 21:11:35] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONLibRoomType`
-[2024-02-07 21:11:35] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoomClass`
-[2024-02-07 21:11:35] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibProperty`
-[2024-02-07 21:11:35] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONgroup`
-[2024-02-07 21:11:35] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibsource`
-[2024-02-07 21:11:35] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibstaystatus`
-[2024-02-07 21:11:35] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibTender`
-[2024-02-07 21:11:35] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibServiceItems`
-[2024-02-07 21:11:35] (createArrRESERVATIONstay) Successfully processed ARR RESERVATION stay data
-[2024-02-07 21:11:35] (createArrCUSTOMERrelationship) Successfully processed CUSTOMER relationship data
-[2024-02-07 21:11:39] (createArrCUSTOMERmembership) Successfully processed CUSTOMER membership data
-[2024-02-07 21:11:39] (createArrSERVICESpayment) Successfully processed SERVICES payment data
-[2024-02-07 21:11:40] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstay`
-[2024-02-07 21:11:40] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERrelationship`
-[2024-02-07 21:11:40] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERmembership`
-[2024-02-07 21:11:40] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESpayment`
-[2024-02-07 21:11:41] (createArrRESERVATIONstayStatusStay) Successfully processed RESERVATION stay status data
-[2024-02-07 21:11:46] (removeDuplicateRows) Successfully removed duplicate rows
-[2024-02-07 21:11:46] (createArrSERVICESfolioOrders) Successfully processed SERVICES folio orders
-[2024-02-07 21:11:46] (removeDuplicateOrders) Successfully removed duplicate folio orders
-[2024-02-07 21:11:46] (upsertSERVICESfolioOrders) Error: contactId:0Cannot add or update a child row: a foreign key constraint fails (`pms_db`.`servicesfolioorders`, CONSTRAINT `fk_SERVICESfolioorders_CUSTOMERcontact1` FOREIGN KEY (`contactId`) REFERENCES `customercontact` (`id`))
-[2024-02-07 21:11:46] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONroomDetails`
-[2024-02-07 21:11:46] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstayStatusStay`
-[2024-02-07 21:11:46] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
-[2024-02-07 21:12:53] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
-[2024-02-07 21:12:53] (fetchDataFromMySQLTable) Successfully fetched 415 records from hapi_raw_reservations
-[2024-02-07 21:12:53] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
-[2024-02-07 21:12:57] (createArrCUSTOMERcontact) Successfully processed CUSTOMER contacts
-[2024-02-07 21:12:57] (createCUSTOMERContactType) Successfully created CUSTOMER contact type array
-[2024-02-07 21:12:57] (createCUSTOMERloyaltyProgram) Successfully created CUSTOMER loyalty program array
-[2024-02-07 21:12:57] (createSERVICESLibTender) Successfully processed SERVICES LibTender
-[2024-02-07 21:12:57] (createSERVICESlibserviceitems) Successfully processed SERVICES LibServiceItems
-[2024-02-07 21:12:57] (createReservationLibProperty) Successfully processed reservationLibProperty
-[2024-02-07 21:12:57] (createReservationLibSource) Successfully processed reservationLibSource
-[2024-02-07 21:12:57] (createReservationLibRoomClass) Successfully processed ReservationLibRoomClass
-[2024-02-07 21:12:57] (createReservationGroup) Successfully processed ReservationGroup
-[2024-02-07 21:12:57] (createReservationLibRoom) Successfully processed ReservationLibRoom
-[2024-02-07 21:12:57] (upsertCustomerContact)  Incorrect date value: '' for column 'birthDate' at row 1
-[2024-02-07 21:12:57] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibContactType`
-[2024-02-07 21:12:57] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERcontact`
-[2024-02-07 21:12:57] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibLoyaltyProgram`
-[2024-02-07 21:12:57] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoom`
-[2024-02-07 21:12:57] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONLibRoomType`
-[2024-02-07 21:12:57] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoomClass`
-[2024-02-07 21:12:57] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibProperty`
-[2024-02-07 21:12:57] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONgroup`
-[2024-02-07 21:12:57] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibsource`
-[2024-02-07 21:12:57] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibstaystatus`
-[2024-02-07 21:12:57] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibTender`
-[2024-02-07 21:12:57] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibServiceItems`
-[2024-02-07 21:12:57] (createArrRESERVATIONstay) Successfully processed ARR RESERVATION stay data
-[2024-02-07 21:12:58] (createArrCUSTOMERrelationship) Successfully processed CUSTOMER relationship data
-[2024-02-07 21:13:01] (createArrCUSTOMERmembership) Successfully processed CUSTOMER membership data
-[2024-02-07 21:13:01] (createArrSERVICESpayment) Successfully processed SERVICES payment data
-[2024-02-07 21:13:02] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstay`
-[2024-02-07 21:13:02] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERrelationship`
-[2024-02-07 21:13:02] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERmembership`
-[2024-02-07 21:13:02] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESpayment`
-[2024-02-07 21:13:03] (createArrRESERVATIONstayStatusStay) Successfully processed RESERVATION stay status data
-[2024-02-07 21:13:08] (removeDuplicateRows) Successfully removed duplicate rows
-[2024-02-07 21:13:08] (createArrSERVICESfolioOrders) Successfully processed SERVICES folio orders
-[2024-02-07 21:13:08] (removeDuplicateOrders) Successfully removed duplicate folio orders
-[2024-02-07 21:13:09] (upsertSERVICESfolioOrders) Error: stayId:401916226Cannot add or update a child row: a foreign key constraint fails (`pms_db`.`servicesfolioorders`, CONSTRAINT `fk_SERVICESfolioorders_CUSTOMERcontact1` FOREIGN KEY (`contactId`) REFERENCES `customercontact` (`id`))
-[2024-02-07 21:13:09] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONroomDetails`
-[2024-02-07 21:13:09] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstayStatusStay`
-[2024-02-07 21:13:09] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
-[2024-02-07 21:36:19] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
-[2024-02-07 21:36:19] (fetchDataFromMySQLTable) Successfully fetched 415 records from hapi_raw_reservations
-[2024-02-07 21:36:20] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
-[2024-02-07 21:36:24] (createArrCUSTOMERcontact) Successfully processed CUSTOMER contacts
-[2024-02-07 21:36:24] (createCUSTOMERContactType) Successfully created CUSTOMER contact type array
-[2024-02-07 21:36:24] (createCUSTOMERloyaltyProgram) Successfully created CUSTOMER loyalty program array
-[2024-02-07 21:36:24] (createSERVICESLibTender) Successfully processed SERVICES LibTender
-[2024-02-07 21:36:24] (createSERVICESlibserviceitems) Successfully processed SERVICES LibServiceItems
-[2024-02-07 21:36:24] (createReservationLibProperty) Successfully processed reservationLibProperty
-[2024-02-07 21:36:24] (createReservationLibSource) Successfully processed reservationLibSource
-[2024-02-07 21:36:24] (createReservationLibRoomClass) Successfully processed ReservationLibRoomClass
-[2024-02-07 21:36:24] (createReservationGroup) Successfully processed ReservationGroup
-[2024-02-07 21:36:24] (createReservationLibRoom) Successfully processed ReservationLibRoom
-[2024-02-07 21:36:24] (upsertCustomerContact)  Incorrect date value: '' for column 'birthDate' at row 1
-[2024-02-07 21:36:24] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibContactType`
-[2024-02-07 21:36:24] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERcontact`
-[2024-02-07 21:36:24] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibLoyaltyProgram`
-[2024-02-07 21:36:24] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoom`
-[2024-02-07 21:36:24] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONLibRoomType`
-[2024-02-07 21:36:24] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoomClass`
-[2024-02-07 21:36:24] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibProperty`
-[2024-02-07 21:36:24] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONgroup`
-[2024-02-07 21:36:24] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibsource`
-[2024-02-07 21:36:24] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibstaystatus`
-[2024-02-07 21:36:24] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibTender`
-[2024-02-07 21:36:24] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibServiceItems`
-[2024-02-07 21:36:24] (createArrRESERVATIONstay) Successfully processed ARR RESERVATION stay data
-[2024-02-07 21:36:24] (createArrCUSTOMERrelationship) Successfully processed CUSTOMER relationship data
-[2024-02-07 21:36:28] (createArrCUSTOMERmembership) Successfully processed CUSTOMER membership data
-[2024-02-07 21:36:28] (createArrSERVICESpayment) Successfully processed SERVICES payment data
-[2024-02-07 21:36:29] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstay`
-[2024-02-07 21:36:29] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERrelationship`
-[2024-02-07 21:36:29] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERmembership`
-[2024-02-07 21:36:29] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESpayment`
-[2024-02-07 21:36:30] (createArrRESERVATIONstayStatusStay) Successfully processed RESERVATION stay status data
-[2024-02-07 21:36:35] (removeDuplicateRows) Successfully removed duplicate rows
-[2024-02-07 21:36:35] (createArrSERVICESfolioOrders) Successfully processed SERVICES folio orders
-[2024-02-07 21:36:35] (removeDuplicateOrders) Successfully removed duplicate folio orders
-[2024-02-07 21:36:36] (upsertSERVICESfolioOrders) Error: stayId:401919075Cannot add or update a child row: a foreign key constraint fails (`pms_db`.`servicesfolioorders`, CONSTRAINT `fk_SERVICESfolioorders_CUSTOMERcontact1` FOREIGN KEY (`contactId`) REFERENCES `customercontact` (`id`))
-[2024-02-07 21:36:36] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONroomDetails`
-[2024-02-07 21:36:36] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstayStatusStay`
-[2024-02-07 21:36:36] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
-[2024-02-07 21:40:21] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
-[2024-02-07 21:40:21] (fetchDataFromMySQLTable) Successfully fetched 415 records from hapi_raw_reservations
-[2024-02-07 21:40:21] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
-[2024-02-07 21:40:21] (createArrCUSTOMERcontact) Successfully processed CUSTOMER contacts
-[2024-02-07 21:40:21] (createCUSTOMERContactType) Successfully created CUSTOMER contact type array
-[2024-02-07 21:40:21] (createCUSTOMERloyaltyProgram) Successfully created CUSTOMER loyalty program array
-[2024-02-07 21:40:21] (createSERVICESLibTender) Successfully processed SERVICES LibTender
-[2024-02-07 21:40:21] (createSERVICESlibserviceitems) Successfully processed SERVICES LibServiceItems
-[2024-02-07 21:40:21] (createReservationLibProperty) Successfully processed reservationLibProperty
-[2024-02-07 21:40:21] (createReservationLibSource) Successfully processed reservationLibSource
-[2024-02-07 21:40:21] (createReservationLibRoomClass) Successfully processed ReservationLibRoomClass
-[2024-02-07 21:40:21] (createReservationGroup) Successfully processed ReservationGroup
-[2024-02-07 21:40:21] (createReservationLibRoom) Successfully processed ReservationLibRoom
-[2024-02-07 21:40:21] (upsertCustomerContact)  Incorrect date value: '' for column 'birthDate' at row 1
-[2024-02-07 21:40:21] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
-[2024-02-07 21:42:06] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
-[2024-02-07 21:42:06] (fetchDataFromMySQLTable) Successfully fetched 415 records from hapi_raw_reservations
-[2024-02-07 21:42:06] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
-[2024-02-07 21:42:10] (createArrCUSTOMERcontact) Successfully processed CUSTOMER contacts
-[2024-02-07 21:42:10] (createCUSTOMERContactType) Successfully created CUSTOMER contact type array
-[2024-02-07 21:42:10] (createCUSTOMERloyaltyProgram) Successfully created CUSTOMER loyalty program array
-[2024-02-07 21:42:10] (createSERVICESLibTender) Successfully processed SERVICES LibTender
-[2024-02-07 21:42:10] (createSERVICESlibserviceitems) Successfully processed SERVICES LibServiceItems
-[2024-02-07 21:42:10] (createReservationLibProperty) Successfully processed reservationLibProperty
-[2024-02-07 21:42:10] (createReservationLibSource) Successfully processed reservationLibSource
-[2024-02-07 21:42:10] (createReservationLibRoomClass) Successfully processed ReservationLibRoomClass
-[2024-02-07 21:42:10] (createReservationGroup) Successfully processed ReservationGroup
-[2024-02-07 21:42:10] (createReservationLibRoom) Successfully processed ReservationLibRoom
-[2024-02-07 21:42:10] (upsertCustomerContact)  Incorrect date value: '' for column 'birthDate' at row 1
-[2024-02-07 21:42:10] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
-[2024-02-07 21:46:20] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
-[2024-02-07 21:46:20] (fetchDataFromMySQLTable) Successfully fetched 415 records from hapi_raw_reservations
-[2024-02-07 21:46:20] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
-[2024-02-07 21:46:24] (createArrCUSTOMERcontact) Successfully processed CUSTOMER contacts
-[2024-02-07 21:46:24] (createCUSTOMERContactType) Successfully created CUSTOMER contact type array
-[2024-02-07 21:46:24] (createCUSTOMERloyaltyProgram) Successfully created CUSTOMER loyalty program array
-[2024-02-07 21:46:24] (createSERVICESLibTender) Successfully processed SERVICES LibTender
-[2024-02-07 21:46:24] (createSERVICESlibserviceitems) Successfully processed SERVICES LibServiceItems
-[2024-02-07 21:46:24] (createReservationLibProperty) Successfully processed reservationLibProperty
-[2024-02-07 21:46:24] (createReservationLibSource) Successfully processed reservationLibSource
-[2024-02-07 21:46:24] (createReservationLibRoomClass) Successfully processed ReservationLibRoomClass
-[2024-02-07 21:46:24] (createReservationGroup) Successfully processed ReservationGroup
-[2024-02-07 21:46:24] (createReservationLibRoom) Successfully processed ReservationLibRoom
-[2024-02-07 21:46:25] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
-[2024-02-07 21:48:40] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
-[2024-02-07 21:48:40] (fetchDataFromMySQLTable) Successfully fetched 415 records from hapi_raw_reservations
-[2024-02-07 21:48:40] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
-[2024-02-07 21:48:45] (createArrCUSTOMERcontact) Successfully processed CUSTOMER contacts
-[2024-02-07 21:48:45] (createCUSTOMERContactType) Successfully created CUSTOMER contact type array
-[2024-02-07 21:48:45] (createCUSTOMERloyaltyProgram) Successfully created CUSTOMER loyalty program array
-[2024-02-07 21:48:45] (createSERVICESLibTender) Successfully processed SERVICES LibTender
-[2024-02-07 21:48:45] (createSERVICESlibserviceitems) Successfully processed SERVICES LibServiceItems
-[2024-02-07 21:48:45] (createReservationLibProperty) Successfully processed reservationLibProperty
-[2024-02-07 21:48:45] (createReservationLibSource) Successfully processed reservationLibSource
-[2024-02-07 21:48:45] (createReservationLibRoomClass) Successfully processed ReservationLibRoomClass
-[2024-02-07 21:48:45] (createReservationGroup) Successfully processed ReservationGroup
-[2024-02-07 21:48:45] (createReservationLibRoom) Successfully processed ReservationLibRoom
-[2024-02-07 21:48:45] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibContactType`
-[2024-02-07 21:48:45] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERcontact`
-[2024-02-07 21:48:45] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibLoyaltyProgram`
-[2024-02-07 21:48:45] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoom`
-[2024-02-07 21:48:45] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONLibRoomType`
-[2024-02-07 21:48:45] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoomClass`
-[2024-02-07 21:48:45] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibProperty`
-[2024-02-07 21:48:45] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONgroup`
-[2024-02-07 21:48:45] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibsource`
-[2024-02-07 21:48:45] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibstaystatus`
-[2024-02-07 21:48:45] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibTender`
-[2024-02-07 21:48:45] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibServiceItems`
-[2024-02-07 21:48:45] (createArrRESERVATIONstay) Successfully processed ARR RESERVATION stay data
-[2024-02-07 21:48:45] (createArrCUSTOMERrelationship) Successfully processed CUSTOMER relationship data
-[2024-02-07 21:48:51] (createArrCUSTOMERmembership) Successfully processed CUSTOMER membership data
-[2024-02-07 21:48:51] (createArrSERVICESpayment) Successfully processed SERVICES payment data
-[2024-02-07 21:48:52] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstay`
-[2024-02-07 21:48:52] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERrelationship`
-[2024-02-07 21:48:52] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERmembership`
-[2024-02-07 21:48:52] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESpayment`
-[2024-02-07 21:48:53] (createArrRESERVATIONstayStatusStay) Successfully processed RESERVATION stay status data
-[2024-02-07 21:48:59] (removeDuplicateRows) Successfully removed duplicate rows
-[2024-02-07 21:48:59] (createArrSERVICESfolioOrders) Successfully processed SERVICES folio orders
-[2024-02-07 21:48:59] (removeDuplicateOrders) Successfully removed duplicate folio orders
-[2024-02-07 21:49:00] (upsertSERVICESfolioOrders) Error: stayId:401922826Cannot add or update a child row: a foreign key constraint fails (`pms_db`.`servicesfolioorders`, CONSTRAINT `fk_SERVICESfolioorders_CUSTOMERcontact1` FOREIGN KEY (`contactId`) REFERENCES `customercontact` (`id`))
-[2024-02-07 21:49:00] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONroomDetails`
-[2024-02-07 21:49:00] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstayStatusStay`
-[2024-02-07 21:49:00] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESfolioOrders`
-[2024-02-07 21:49:00] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
-[2024-02-07 21:57:31] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
-[2024-02-07 21:57:31] (fetchDataFromMySQLTable) Successfully fetched 415 records from hapi_raw_reservations
-[2024-02-07 21:57:31] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
-[2024-02-07 21:57:35] (createArrCUSTOMERcontact) Successfully processed CUSTOMER contacts
-[2024-02-07 21:57:35] (createCUSTOMERContactType) Successfully created CUSTOMER contact type array
-[2024-02-07 21:57:35] (createCUSTOMERloyaltyProgram) Successfully created CUSTOMER loyalty program array
-[2024-02-07 21:57:35] (createSERVICESLibTender) Successfully processed SERVICES LibTender
-[2024-02-07 21:57:35] (createSERVICESlibserviceitems) Successfully processed SERVICES LibServiceItems
-[2024-02-07 21:57:35] (createReservationLibProperty) Successfully processed reservationLibProperty
-[2024-02-07 21:57:35] (createReservationLibSource) Successfully processed reservationLibSource
-[2024-02-07 21:57:35] (createReservationLibRoomClass) Successfully processed ReservationLibRoomClass
-[2024-02-07 21:57:35] (createReservationGroup) Successfully processed ReservationGroup
-[2024-02-07 21:57:35] (createReservationLibRoom) Successfully processed ReservationLibRoom
-[2024-02-07 21:57:36] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibContactType`
-[2024-02-07 21:57:36] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERcontact`
-[2024-02-07 21:57:36] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibLoyaltyProgram`
-[2024-02-07 21:57:36] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoom`
-[2024-02-07 21:57:36] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONLibRoomType`
-[2024-02-07 21:57:36] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoomClass`
-[2024-02-07 21:57:36] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibProperty`
-[2024-02-07 21:57:36] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONgroup`
-[2024-02-07 21:57:36] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibsource`
-[2024-02-07 21:57:36] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibstaystatus`
-[2024-02-07 21:57:36] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibTender`
-[2024-02-07 21:57:36] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibServiceItems`
-[2024-02-07 21:57:36] (createArrRESERVATIONstay) Successfully processed ARR RESERVATION stay data
-[2024-02-07 21:57:36] (createArrCUSTOMERrelationship) Successfully processed CUSTOMER relationship data
-[2024-02-07 21:57:40] (createArrCUSTOMERmembership) Successfully processed CUSTOMER membership data
-[2024-02-07 21:57:40] (createArrSERVICESpayment) Successfully processed SERVICES payment data
-[2024-02-07 21:57:42] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstay`
-[2024-02-07 21:57:42] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERrelationship`
-[2024-02-07 21:57:42] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERmembership`
-[2024-02-07 21:57:42] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESpayment`
-[2024-02-07 21:57:43] (createArrRESERVATIONstayStatusStay) Successfully processed RESERVATION stay status data
-[2024-02-07 21:57:49] (removeDuplicateRows) Successfully removed duplicate rows
-[2024-02-07 21:57:49] (createArrSERVICESfolioOrders) Successfully processed SERVICES folio orders
-[2024-02-07 21:57:49] (removeDuplicateOrders) Successfully removed duplicate folio orders
-[2024-02-07 21:57:50] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONroomDetails`
-[2024-02-07 21:57:50] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstayStatusStay`
-[2024-02-07 21:57:50] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESfolioOrders`
-[2024-02-07 21:57:50] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
-[2024-02-07 22:15:56] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
-[2024-02-07 22:15:56] (fetchDataFromMySQLTable) Successfully fetched 415 records from hapi_raw_reservations
-[2024-02-07 22:15:56] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
-[2024-02-07 22:16:00] (createArrCUSTOMERcontact) Successfully processed CUSTOMER contacts
-[2024-02-07 22:16:00] (createCUSTOMERContactType) Successfully created CUSTOMER contact type array
-[2024-02-07 22:16:00] (createCUSTOMERloyaltyProgram) Successfully created CUSTOMER loyalty program array
-[2024-02-07 22:16:00] (createSERVICESLibTender) Successfully processed SERVICES LibTender
-[2024-02-07 22:16:00] (createSERVICESlibserviceitems) Successfully processed SERVICES LibServiceItems
-[2024-02-07 22:16:00] (createReservationLibProperty) Successfully processed reservationLibProperty
-[2024-02-07 22:16:00] (createReservationLibSource) Successfully processed reservationLibSource
-[2024-02-07 22:16:00] (createReservationLibRoomClass) Successfully processed ReservationLibRoomClass
-[2024-02-07 22:16:00] (createReservationGroup) Successfully processed ReservationGroup
-[2024-02-07 22:16:00] (createReservationLibRoom) Successfully processed ReservationLibRoom
-[2024-02-07 22:16:01] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibContactType`
-[2024-02-07 22:16:01] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERcontact`
-[2024-02-07 22:16:01] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibLoyaltyProgram`
-[2024-02-07 22:16:01] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoom`
-[2024-02-07 22:16:01] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONLibRoomType`
-[2024-02-07 22:16:01] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoomClass`
-[2024-02-07 22:16:01] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibProperty`
-[2024-02-07 22:16:01] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONgroup`
-[2024-02-07 22:16:01] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibsource`
-[2024-02-07 22:16:01] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibstaystatus`
-[2024-02-07 22:16:01] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibTender`
-[2024-02-07 22:16:01] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibServiceItems`
-[2024-02-07 22:16:01] (createArrRESERVATIONstay) Successfully processed ARR RESERVATION stay data
-[2024-02-07 22:16:01] (createArrCUSTOMERrelationship) Successfully processed CUSTOMER relationship data
-[2024-02-07 22:16:06] (createArrCUSTOMERmembership) Successfully processed CUSTOMER membership data
-[2024-02-07 22:16:06] (createArrSERVICESpayment) Successfully processed SERVICES payment data
-[2024-02-07 22:16:07] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstay`
-[2024-02-07 22:16:07] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERrelationship`
-[2024-02-07 22:16:07] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERmembership`
-[2024-02-07 22:16:07] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESpayment`
-[2024-02-07 22:16:08] (createArrRESERVATIONstayStatusStay) Successfully processed RESERVATION stay status data
-[2024-02-07 22:16:29] (removeDuplicateRows) Successfully removed duplicate rows
-[2024-02-07 22:16:29] (createArrSERVICESfolioOrders) Successfully processed SERVICES folio orders
-[2024-02-07 22:16:29] (removeDuplicateOrders) Successfully removed duplicate folio orders
-[2024-02-07 22:16:30] (upsertSERVICESfolioOrders) Error: stayId:401930584Cannot add or update a child row: a foreign key constraint fails (`pms_db`.`servicesfolioorders`, CONSTRAINT `fk_SERVICESfolioorders_CUSTOMERcontact1` FOREIGN KEY (`contactId`) REFERENCES `customercontact` (`id`))
-[2024-02-07 22:16:30] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONroomDetails`
-[2024-02-07 22:16:30] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstayStatusStay`
-[2024-02-07 22:16:30] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESfolioOrders`
-[2024-02-07 22:16:30] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
-[2024-02-07 23:26:39] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
-[2024-02-07 23:26:39] (fetchDataFromMySQLTable) Successfully fetched 415 records from hapi_raw_reservations
-[2024-02-07 23:26:39] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
-[2024-02-07 23:26:44] (createArrCUSTOMERcontact) Successfully processed CUSTOMER contacts
-[2024-02-07 23:26:44] (createCUSTOMERContactType) Successfully created CUSTOMER contact type array
-[2024-02-07 23:26:44] (createCUSTOMERloyaltyProgram) Successfully created CUSTOMER loyalty program array
-[2024-02-07 23:26:44] (createSERVICESLibTender) Successfully processed SERVICES LibTender
-[2024-02-07 23:26:44] (createSERVICESlibserviceitems) Successfully processed SERVICES LibServiceItems
-[2024-02-07 23:26:44] (createReservationLibProperty) Successfully processed reservationLibProperty
-[2024-02-07 23:26:44] (createReservationLibSource) Successfully processed reservationLibSource
-[2024-02-07 23:26:44] (createReservationLibRoomClass) Successfully processed ReservationLibRoomClass
-[2024-02-07 23:26:44] (createReservationGroup) Successfully processed ReservationGroup
-[2024-02-07 23:26:44] (createReservationLibRoom) Successfully processed ReservationLibRoom
-[2024-02-07 23:26:44] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibContactType`
-[2024-02-07 23:26:44] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERcontact`
-[2024-02-07 23:26:44] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibLoyaltyProgram`
-[2024-02-07 23:26:44] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoom`
-[2024-02-07 23:26:44] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONLibRoomType`
-[2024-02-07 23:26:44] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoomClass`
-[2024-02-07 23:26:44] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibProperty`
-[2024-02-07 23:26:44] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONgroup`
-[2024-02-07 23:26:44] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibsource`
-[2024-02-07 23:26:44] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibstaystatus`
-[2024-02-07 23:26:44] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibTender`
-[2024-02-07 23:26:44] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibServiceItems`
-[2024-02-07 23:26:44] (createArrRESERVATIONstay) Successfully processed ARR RESERVATION stay data
-[2024-02-07 23:26:44] (createArrCUSTOMERrelationship) Successfully processed CUSTOMER relationship data
-[2024-02-07 23:26:49] (createArrCUSTOMERmembership) Successfully processed CUSTOMER membership data
-[2024-02-07 23:26:49] (createArrSERVICESpayment) Successfully processed SERVICES payment data
-[2024-02-07 23:26:50] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstay`
-[2024-02-07 23:26:50] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERrelationship`
-[2024-02-07 23:26:50] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERmembership`
-[2024-02-07 23:26:50] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESpayment`
-[2024-02-07 23:26:51] (createArrRESERVATIONstayStatusStay) Successfully processed RESERVATION stay status data
-[2024-02-07 23:27:13] (removeDuplicateRows) Successfully removed duplicate rows
-[2024-02-07 23:27:13] (createArrSERVICESfolioOrders) Successfully processed SERVICES folio orders
-[2024-02-07 23:27:13] (removeDuplicateOrders) Successfully removed duplicate folio orders
-[2024-02-07 23:27:13] (upsertSERVICESfolioOrders) Error: stayId:401934357Cannot add or update a child row: a foreign key constraint fails (`pms_db`.`servicesfolioorders`, CONSTRAINT `fk_SERVICESfolioorders_CUSTOMERcontact1` FOREIGN KEY (`contactId`) REFERENCES `customercontact` (`id`))
-[2024-02-07 23:27:13] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONroomDetails`
-[2024-02-07 23:27:13] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstayStatusStay`
-[2024-02-07 23:27:13] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESfolioOrders`
-[2024-02-07 23:27:13] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
-[2024-02-07 23:32:14] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
-[2024-02-07 23:32:14] (fetchDataFromMySQLTable) Successfully fetched 0 records from hapi_raw_reservations
-[2024-02-07 23:32:14] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
-[2024-02-07 23:32:14] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
-[2024-02-07 23:32:35] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
-[2024-02-07 23:32:35] (fetchDataFromMySQLTable) Successfully fetched 415 records from hapi_raw_reservations
-[2024-02-07 23:32:35] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
-[2024-02-07 23:32:39] (createArrCUSTOMERcontact) Successfully processed CUSTOMER contacts
-[2024-02-07 23:32:39] (createCUSTOMERContactType) Successfully created CUSTOMER contact type array
-[2024-02-07 23:32:39] (createCUSTOMERloyaltyProgram) Successfully created CUSTOMER loyalty program array
-[2024-02-07 23:32:39] (createSERVICESLibTender) Successfully processed SERVICES LibTender
-[2024-02-07 23:32:39] (createSERVICESlibserviceitems) Successfully processed SERVICES LibServiceItems
-[2024-02-07 23:32:39] (createReservationLibProperty) Successfully processed reservationLibProperty
-[2024-02-07 23:32:39] (createReservationLibSource) Successfully processed reservationLibSource
-[2024-02-07 23:32:39] (createReservationLibRoomClass) Successfully processed ReservationLibRoomClass
-[2024-02-07 23:32:39] (createReservationGroup) Successfully processed ReservationGroup
-[2024-02-07 23:32:39] (createReservationLibRoom) Successfully processed ReservationLibRoom
-[2024-02-07 23:32:40] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibContactType`
-[2024-02-07 23:32:40] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERcontact`
-[2024-02-07 23:32:40] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibLoyaltyProgram`
-[2024-02-07 23:32:40] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoom`
-[2024-02-07 23:32:40] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONLibRoomType`
-[2024-02-07 23:32:40] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoomClass`
-[2024-02-07 23:32:40] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibProperty`
-[2024-02-07 23:32:40] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONgroup`
-[2024-02-07 23:32:40] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibsource`
-[2024-02-07 23:32:40] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibstaystatus`
-[2024-02-07 23:32:40] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibTender`
-[2024-02-07 23:32:40] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibServiceItems`
-[2024-02-07 23:32:40] (createArrRESERVATIONstay) Successfully processed ARR RESERVATION stay data
-[2024-02-07 23:32:40] (createArrCUSTOMERrelationship) Successfully processed CUSTOMER relationship data
-[2024-02-07 23:32:45] (createArrCUSTOMERmembership) Successfully processed CUSTOMER membership data
-[2024-02-07 23:32:45] (createArrSERVICESpayment) Successfully processed SERVICES payment data
-[2024-02-07 23:32:47] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstay`
-[2024-02-07 23:32:47] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERrelationship`
-[2024-02-07 23:32:47] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERmembership`
-[2024-02-07 23:32:47] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESpayment`
-[2024-02-07 23:32:48] (createArrRESERVATIONstayStatusStay) Successfully processed RESERVATION stay status data
-[2024-02-07 23:33:09] (removeDuplicateRows) Successfully removed duplicate rows
-[2024-02-07 23:33:09] (createArrSERVICESfolioOrders) Successfully processed SERVICES folio orders
-[2024-02-07 23:33:09] (removeDuplicateOrders) Successfully removed duplicate folio orders
-[2024-02-07 23:33:10] (upsertSERVICESfolioOrders) Error: stayId:401938131Cannot add or update a child row: a foreign key constraint fails (`pms_db`.`servicesfolioorders`, CONSTRAINT `fk_SERVICESfolioorders_CUSTOMERcontact1` FOREIGN KEY (`contactId`) REFERENCES `customercontact` (`id`))
-[2024-02-07 23:33:10] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONroomDetails`
-[2024-02-07 23:33:10] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstayStatusStay`
-[2024-02-07 23:33:10] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESfolioOrders`
-[2024-02-07 23:33:10] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
-[2024-02-08 00:51:46] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
-[2024-02-08 00:51:46] (fetchDataFromMySQLTable) Successfully fetched 415 records from hapi_raw_reservations
-[2024-02-08 00:51:46] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
-[2024-02-08 00:51:51] (createArrCUSTOMERcontact) Successfully processed CUSTOMER contacts
-[2024-02-08 00:51:51] (createCUSTOMERContactType) Successfully created CUSTOMER contact type array
-[2024-02-08 00:51:51] (createCUSTOMERloyaltyProgram) Successfully created CUSTOMER loyalty program array
-[2024-02-08 00:51:51] (createSERVICESLibTender) Successfully processed SERVICES LibTender
-[2024-02-08 00:51:51] (createSERVICESlibserviceitems) Successfully processed SERVICES LibServiceItems
-[2024-02-08 00:51:51] (createReservationLibProperty) Successfully processed reservationLibProperty
-[2024-02-08 00:51:51] (createReservationLibSource) Successfully processed reservationLibSource
-[2024-02-08 00:51:51] (createReservationLibRoomClass) Successfully processed ReservationLibRoomClass
-[2024-02-08 00:51:51] (createReservationGroup) Successfully processed ReservationGroup
-[2024-02-08 00:51:51] (createReservationLibRoom) Successfully processed ReservationLibRoom
-[2024-02-08 00:51:52] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibContactType`
-[2024-02-08 00:51:52] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERcontact`
-[2024-02-08 00:51:52] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibLoyaltyProgram`
-[2024-02-08 00:51:52] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoom`
-[2024-02-08 00:51:52] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONLibRoomType`
-[2024-02-08 00:51:52] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoomClass`
-[2024-02-08 00:51:52] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibProperty`
-[2024-02-08 00:51:52] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONgroup`
-[2024-02-08 00:51:52] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibsource`
-[2024-02-08 00:51:52] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibstaystatus`
-[2024-02-08 00:51:52] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibTender`
-[2024-02-08 00:51:52] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibServiceItems`
-[2024-02-08 00:51:52] (createArrRESERVATIONstay) Successfully processed ARR RESERVATION stay data
-[2024-02-08 00:51:52] (createArrCUSTOMERrelationship) Successfully processed CUSTOMER relationship data
-[2024-02-08 00:51:58] (createArrCUSTOMERmembership) Successfully processed CUSTOMER membership data
-[2024-02-08 00:51:58] (createArrSERVICESpayment) Successfully processed SERVICES payment data
-[2024-02-08 00:51:59] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstay`
-[2024-02-08 00:51:59] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERrelationship`
-[2024-02-08 00:51:59] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERmembership`
-[2024-02-08 00:51:59] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESpayment`
-[2024-02-08 00:52:00] (createArrRESERVATIONstayStatusStay) Successfully processed RESERVATION stay status data
-[2024-02-08 00:52:24] (removeDuplicateRows) Successfully removed duplicate rows
-[2024-02-08 00:52:24] (createArrSERVICESfolioOrders) Successfully processed SERVICES folio orders
-[2024-02-08 00:52:24] (removeDuplicateOrders) Successfully removed duplicate folio orders
-[2024-02-08 00:52:25] (upsertSERVICESfolioOrders) Error: stayId:401941904Cannot add or update a child row: a foreign key constraint fails (`pms_db`.`servicesfolioorders`, CONSTRAINT `fk_SERVICESfolioorders_CUSTOMERcontact1` FOREIGN KEY (`contactId`) REFERENCES `customercontact` (`id`))
-[2024-02-08 00:52:25] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONroomDetails`
-[2024-02-08 00:52:25] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstayStatusStay`
-[2024-02-08 00:52:25] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESfolioOrders`
-[2024-02-08 00:52:25] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
-[2024-02-08 01:00:03] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
-[2024-02-08 01:00:03] (fetchDataFromMySQLTable) Successfully fetched 415 records from hapi_raw_reservations
-[2024-02-08 01:00:03] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
-[2024-02-08 01:00:08] (createArrCUSTOMERcontact) Successfully processed CUSTOMER contacts
-[2024-02-08 01:00:08] (createCUSTOMERContactType) Successfully created CUSTOMER contact type array
-[2024-02-08 01:00:08] (createCUSTOMERloyaltyProgram) Successfully created CUSTOMER loyalty program array
-[2024-02-08 01:00:08] (createSERVICESLibTender) Successfully processed SERVICES LibTender
-[2024-02-08 01:00:08] (createSERVICESlibserviceitems) Successfully processed SERVICES LibServiceItems
-[2024-02-08 01:00:08] (createReservationLibProperty) Successfully processed reservationLibProperty
-[2024-02-08 01:00:08] (createReservationLibSource) Successfully processed reservationLibSource
-[2024-02-08 01:00:08] (createReservationLibRoomClass) Successfully processed ReservationLibRoomClass
-[2024-02-08 01:00:08] (createReservationGroup) Successfully processed ReservationGroup
-[2024-02-08 01:00:08] (createReservationLibRoom) Successfully processed ReservationLibRoom
-[2024-02-08 01:00:09] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibContactType`
-[2024-02-08 01:00:09] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERcontact`
-[2024-02-08 01:00:09] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibLoyaltyProgram`
-[2024-02-08 01:00:09] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoom`
-[2024-02-08 01:00:09] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONLibRoomType`
-[2024-02-08 01:00:09] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoomClass`
-[2024-02-08 01:00:09] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibProperty`
-[2024-02-08 01:00:09] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONgroup`
-[2024-02-08 01:00:09] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibsource`
-[2024-02-08 01:00:09] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibstaystatus`
-[2024-02-08 01:00:09] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibTender`
-[2024-02-08 01:00:09] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibServiceItems`
-[2024-02-08 01:00:09] (createArrRESERVATIONstay) Successfully processed ARR RESERVATION stay data
-[2024-02-08 01:00:09] (createArrCUSTOMERrelationship) Successfully processed CUSTOMER relationship data
-[2024-02-08 01:00:14] (createArrCUSTOMERmembership) Successfully processed CUSTOMER membership data
-[2024-02-08 01:00:14] (createArrSERVICESpayment) Successfully processed SERVICES payment data
-[2024-02-08 01:00:16] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstay`
-[2024-02-08 01:00:16] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERrelationship`
-[2024-02-08 01:00:16] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERmembership`
-[2024-02-08 01:00:16] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESpayment`
-[2024-02-08 01:00:17] (createArrRESERVATIONstayStatusStay) Successfully processed RESERVATION stay status data
-[2024-02-08 01:00:40] (removeDuplicateRows) Successfully removed duplicate rows
-[2024-02-08 01:00:40] (createArrSERVICESfolioOrders) Successfully processed SERVICES folio orders
-[2024-02-08 01:00:40] (removeDuplicateOrders) Successfully removed duplicate folio orders
-[2024-02-08 01:00:41] (upsertSERVICESfolioOrders) Error: stayId:401945677Cannot add or update a child row: a foreign key constraint fails (`pms_db`.`servicesfolioorders`, CONSTRAINT `fk_SERVICESfolioorders_CUSTOMERcontact1` FOREIGN KEY (`contactId`) REFERENCES `customercontact` (`id`))
-[2024-02-08 01:00:41] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONroomDetails`
-[2024-02-08 01:00:41] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstayStatusStay`
-[2024-02-08 01:00:41] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESfolioOrders`
-[2024-02-08 01:00:41] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
-[2024-02-08 01:06:09] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
-[2024-02-08 01:06:09] (fetchDataFromMySQLTable) Successfully fetched 415 records from hapi_raw_reservations
-[2024-02-08 01:06:09] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
-[2024-02-08 01:06:14] (createArrCUSTOMERcontact) Successfully processed CUSTOMER contacts
-[2024-02-08 01:06:14] (createCUSTOMERContactType) Successfully created CUSTOMER contact type array
-[2024-02-08 01:06:14] (createCUSTOMERloyaltyProgram) Successfully created CUSTOMER loyalty program array
-[2024-02-08 01:06:14] (createSERVICESLibTender) Successfully processed SERVICES LibTender
-[2024-02-08 01:06:14] (createSERVICESlibserviceitems) Successfully processed SERVICES LibServiceItems
-[2024-02-08 01:06:14] (createReservationLibProperty) Successfully processed reservationLibProperty
-[2024-02-08 01:06:14] (createReservationLibSource) Successfully processed reservationLibSource
-[2024-02-08 01:06:14] (createReservationLibRoomClass) Successfully processed ReservationLibRoomClass
-[2024-02-08 01:06:14] (createReservationGroup) Successfully processed ReservationGroup
-[2024-02-08 01:06:14] (createReservationLibRoom) Successfully processed ReservationLibRoom
-[2024-02-08 01:06:15] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibContactType`
-[2024-02-08 01:06:15] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERcontact`
-[2024-02-08 01:06:15] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibLoyaltyProgram`
-[2024-02-08 01:06:15] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoom`
-[2024-02-08 01:06:15] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONLibRoomType`
-[2024-02-08 01:06:15] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoomClass`
-[2024-02-08 01:06:15] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibProperty`
-[2024-02-08 01:06:15] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONgroup`
-[2024-02-08 01:06:15] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibsource`
-[2024-02-08 01:06:15] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibstaystatus`
-[2024-02-08 01:06:15] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibTender`
-[2024-02-08 01:06:15] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibServiceItems`
-[2024-02-08 01:06:15] (createArrRESERVATIONstay) Successfully processed ARR RESERVATION stay data
-[2024-02-08 01:06:15] (createArrCUSTOMERrelationship) Successfully processed CUSTOMER relationship data
-[2024-02-08 01:06:20] (createArrCUSTOMERmembership) Successfully processed CUSTOMER membership data
-[2024-02-08 01:06:20] (createArrSERVICESpayment) Successfully processed SERVICES payment data
-[2024-02-08 01:06:21] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstay`
-[2024-02-08 01:06:21] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERrelationship`
-[2024-02-08 01:06:21] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERmembership`
-[2024-02-08 01:06:21] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESpayment`
-[2024-02-08 01:06:22] (createArrRESERVATIONstayStatusStay) Successfully processed RESERVATION stay status data
-[2024-02-08 01:06:44] (removeDuplicateRows) Successfully removed duplicate rows
-[2024-02-08 01:06:44] (createArrSERVICESfolioOrders) Successfully processed SERVICES folio orders
-[2024-02-08 01:06:44] (removeDuplicateOrders) Successfully removed duplicate folio orders
-[2024-02-08 01:06:45] (upsertSERVICESfolioOrders) Error: stayId:401949450Cannot add or update a child row: a foreign key constraint fails (`pms_db`.`servicesfolioorders`, CONSTRAINT `fk_SERVICESfolioorders_CUSTOMERcontact1` FOREIGN KEY (`contactId`) REFERENCES `customercontact` (`id`))
-[2024-02-08 01:06:45] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONroomDetails`
-[2024-02-08 01:06:45] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstayStatusStay`
-[2024-02-08 01:06:45] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESfolioOrders`
-[2024-02-08 01:06:45] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
-[2024-02-08 01:14:46] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
-[2024-02-08 01:14:46] (fetchDataFromMySQLTable) Successfully fetched 415 records from hapi_raw_reservations
-[2024-02-08 01:14:46] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
-[2024-02-08 01:14:50] (createArrCUSTOMERcontact) Successfully processed CUSTOMER contacts
-[2024-02-08 01:14:50] (createCUSTOMERContactType) Successfully created CUSTOMER contact type array
-[2024-02-08 01:14:50] (createCUSTOMERloyaltyProgram) Successfully created CUSTOMER loyalty program array
-[2024-02-08 01:14:50] (createSERVICESLibTender) Successfully processed SERVICES LibTender
-[2024-02-08 01:14:50] (createSERVICESlibserviceitems) Successfully processed SERVICES LibServiceItems
-[2024-02-08 01:14:50] (createReservationLibProperty) Successfully processed reservationLibProperty
-[2024-02-08 01:14:50] (createReservationLibSource) Successfully processed reservationLibSource
-[2024-02-08 01:14:50] (createReservationLibRoomClass) Successfully processed ReservationLibRoomClass
-[2024-02-08 01:14:50] (createReservationGroup) Successfully processed ReservationGroup
-[2024-02-08 01:14:50] (createReservationLibRoom) Successfully processed ReservationLibRoom
-[2024-02-08 01:14:51] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibContactType`
-[2024-02-08 01:14:51] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERcontact`
-[2024-02-08 01:14:51] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibLoyaltyProgram`
-[2024-02-08 01:14:51] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoom`
-[2024-02-08 01:14:51] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONLibRoomType`
-[2024-02-08 01:14:51] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoomClass`
-[2024-02-08 01:14:51] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibProperty`
-[2024-02-08 01:14:51] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONgroup`
-[2024-02-08 01:14:51] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibsource`
-[2024-02-08 01:14:51] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibstaystatus`
-[2024-02-08 01:14:51] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibTender`
-[2024-02-08 01:14:51] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibServiceItems`
-[2024-02-08 01:14:51] (createArrRESERVATIONstay) Successfully processed ARR RESERVATION stay data
-[2024-02-08 01:14:51] (createArrCUSTOMERrelationship) Successfully processed CUSTOMER relationship data
-[2024-02-08 01:14:56] (createArrCUSTOMERmembership) Successfully processed CUSTOMER membership data
-[2024-02-08 01:14:56] (createArrSERVICESpayment) Successfully processed SERVICES payment data
-[2024-02-08 01:14:58] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstay`
-[2024-02-08 01:14:58] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERrelationship`
-[2024-02-08 01:14:58] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERmembership`
-[2024-02-08 01:14:58] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESpayment`
-[2024-02-08 01:14:59] (createArrRESERVATIONstayStatusStay) Successfully processed RESERVATION stay status data
-[2024-02-08 01:15:23] (removeDuplicateRows) Successfully removed duplicate rows
-[2024-02-08 01:15:23] (createArrSERVICESfolioOrders) Successfully processed SERVICES folio orders
-[2024-02-08 01:15:23] (removeDuplicateOrders) Successfully removed duplicate folio orders
-[2024-02-08 01:15:24] (upsertSERVICESfolioOrders) Error: stayId:401953223Cannot add or update a child row: a foreign key constraint fails (`pms_db`.`servicesfolioorders`, CONSTRAINT `fk_SERVICESfolioorders_CUSTOMERcontact1` FOREIGN KEY (`contactId`) REFERENCES `customercontact` (`id`))
-[2024-02-08 01:15:24] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONroomDetails`
-[2024-02-08 01:15:24] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstayStatusStay`
-[2024-02-08 01:15:24] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESfolioOrders`
-[2024-02-08 01:15:24] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
-[2024-02-08 17:39:45] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
-[2024-02-08 17:39:45] (fetchDataFromMySQLTable) Successfully fetched 415 records from hapi_raw_reservations
-[2024-02-08 17:39:45] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
-[2024-02-08 17:39:52] (createArrCUSTOMERcontact) Successfully processed CUSTOMER contacts
-[2024-02-08 17:39:52] (createCUSTOMERContactType) Successfully created CUSTOMER contact type array
-[2024-02-08 17:39:52] (createCUSTOMERloyaltyProgram) Successfully created CUSTOMER loyalty program array
-[2024-02-08 17:39:52] (createSERVICESLibTender) Successfully processed SERVICES LibTender
-[2024-02-08 17:39:52] (createSERVICESlibserviceitems) Successfully processed SERVICES LibServiceItems
-[2024-02-08 17:39:52] (createReservationLibProperty) Successfully processed reservationLibProperty
-[2024-02-08 17:39:52] (createReservationLibSource) Successfully processed reservationLibSource
-[2024-02-08 17:39:52] (createReservationLibRoomClass) Successfully processed ReservationLibRoomClass
-[2024-02-08 17:39:52] (createReservationGroup) Successfully processed ReservationGroup
-[2024-02-08 17:39:52] (createReservationLibRoom) Successfully processed ReservationLibRoom
-[2024-02-08 17:39:53] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibContactType`
-[2024-02-08 17:39:53] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERcontact`
-[2024-02-08 17:39:53] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibLoyaltyProgram`
-[2024-02-08 17:39:53] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoom`
-[2024-02-08 17:39:53] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONLibRoomType`
-[2024-02-08 17:39:53] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoomClass`
-[2024-02-08 17:39:53] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibProperty`
-[2024-02-08 17:39:53] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONgroup`
-[2024-02-08 17:39:53] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibsource`
-[2024-02-08 17:39:53] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibstaystatus`
-[2024-02-08 17:39:53] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibTender`
-[2024-02-08 17:39:53] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibServiceItems`
-[2024-02-08 17:39:53] (createArrRESERVATIONstay) Successfully processed ARR RESERVATION stay data
-[2024-02-08 17:39:53] (createArrCUSTOMERrelationship) Successfully processed CUSTOMER relationship data
-[2024-02-08 17:39:59] (createArrCUSTOMERmembership) Successfully processed CUSTOMER membership data
-[2024-02-08 17:39:59] (createArrSERVICESpayment) Successfully processed SERVICES payment data
-[2024-02-08 17:40:01] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstay`
-[2024-02-08 17:40:01] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERrelationship`
-[2024-02-08 17:40:01] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERmembership`
-[2024-02-08 17:40:01] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESpayment`
-[2024-02-08 17:40:02] (createArrRESERVATIONstayStatusStay) Successfully processed RESERVATION stay status data
-[2024-02-08 17:40:02] (removeDuplicateRows) Error in removeDuplicateRows: Invalid or empty array provided.
-[2024-02-08 17:40:02] (createArrSERVICESfolioOrders) Successfully processed SERVICES folio orders
-[2024-02-08 17:40:02] (removeDuplicateOrders) Successfully removed duplicate folio orders
-[2024-02-08 17:40:03] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONroomDetails`
-[2024-02-08 17:40:03] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstayStatusStay`
-[2024-02-08 17:40:03] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESfolioOrders`
-[2024-02-08 17:40:03] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
-[2024-02-08 17:41:35] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
-[2024-02-08 17:41:35] (fetchDataFromMySQLTable) Successfully fetched 415 records from hapi_raw_reservations
-[2024-02-08 17:41:35] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
-[2024-02-08 17:41:40] (createArrCUSTOMERcontact) Successfully processed CUSTOMER contacts
-[2024-02-08 17:41:40] (createCUSTOMERContactType) Successfully created CUSTOMER contact type array
-[2024-02-08 17:41:40] (createCUSTOMERloyaltyProgram) Successfully created CUSTOMER loyalty program array
-[2024-02-08 17:41:40] (createSERVICESLibTender) Successfully processed SERVICES LibTender
-[2024-02-08 17:41:40] (createSERVICESlibserviceitems) Successfully processed SERVICES LibServiceItems
-[2024-02-08 17:41:40] (createReservationLibProperty) Successfully processed reservationLibProperty
-[2024-02-08 17:41:40] (createReservationLibSource) Successfully processed reservationLibSource
-[2024-02-08 17:41:40] (createReservationLibRoomClass) Successfully processed ReservationLibRoomClass
-[2024-02-08 17:41:40] (createReservationGroup) Successfully processed ReservationGroup
-[2024-02-08 17:41:40] (createReservationLibRoom) Successfully processed ReservationLibRoom
-[2024-02-08 17:41:40] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibContactType`
-[2024-02-08 17:41:40] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERcontact`
-[2024-02-08 17:41:40] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibLoyaltyProgram`
-[2024-02-08 17:41:40] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoom`
-[2024-02-08 17:41:40] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONLibRoomType`
-[2024-02-08 17:41:40] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoomClass`
-[2024-02-08 17:41:40] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibProperty`
-[2024-02-08 17:41:40] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONgroup`
-[2024-02-08 17:41:40] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibsource`
-[2024-02-08 17:41:40] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibstaystatus`
-[2024-02-08 17:41:40] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibTender`
-[2024-02-08 17:41:40] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibServiceItems`
-[2024-02-08 17:41:40] (createArrRESERVATIONstay) Successfully processed ARR RESERVATION stay data
-[2024-02-08 17:41:40] (createArrCUSTOMERrelationship) Successfully processed CUSTOMER relationship data
-[2024-02-08 17:41:46] (createArrCUSTOMERmembership) Successfully processed CUSTOMER membership data
-[2024-02-08 17:41:46] (createArrSERVICESpayment) Successfully processed SERVICES payment data
-[2024-02-08 17:41:48] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstay`
-[2024-02-08 17:41:48] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERrelationship`
-[2024-02-08 17:41:48] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERmembership`
-[2024-02-08 17:41:48] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESpayment`
-[2024-02-08 17:41:49] (createArrRESERVATIONstayStatusStay) Successfully processed RESERVATION stay status data
-[2024-02-08 17:42:15] (removeDuplicateRows) Successfully removed duplicate rows
-[2024-02-08 17:42:15] (createArrSERVICESfolioOrders) Successfully processed SERVICES folio orders
-[2024-02-08 17:42:15] (removeDuplicateOrders) Successfully removed duplicate folio orders
-[2024-02-08 17:42:16] (upsertSERVICESfolioOrders) Error: stayId:401960737Cannot add or update a child row: a foreign key constraint fails (`pms_db`.`servicesfolioorders`, CONSTRAINT `fk_SERVICESfolioorders_CUSTOMERcontact1` FOREIGN KEY (`contactId`) REFERENCES `customercontact` (`id`))
-[2024-02-08 17:42:16] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONroomDetails`
-[2024-02-08 17:42:16] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstayStatusStay`
-[2024-02-08 17:42:16] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESfolioOrders`
-[2024-02-08 17:42:16] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
+[2024-02-12 22:09:06] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
+[2024-02-12 22:09:06] (fetchDataFromMySQLTable) Successfully fetched 0 records from hapi_raw_reservations
+[2024-02-12 22:09:06] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
+[2024-02-12 22:09:06] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
+[2024-02-12 22:20:42] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
+[2024-02-12 22:20:42] (fetchDataFromMySQLTable) Successfully fetched 415 records from hapi_raw_reservations
+[2024-02-12 22:20:42] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
+[2024-02-12 22:21:31] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
+[2024-02-12 22:21:31] (fetchDataFromMySQLTable) Successfully fetched 415 records from hapi_raw_reservations
+[2024-02-12 22:21:31] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
+[2024-02-12 22:21:39] (createArrCUSTOMERcontact) Successfully processed CUSTOMER contacts
+[2024-02-12 22:21:39] (createCUSTOMERContactType) Successfully created CUSTOMER contact type array
+[2024-02-12 22:21:39] (createCUSTOMERloyaltyProgram) Successfully created CUSTOMER loyalty program array
+[2024-02-12 22:21:39] (createSERVICESLibTender) Successfully processed SERVICES LibTender
+[2024-02-12 22:21:39] (createSERVICESlibserviceitems) Successfully processed SERVICES LibServiceItems
+[2024-02-12 22:21:39] (createReservationLibProperty) Successfully processed reservationLibProperty
+[2024-02-12 22:21:39] (createReservationLibSource) Successfully processed reservationLibSource
+[2024-02-12 22:21:39] (createReservationLibRoomClass) Successfully processed ReservationLibRoomClass
+[2024-02-12 22:21:39] (createReservationGroup) Successfully processed ReservationGroup
+[2024-02-12 22:21:39] (createReservationLibRoom) Successfully processed ReservationLibRoom
+[2024-02-12 22:21:40] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibContactType`
+[2024-02-12 22:21:40] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERcontact`
+[2024-02-12 22:21:40] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibLoyaltyProgram`
+[2024-02-12 22:21:40] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoom`
+[2024-02-12 22:21:40] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONLibRoomType`
+[2024-02-12 22:21:40] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoomClass`
+[2024-02-12 22:21:40] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibProperty`
+[2024-02-12 22:21:40] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONgroup`
+[2024-02-12 22:21:40] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibsource`
+[2024-02-12 22:21:40] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibstaystatus`
+[2024-02-12 22:21:40] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibTender`
+[2024-02-12 22:21:40] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibServiceItems`
+[2024-02-12 22:21:40] (createArrRESERVATIONstay) Successfully processed ARR RESERVATION stay data
+[2024-02-12 22:21:40] (createArrCUSTOMERrelationship) Successfully processed CUSTOMER relationship data
+[2024-02-12 22:21:46] (createArrCUSTOMERmembership) Successfully processed CUSTOMER membership data
+[2024-02-12 22:21:46] (createArrSERVICESpayment) Successfully processed SERVICES payment data
+[2024-02-12 22:21:47] (upsertCustomerRelationship) Unknown column 'isPrimaryGuest' in 'field list'
+[2024-02-12 22:21:47] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstay`
+[2024-02-12 22:21:47] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERrelationship`
+[2024-02-12 22:21:47] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERmembership`
+[2024-02-12 22:21:47] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESpayment`
+[2024-02-12 22:21:49] (createArrRESERVATIONstayStatusStay) Successfully processed RESERVATION stay status data
+[2024-02-12 22:22:16] (removeDuplicateRows) Successfully removed duplicate rows
+[2024-02-12 22:22:16] (createArrSERVICESfolioOrders) Successfully processed SERVICES folio orders
+[2024-02-12 22:22:16] (removeDuplicateOrders) Successfully removed duplicate folio orders
+[2024-02-12 22:22:26] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONroomDetails`
+[2024-02-12 22:22:26] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstayStatusStay`
+[2024-02-12 22:22:26] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
+[2024-02-12 22:36:03] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
+[2024-02-12 22:36:03] (fetchDataFromMySQLTable) Successfully fetched 415 records from hapi_raw_reservations
+[2024-02-12 22:36:03] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
+[2024-02-12 22:36:09] (createArrCUSTOMERcontact) Successfully processed CUSTOMER contacts
+[2024-02-12 22:36:09] (createCUSTOMERContactType) Successfully created CUSTOMER contact type array
+[2024-02-12 22:36:09] (createCUSTOMERloyaltyProgram) Successfully created CUSTOMER loyalty program array
+[2024-02-12 22:36:09] (createSERVICESLibTender) Successfully processed SERVICES LibTender
+[2024-02-12 22:36:09] (createSERVICESlibserviceitems) Successfully processed SERVICES LibServiceItems
+[2024-02-12 22:36:09] (createReservationLibProperty) Successfully processed reservationLibProperty
+[2024-02-12 22:36:09] (createReservationLibSource) Successfully processed reservationLibSource
+[2024-02-12 22:36:09] (createReservationLibRoomClass) Successfully processed ReservationLibRoomClass
+[2024-02-12 22:36:09] (createReservationGroup) Successfully processed ReservationGroup
+[2024-02-12 22:36:09] (createReservationLibRoom) Successfully processed ReservationLibRoom
+[2024-02-12 22:36:10] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibContactType`
+[2024-02-12 22:36:10] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERcontact`
+[2024-02-12 22:36:10] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibLoyaltyProgram`
+[2024-02-12 22:36:10] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoom`
+[2024-02-12 22:36:10] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONLibRoomType`
+[2024-02-12 22:36:10] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoomClass`
+[2024-02-12 22:36:10] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibProperty`
+[2024-02-12 22:36:10] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONgroup`
+[2024-02-12 22:36:10] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibsource`
+[2024-02-12 22:36:10] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibstaystatus`
+[2024-02-12 22:36:10] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibTender`
+[2024-02-12 22:36:10] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibServiceItems`
+[2024-02-12 22:36:10] (createArrRESERVATIONstay) Successfully processed ARR RESERVATION stay data
+[2024-02-12 22:36:10] (createArrCUSTOMERrelationship) Successfully processed CUSTOMER relationship data
+[2024-02-12 22:36:16] (createArrCUSTOMERmembership) Successfully processed CUSTOMER membership data
+[2024-02-12 22:36:16] (createArrSERVICESpayment) Successfully processed SERVICES payment data
+[2024-02-12 22:36:16] (upsertCustomerRelationship) Unknown column 'isPrimaryGuest' in 'field list'
+[2024-02-12 22:36:17] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstay`
+[2024-02-12 22:36:17] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERrelationship`
+[2024-02-12 22:36:17] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERmembership`
+[2024-02-12 22:36:17] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESpayment`
+[2024-02-12 22:36:19] (createArrRESERVATIONstayStatusStay) Successfully processed RESERVATION stay status data
+[2024-02-12 22:36:45] (removeDuplicateRows) Successfully removed duplicate rows
+[2024-02-12 22:36:45] (createArrSERVICESfolioOrders) Successfully processed SERVICES folio orders
+[2024-02-12 22:36:45] (removeDuplicateOrders) Successfully removed duplicate folio orders
+[2024-02-12 22:36:54] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONroomDetails`
+[2024-02-12 22:36:54] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstayStatusStay`
+[2024-02-12 22:36:54] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
+[2024-02-12 22:38:07] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
+[2024-02-12 22:38:07] (fetchDataFromMySQLTable) Successfully fetched 415 records from hapi_raw_reservations
+[2024-02-12 22:38:07] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
+[2024-02-12 22:38:12] (createArrCUSTOMERcontact) Successfully processed CUSTOMER contacts
+[2024-02-12 22:38:12] (createCUSTOMERContactType) Successfully created CUSTOMER contact type array
+[2024-02-12 22:38:12] (createCUSTOMERloyaltyProgram) Successfully created CUSTOMER loyalty program array
+[2024-02-12 22:38:12] (createSERVICESLibTender) Successfully processed SERVICES LibTender
+[2024-02-12 22:38:12] (createSERVICESlibserviceitems) Successfully processed SERVICES LibServiceItems
+[2024-02-12 22:38:12] (createReservationLibProperty) Successfully processed reservationLibProperty
+[2024-02-12 22:38:12] (createReservationLibSource) Successfully processed reservationLibSource
+[2024-02-12 22:38:12] (createReservationLibRoomClass) Successfully processed ReservationLibRoomClass
+[2024-02-12 22:38:12] (createReservationGroup) Successfully processed ReservationGroup
+[2024-02-12 22:38:12] (createReservationLibRoom) Successfully processed ReservationLibRoom
+[2024-02-12 22:38:13] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibContactType`
+[2024-02-12 22:38:13] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERcontact`
+[2024-02-12 22:38:13] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibLoyaltyProgram`
+[2024-02-12 22:38:13] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoom`
+[2024-02-12 22:38:13] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONLibRoomType`
+[2024-02-12 22:38:13] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoomClass`
+[2024-02-12 22:38:13] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibProperty`
+[2024-02-12 22:38:13] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONgroup`
+[2024-02-12 22:38:13] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibsource`
+[2024-02-12 22:38:13] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibstaystatus`
+[2024-02-12 22:38:13] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibTender`
+[2024-02-12 22:38:13] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibServiceItems`
+[2024-02-12 22:38:13] (createArrRESERVATIONstay) Successfully processed ARR RESERVATION stay data
+[2024-02-12 22:38:13] (createArrCUSTOMERrelationship) Successfully processed CUSTOMER relationship data
+[2024-02-12 22:38:19] (createArrCUSTOMERmembership) Successfully processed CUSTOMER membership data
+[2024-02-12 22:38:19] (createArrSERVICESpayment) Successfully processed SERVICES payment data
+[2024-02-12 22:38:19] (upsertCustomerRelationship) Unknown column 'isPrimaryGuest' in 'field list'
+[2024-02-12 22:38:20] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstay`
+[2024-02-12 22:38:20] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERrelationship`
+[2024-02-12 22:38:20] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERmembership`
+[2024-02-12 22:38:20] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESpayment`
+[2024-02-12 22:38:21] (createArrRESERVATIONstayStatusStay) Successfully processed RESERVATION stay status data
+[2024-02-12 22:38:42] (removeDuplicateRows) Successfully removed duplicate rows
+[2024-02-12 22:38:42] (createArrSERVICESfolioOrders) Successfully processed SERVICES folio orders
+[2024-02-12 22:38:42] (removeDuplicateOrders) Successfully removed duplicate folio orders
+[2024-02-12 22:38:50] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONroomDetails`
+[2024-02-12 22:38:50] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstayStatusStay`
+[2024-02-12 22:38:50] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
+[2024-02-12 22:42:31] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
+[2024-02-12 22:42:31] (fetchDataFromMySQLTable) Successfully fetched 415 records from hapi_raw_reservations
+[2024-02-12 22:42:31] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
+[2024-02-12 22:42:37] (createArrCUSTOMERcontact) Successfully processed CUSTOMER contacts
+[2024-02-12 22:42:37] (createCUSTOMERContactType) Successfully created CUSTOMER contact type array
+[2024-02-12 22:42:37] (createCUSTOMERloyaltyProgram) Successfully created CUSTOMER loyalty program array
+[2024-02-12 22:42:37] (createSERVICESLibTender) Successfully processed SERVICES LibTender
+[2024-02-12 22:42:37] (createSERVICESlibserviceitems) Successfully processed SERVICES LibServiceItems
+[2024-02-12 22:42:37] (createReservationLibProperty) Successfully processed reservationLibProperty
+[2024-02-12 22:42:37] (createReservationLibSource) Successfully processed reservationLibSource
+[2024-02-12 22:42:37] (createReservationLibRoomClass) Successfully processed ReservationLibRoomClass
+[2024-02-12 22:42:37] (createReservationGroup) Successfully processed ReservationGroup
+[2024-02-12 22:42:37] (createReservationLibRoom) Successfully processed ReservationLibRoom
+[2024-02-12 22:42:38] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibContactType`
+[2024-02-12 22:42:38] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERcontact`
+[2024-02-12 22:42:38] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibLoyaltyProgram`
+[2024-02-12 22:42:38] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoom`
+[2024-02-12 22:42:38] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONLibRoomType`
+[2024-02-12 22:42:38] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoomClass`
+[2024-02-12 22:42:38] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibProperty`
+[2024-02-12 22:42:38] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONgroup`
+[2024-02-12 22:42:38] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibsource`
+[2024-02-12 22:42:38] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibstaystatus`
+[2024-02-12 22:42:38] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibTender`
+[2024-02-12 22:42:38] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibServiceItems`
+[2024-02-12 22:42:38] (createArrRESERVATIONstay) Successfully processed ARR RESERVATION stay data
+[2024-02-12 22:42:38] (createArrCUSTOMERrelationship) Successfully processed CUSTOMER relationship data
+[2024-02-12 22:42:43] (createArrCUSTOMERmembership) Successfully processed CUSTOMER membership data
+[2024-02-12 22:42:43] (createArrSERVICESpayment) Successfully processed SERVICES payment data
+[2024-02-12 22:42:44] (upsertCustomerRelationship) Unknown column 'isPrimaryGuest' in 'field list'
+[2024-02-12 22:42:45] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstay`
+[2024-02-12 22:42:45] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERrelationship`
+[2024-02-12 22:42:45] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERmembership`
+[2024-02-12 22:42:45] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESpayment`
+[2024-02-12 22:42:46] (createArrRESERVATIONstayStatusStay) Successfully processed RESERVATION stay status data
+[2024-02-12 22:43:07] (removeDuplicateRows) Successfully removed duplicate rows
+[2024-02-12 22:43:07] (createArrSERVICESfolioOrders) Successfully processed SERVICES folio orders
+[2024-02-12 22:43:07] (removeDuplicateOrders) Successfully removed duplicate folio orders
+[2024-02-12 22:43:16] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONroomDetails`
+[2024-02-12 22:43:16] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstayStatusStay`
+[2024-02-12 22:43:16] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
+[2024-02-12 22:48:43] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
+[2024-02-12 22:48:43] (fetchDataFromMySQLTable) Successfully fetched 415 records from hapi_raw_reservations
+[2024-02-12 22:48:43] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
+[2024-02-12 22:48:48] (createArrCUSTOMERcontact) Successfully processed CUSTOMER contacts
+[2024-02-12 22:48:48] (createCUSTOMERContactType) Successfully created CUSTOMER contact type array
+[2024-02-12 22:48:48] (createCUSTOMERloyaltyProgram) Successfully created CUSTOMER loyalty program array
+[2024-02-12 22:48:48] (createSERVICESLibTender) Successfully processed SERVICES LibTender
+[2024-02-12 22:48:48] (createSERVICESlibserviceitems) Successfully processed SERVICES LibServiceItems
+[2024-02-12 22:48:48] (createReservationLibProperty) Successfully processed reservationLibProperty
+[2024-02-12 22:48:48] (createReservationLibSource) Successfully processed reservationLibSource
+[2024-02-12 22:48:48] (createReservationLibRoomClass) Successfully processed ReservationLibRoomClass
+[2024-02-12 22:48:48] (createReservationGroup) Successfully processed ReservationGroup
+[2024-02-12 22:48:48] (createReservationLibRoom) Successfully processed ReservationLibRoom
+[2024-02-12 22:48:49] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibContactType`
+[2024-02-12 22:48:49] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERcontact`
+[2024-02-12 22:48:49] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibLoyaltyProgram`
+[2024-02-12 22:48:49] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoom`
+[2024-02-12 22:48:49] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONLibRoomType`
+[2024-02-12 22:48:49] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoomClass`
+[2024-02-12 22:48:49] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibProperty`
+[2024-02-12 22:48:49] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONgroup`
+[2024-02-12 22:48:49] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibsource`
+[2024-02-12 22:48:49] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibstaystatus`
+[2024-02-12 22:48:49] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibTender`
+[2024-02-12 22:48:49] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibServiceItems`
+[2024-02-12 22:48:49] (createArrRESERVATIONstay) Successfully processed ARR RESERVATION stay data
+[2024-02-12 22:48:49] (createArrCUSTOMERrelationship) Successfully processed CUSTOMER relationship data
+[2024-02-12 22:48:54] (createArrCUSTOMERmembership) Successfully processed CUSTOMER membership data
+[2024-02-12 22:48:54] (createArrSERVICESpayment) Successfully processed SERVICES payment data
+[2024-02-12 22:48:55] (upsertCustomerRelationship) Unknown column 'isPrimaryGuest' in 'field list'
+[2024-02-12 22:48:56] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstay`
+[2024-02-12 22:48:56] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERrelationship`
+[2024-02-12 22:48:56] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERmembership`
+[2024-02-12 22:48:56] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESpayment`
+[2024-02-12 22:48:57] (createArrRESERVATIONstayStatusStay) Successfully processed RESERVATION stay status data
+[2024-02-12 22:49:21] (removeDuplicateRows) Successfully removed duplicate rows
+[2024-02-12 22:49:21] (createArrSERVICESfolioOrders) Successfully processed SERVICES folio orders
+[2024-02-12 22:49:21] (removeDuplicateOrders) Successfully removed duplicate folio orders
+[2024-02-12 22:49:30] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONroomDetails`
+[2024-02-12 22:49:30] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstayStatusStay`
+[2024-02-12 22:49:30] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
+[2024-02-12 23:11:11] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
+[2024-02-12 23:11:11] (fetchDataFromMySQLTable) Successfully fetched 415 records from hapi_raw_reservations
+[2024-02-12 23:11:11] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
+[2024-02-12 23:11:16] (createArrCUSTOMERcontact) Successfully processed CUSTOMER contacts
+[2024-02-12 23:11:16] (createCUSTOMERContactType) Successfully created CUSTOMER contact type array
+[2024-02-12 23:11:16] (createCUSTOMERloyaltyProgram) Successfully created CUSTOMER loyalty program array
+[2024-02-12 23:11:16] (createSERVICESLibTender) Successfully processed SERVICES LibTender
+[2024-02-12 23:11:16] (createSERVICESlibserviceitems) Successfully processed SERVICES LibServiceItems
+[2024-02-12 23:11:16] (createReservationLibProperty) Successfully processed reservationLibProperty
+[2024-02-12 23:11:16] (createReservationLibSource) Successfully processed reservationLibSource
+[2024-02-12 23:11:16] (createReservationLibRoomClass) Successfully processed ReservationLibRoomClass
+[2024-02-12 23:11:16] (createReservationGroup) Successfully processed ReservationGroup
+[2024-02-12 23:11:16] (createReservationLibRoom) Successfully processed ReservationLibRoom
+[2024-02-12 23:11:17] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibContactType`
+[2024-02-12 23:11:17] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERcontact`
+[2024-02-12 23:11:17] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibLoyaltyProgram`
+[2024-02-12 23:11:17] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoom`
+[2024-02-12 23:11:17] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONLibRoomType`
+[2024-02-12 23:11:17] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoomClass`
+[2024-02-12 23:11:17] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibProperty`
+[2024-02-12 23:11:17] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONgroup`
+[2024-02-12 23:11:17] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibsource`
+[2024-02-12 23:11:17] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibstaystatus`
+[2024-02-12 23:11:17] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibTender`
+[2024-02-12 23:11:17] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibServiceItems`
+[2024-02-12 23:11:17] (createArrRESERVATIONstay) Successfully processed ARR RESERVATION stay data
+[2024-02-12 23:11:17] (createArrCUSTOMERrelationship) Successfully processed CUSTOMER relationship data
+[2024-02-12 23:11:22] (createArrCUSTOMERmembership) Successfully processed CUSTOMER membership data
+[2024-02-12 23:11:22] (createArrSERVICESpayment) Successfully processed SERVICES payment data
+[2024-02-12 23:11:23] (upsertCustomerRelationship) Unknown column 'isPrimaryGuest' in 'field list'
+[2024-02-12 23:11:23] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstay`
+[2024-02-12 23:11:23] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERrelationship`
+[2024-02-12 23:11:23] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERmembership`
+[2024-02-12 23:11:23] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESpayment`
+[2024-02-12 23:11:24] (createArrRESERVATIONstayStatusStay) Successfully processed RESERVATION stay status data
+[2024-02-12 23:11:46] (removeDuplicateRows) Successfully removed duplicate rows
+[2024-02-12 23:11:46] (createArrSERVICESfolioOrders) Successfully processed SERVICES folio orders
+[2024-02-12 23:11:46] (removeDuplicateOrders) Successfully removed duplicate folio orders
+[2024-02-12 23:11:53] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONroomDetails`
+[2024-02-12 23:11:53] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstayStatusStay`
+[2024-02-12 23:11:53] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
+[2024-02-12 23:13:13] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
+[2024-02-12 23:13:13] (fetchDataFromMySQLTable) Successfully fetched 415 records from hapi_raw_reservations
+[2024-02-12 23:13:13] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
+[2024-02-12 23:13:19] (createArrCUSTOMERcontact) Successfully processed CUSTOMER contacts
+[2024-02-12 23:13:19] (createCUSTOMERContactType) Successfully created CUSTOMER contact type array
+[2024-02-12 23:13:19] (createCUSTOMERloyaltyProgram) Successfully created CUSTOMER loyalty program array
+[2024-02-12 23:13:19] (createSERVICESLibTender) Successfully processed SERVICES LibTender
+[2024-02-12 23:13:19] (createSERVICESlibserviceitems) Successfully processed SERVICES LibServiceItems
+[2024-02-12 23:13:19] (createReservationLibProperty) Successfully processed reservationLibProperty
+[2024-02-12 23:13:19] (createReservationLibSource) Successfully processed reservationLibSource
+[2024-02-12 23:13:19] (createReservationLibRoomClass) Successfully processed ReservationLibRoomClass
+[2024-02-12 23:13:19] (createReservationGroup) Successfully processed ReservationGroup
+[2024-02-12 23:13:19] (createReservationLibRoom) Successfully processed ReservationLibRoom
+[2024-02-12 23:13:20] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibContactType`
+[2024-02-12 23:13:20] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERcontact`
+[2024-02-12 23:13:20] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibLoyaltyProgram`
+[2024-02-12 23:13:20] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoom`
+[2024-02-12 23:13:20] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONLibRoomType`
+[2024-02-12 23:13:20] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoomClass`
+[2024-02-12 23:13:20] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibProperty`
+[2024-02-12 23:13:20] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONgroup`
+[2024-02-12 23:13:20] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibsource`
+[2024-02-12 23:13:20] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibstaystatus`
+[2024-02-12 23:13:20] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibTender`
+[2024-02-12 23:13:20] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibServiceItems`
+[2024-02-12 23:13:20] (createArrRESERVATIONstay) Successfully processed ARR RESERVATION stay data
+[2024-02-12 23:13:20] (createArrCUSTOMERrelationship) Successfully processed CUSTOMER relationship data
+[2024-02-12 23:13:25] (createArrCUSTOMERmembership) Successfully processed CUSTOMER membership data
+[2024-02-12 23:13:25] (createArrSERVICESpayment) Successfully processed SERVICES payment data
+[2024-02-12 23:13:26] (upsertCustomerRelationship) Unknown column 'isPrimaryGuest' in 'field list'
+[2024-02-12 23:13:27] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstay`
+[2024-02-12 23:13:27] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERrelationship`
+[2024-02-12 23:13:27] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERmembership`
+[2024-02-12 23:13:27] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESpayment`
+[2024-02-12 23:13:28] (createArrRESERVATIONstayStatusStay) Successfully processed RESERVATION stay status data
+[2024-02-12 23:13:52] (removeDuplicateRows) Successfully removed duplicate rows
+[2024-02-12 23:13:52] (createArrSERVICESfolioOrders) Successfully processed SERVICES folio orders
+[2024-02-12 23:13:52] (removeDuplicateOrders) Successfully removed duplicate folio orders
+[2024-02-12 23:14:00] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONroomDetails`
+[2024-02-12 23:14:00] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstayStatusStay`
+[2024-02-12 23:14:00] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
+[2024-02-13 00:14:54] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
+[2024-02-13 00:14:54] (fetchDataFromMySQLTable) Successfully fetched 415 records from hapi_raw_reservations
+[2024-02-13 00:14:54] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
+[2024-02-13 00:15:00] (createArrCUSTOMERcontact) Successfully processed CUSTOMER contacts
+[2024-02-13 00:15:00] (createCUSTOMERContactType) Successfully created CUSTOMER contact type array
+[2024-02-13 00:15:00] (createCUSTOMERloyaltyProgram) Successfully created CUSTOMER loyalty program array
+[2024-02-13 00:15:00] (createSERVICESLibTender) Successfully processed SERVICES LibTender
+[2024-02-13 00:15:00] (createSERVICESlibserviceitems) Successfully processed SERVICES LibServiceItems
+[2024-02-13 00:15:00] (createReservationLibProperty) Successfully processed reservationLibProperty
+[2024-02-13 00:15:00] (createReservationLibSource) Successfully processed reservationLibSource
+[2024-02-13 00:15:00] (createReservationLibRoomClass) Successfully processed ReservationLibRoomClass
+[2024-02-13 00:15:00] (createReservationGroup) Successfully processed ReservationGroup
+[2024-02-13 00:15:00] (createReservationLibRoom) Successfully processed ReservationLibRoom
+[2024-02-13 00:15:01] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibContactType`
+[2024-02-13 00:15:01] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERcontact`
+[2024-02-13 00:15:01] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibLoyaltyProgram`
+[2024-02-13 00:15:01] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoom`
+[2024-02-13 00:15:01] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONLibRoomType`
+[2024-02-13 00:15:01] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoomClass`
+[2024-02-13 00:15:01] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibProperty`
+[2024-02-13 00:15:01] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONgroup`
+[2024-02-13 00:15:01] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibsource`
+[2024-02-13 00:15:01] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibstaystatus`
+[2024-02-13 00:15:01] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibTender`
+[2024-02-13 00:15:01] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibServiceItems`
+[2024-02-13 00:15:01] (createArrRESERVATIONstay) Successfully processed ARR RESERVATION stay data
+[2024-02-13 00:15:01] (createArrCUSTOMERrelationship) Successfully processed CUSTOMER relationship data
+[2024-02-13 00:15:06] (createArrCUSTOMERmembership) Successfully processed CUSTOMER membership data
+[2024-02-13 00:15:06] (createArrSERVICESpayment) Successfully processed SERVICES payment data
+[2024-02-13 00:15:06] (upsertCustomerRelationship) Unknown column 'isPrimaryGuest' in 'field list'
+[2024-02-13 00:15:07] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstay`
+[2024-02-13 00:15:07] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERrelationship`
+[2024-02-13 00:15:07] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERmembership`
+[2024-02-13 00:15:07] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESpayment`
+[2024-02-13 00:15:08] (createArrRESERVATIONstayStatusStay) Successfully processed RESERVATION stay status data
+[2024-02-13 00:15:32] (removeDuplicateRows) Successfully removed duplicate rows
+[2024-02-13 00:15:32] (createArrSERVICESfolioOrders) Successfully processed SERVICES folio orders
+[2024-02-13 00:15:32] (removeDuplicateOrders) Successfully removed duplicate folio orders
+[2024-02-13 00:15:40] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONroomDetails`
+[2024-02-13 00:15:40] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstayStatusStay`
+[2024-02-13 00:15:40] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
+[2024-02-13 00:34:16] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
+[2024-02-13 00:34:16] (fetchDataFromMySQLTable) Successfully fetched 415 records from hapi_raw_reservations
+[2024-02-13 00:34:16] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
+[2024-02-13 00:34:22] (createArrCUSTOMERcontact) Successfully processed CUSTOMER contacts
+[2024-02-13 00:34:22] (createCUSTOMERContactType) Successfully created CUSTOMER contact type array
+[2024-02-13 00:34:22] (createCUSTOMERloyaltyProgram) Successfully created CUSTOMER loyalty program array
+[2024-02-13 00:34:22] (createSERVICESLibTender) Successfully processed SERVICES LibTender
+[2024-02-13 00:34:22] (createSERVICESlibserviceitems) Successfully processed SERVICES LibServiceItems
+[2024-02-13 00:34:22] (createReservationLibProperty) Successfully processed reservationLibProperty
+[2024-02-13 00:34:22] (createReservationLibSource) Successfully processed reservationLibSource
+[2024-02-13 00:34:22] (createReservationLibRoomClass) Successfully processed ReservationLibRoomClass
+[2024-02-13 00:34:22] (createReservationGroup) Successfully processed ReservationGroup
+[2024-02-13 00:34:22] (createReservationLibRoom) Successfully processed ReservationLibRoom
+[2024-02-13 00:34:23] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibContactType`
+[2024-02-13 00:34:23] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERcontact`
+[2024-02-13 00:34:23] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibLoyaltyProgram`
+[2024-02-13 00:34:23] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoom`
+[2024-02-13 00:34:23] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONLibRoomType`
+[2024-02-13 00:34:23] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoomClass`
+[2024-02-13 00:34:23] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibProperty`
+[2024-02-13 00:34:23] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONgroup`
+[2024-02-13 00:34:23] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibsource`
+[2024-02-13 00:34:23] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibstaystatus`
+[2024-02-13 00:34:23] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibTender`
+[2024-02-13 00:34:23] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibServiceItems`
+[2024-02-13 00:34:23] (createArrRESERVATIONstay) Successfully processed ARR RESERVATION stay data
+[2024-02-13 00:34:23] (createArrCUSTOMERrelationship) Successfully processed CUSTOMER relationship data
+[2024-02-13 00:34:28] (createArrCUSTOMERmembership) Successfully processed CUSTOMER membership data
+[2024-02-13 00:34:28] (createArrSERVICESpayment) Successfully processed SERVICES payment data
+[2024-02-13 00:34:29] (upsertCustomerRelationship) Unknown column 'isPrimaryGuest' in 'field list'
+[2024-02-13 00:34:29] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstay`
+[2024-02-13 00:34:29] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERrelationship`
+[2024-02-13 00:34:29] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERmembership`
+[2024-02-13 00:34:29] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESpayment`
+[2024-02-13 00:34:31] (createArrRESERVATIONstayStatusStay) Successfully processed RESERVATION stay status data
+[2024-02-13 00:35:00] (removeDuplicateRows) Successfully removed duplicate rows
+[2024-02-13 00:35:00] (createArrSERVICESfolioOrders) Successfully processed SERVICES folio orders
+[2024-02-13 00:35:00] (removeDuplicateOrders) Successfully removed duplicate folio orders
+[2024-02-13 00:35:08] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONroomDetails`
+[2024-02-13 00:35:08] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstayStatusStay`
+[2024-02-13 00:35:08] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
+[2024-02-13 00:47:17] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
+[2024-02-13 00:47:17] (fetchDataFromMySQLTable) Successfully fetched 415 records from hapi_raw_reservations
+[2024-02-13 00:47:17] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
+[2024-02-13 00:47:23] (createArrCUSTOMERcontact) Successfully processed CUSTOMER contacts
+[2024-02-13 00:47:23] (createCUSTOMERContactType) Successfully created CUSTOMER contact type array
+[2024-02-13 00:47:23] (createCUSTOMERloyaltyProgram) Successfully created CUSTOMER loyalty program array
+[2024-02-13 00:47:23] (createSERVICESLibTender) Successfully processed SERVICES LibTender
+[2024-02-13 00:47:23] (createSERVICESlibserviceitems) Successfully processed SERVICES LibServiceItems
+[2024-02-13 00:47:23] (createReservationLibProperty) Successfully processed reservationLibProperty
+[2024-02-13 00:47:23] (createReservationLibSource) Successfully processed reservationLibSource
+[2024-02-13 00:47:23] (createReservationLibRoomClass) Successfully processed ReservationLibRoomClass
+[2024-02-13 00:47:23] (createReservationGroup) Successfully processed ReservationGroup
+[2024-02-13 00:47:23] (createReservationLibRoom) Successfully processed ReservationLibRoom
+[2024-02-13 00:47:23] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibContactType`
+[2024-02-13 00:47:23] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERcontact`
+[2024-02-13 00:47:23] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibLoyaltyProgram`
+[2024-02-13 00:47:23] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoom`
+[2024-02-13 00:47:23] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONLibRoomType`
+[2024-02-13 00:47:23] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoomClass`
+[2024-02-13 00:47:23] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibProperty`
+[2024-02-13 00:47:23] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONgroup`
+[2024-02-13 00:47:23] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibsource`
+[2024-02-13 00:47:23] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibstaystatus`
+[2024-02-13 00:47:23] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibTender`
+[2024-02-13 00:47:23] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibServiceItems`
+[2024-02-13 00:47:23] (createArrRESERVATIONstay) Successfully processed ARR RESERVATION stay data
+[2024-02-13 00:47:23] (createArrCUSTOMERrelationship) Successfully processed CUSTOMER relationship data
+[2024-02-13 00:47:28] (createArrCUSTOMERmembership) Successfully processed CUSTOMER membership data
+[2024-02-13 00:47:28] (createArrSERVICESpayment) Successfully processed SERVICES payment data
+[2024-02-13 00:47:29] (upsertCustomerRelationship) Unknown column 'isPrimaryGuest' in 'field list'
+[2024-02-13 00:47:30] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstay`
+[2024-02-13 00:47:30] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERrelationship`
+[2024-02-13 00:47:30] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERmembership`
+[2024-02-13 00:47:30] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESpayment`
+[2024-02-13 00:47:31] (createArrRESERVATIONstayStatusStay) Successfully processed RESERVATION stay status data
+[2024-02-13 00:47:58] (removeDuplicateRows) Successfully removed duplicate rows
+[2024-02-13 00:47:58] (createArrSERVICESfolioOrders) Successfully processed SERVICES folio orders
+[2024-02-13 00:47:58] (removeDuplicateOrders) Successfully removed duplicate folio orders
+[2024-02-13 00:48:08] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONroomDetails`
+[2024-02-13 00:48:08] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstayStatusStay`
+[2024-02-13 00:48:08] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
+[2024-02-13 00:59:53] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
+[2024-02-13 00:59:53] (fetchDataFromMySQLTable) Successfully fetched 415 records from hapi_raw_reservations
+[2024-02-13 00:59:53] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
+[2024-02-13 01:00:00] (createArrCUSTOMERcontact) Successfully processed CUSTOMER contacts
+[2024-02-13 01:00:00] (createCUSTOMERContactType) Successfully created CUSTOMER contact type array
+[2024-02-13 01:00:00] (createCUSTOMERloyaltyProgram) Successfully created CUSTOMER loyalty program array
+[2024-02-13 01:00:00] (createSERVICESLibTender) Successfully processed SERVICES LibTender
+[2024-02-13 01:00:00] (createSERVICESlibserviceitems) Successfully processed SERVICES LibServiceItems
+[2024-02-13 01:00:00] (createReservationLibProperty) Successfully processed reservationLibProperty
+[2024-02-13 01:00:00] (createReservationLibSource) Successfully processed reservationLibSource
+[2024-02-13 01:00:00] (createReservationLibRoomClass) Successfully processed ReservationLibRoomClass
+[2024-02-13 01:00:00] (createReservationGroup) Successfully processed ReservationGroup
+[2024-02-13 01:00:00] (createReservationLibRoom) Successfully processed ReservationLibRoom
+[2024-02-13 01:00:01] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibContactType`
+[2024-02-13 01:00:01] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERcontact`
+[2024-02-13 01:00:01] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibLoyaltyProgram`
+[2024-02-13 01:00:01] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoom`
+[2024-02-13 01:00:01] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONLibRoomType`
+[2024-02-13 01:00:01] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoomClass`
+[2024-02-13 01:00:01] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibProperty`
+[2024-02-13 01:00:01] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONgroup`
+[2024-02-13 01:00:01] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibsource`
+[2024-02-13 01:00:01] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibstaystatus`
+[2024-02-13 01:00:01] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibTender`
+[2024-02-13 01:00:01] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibServiceItems`
+[2024-02-13 01:00:01] (createArrRESERVATIONstay) Successfully processed ARR RESERVATION stay data
+[2024-02-13 01:00:01] (createArrCUSTOMERrelationship) Successfully processed CUSTOMER relationship data
+[2024-02-13 01:00:06] (createArrCUSTOMERmembership) Successfully processed CUSTOMER membership data
+[2024-02-13 01:00:06] (createArrSERVICESpayment) Successfully processed SERVICES payment data
+[2024-02-13 01:00:07] (upsertCustomerRelationship) Unknown column 'isPrimaryGuest' in 'field list'
+[2024-02-13 01:00:07] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstay`
+[2024-02-13 01:00:07] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERrelationship`
+[2024-02-13 01:00:07] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERmembership`
+[2024-02-13 01:00:07] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESpayment`
+[2024-02-13 01:00:08] (createArrRESERVATIONstayStatusStay) Successfully processed RESERVATION stay status data
+[2024-02-13 01:00:33] (removeDuplicateRows) Successfully removed duplicate rows
+[2024-02-13 01:00:33] (createArrSERVICESfolioOrders) Successfully processed SERVICES folio orders
+[2024-02-13 01:00:33] (removeDuplicateOrders) Successfully removed duplicate folio orders
+[2024-02-13 01:00:42] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONroomDetails`
+[2024-02-13 01:00:42] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstayStatusStay`
+[2024-02-13 01:00:42] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
+[2024-02-13 01:02:04] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
+[2024-02-13 01:02:04] (fetchDataFromMySQLTable) Successfully fetched 415 records from hapi_raw_reservations
+[2024-02-13 01:02:04] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
+[2024-02-13 01:02:10] (createArrCUSTOMERcontact) Successfully processed CUSTOMER contacts
+[2024-02-13 01:02:10] (createCUSTOMERContactType) Successfully created CUSTOMER contact type array
+[2024-02-13 01:02:10] (createCUSTOMERloyaltyProgram) Successfully created CUSTOMER loyalty program array
+[2024-02-13 01:02:10] (createSERVICESLibTender) Successfully processed SERVICES LibTender
+[2024-02-13 01:02:10] (createSERVICESlibserviceitems) Successfully processed SERVICES LibServiceItems
+[2024-02-13 01:02:10] (createReservationLibProperty) Successfully processed reservationLibProperty
+[2024-02-13 01:02:10] (createReservationLibSource) Successfully processed reservationLibSource
+[2024-02-13 01:02:10] (createReservationLibRoomClass) Successfully processed ReservationLibRoomClass
+[2024-02-13 01:02:10] (createReservationGroup) Successfully processed ReservationGroup
+[2024-02-13 01:02:10] (createReservationLibRoom) Successfully processed ReservationLibRoom
+[2024-02-13 01:02:11] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibContactType`
+[2024-02-13 01:02:11] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERcontact`
+[2024-02-13 01:02:11] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibLoyaltyProgram`
+[2024-02-13 01:02:11] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoom`
+[2024-02-13 01:02:11] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONLibRoomType`
+[2024-02-13 01:02:11] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoomClass`
+[2024-02-13 01:02:11] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibProperty`
+[2024-02-13 01:02:11] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONgroup`
+[2024-02-13 01:02:11] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibsource`
+[2024-02-13 01:02:11] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibstaystatus`
+[2024-02-13 01:02:11] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibTender`
+[2024-02-13 01:02:11] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibServiceItems`
+[2024-02-13 01:02:11] (createArrRESERVATIONstay) Successfully processed ARR RESERVATION stay data
+[2024-02-13 01:02:11] (createArrCUSTOMERrelationship) Successfully processed CUSTOMER relationship data
+[2024-02-13 01:02:16] (createArrCUSTOMERmembership) Successfully processed CUSTOMER membership data
+[2024-02-13 01:02:16] (createArrSERVICESpayment) Successfully processed SERVICES payment data
+[2024-02-13 01:02:16] (upsertCustomerRelationship) Unknown column 'isPrimaryGuest' in 'field list'
+[2024-02-13 01:02:17] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstay`
+[2024-02-13 01:02:17] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERrelationship`
+[2024-02-13 01:02:17] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERmembership`
+[2024-02-13 01:02:17] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESpayment`
+[2024-02-13 01:02:18] (createArrRESERVATIONstayStatusStay) Successfully processed RESERVATION stay status data
+[2024-02-13 01:02:43] (removeDuplicateRows) Successfully removed duplicate rows
+[2024-02-13 01:02:43] (createArrSERVICESfolioOrders) Successfully processed SERVICES folio orders
+[2024-02-13 01:02:43] (removeDuplicateOrders) Successfully removed duplicate folio orders
+[2024-02-13 01:02:51] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONroomDetails`
+[2024-02-13 01:02:51] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstayStatusStay`
+[2024-02-13 01:02:51] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
+[2024-02-13 01:04:07] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
+[2024-02-13 01:04:07] (fetchDataFromMySQLTable) Successfully fetched 415 records from hapi_raw_reservations
+[2024-02-13 01:04:07] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
+[2024-02-13 01:04:13] (createArrCUSTOMERcontact) Successfully processed CUSTOMER contacts
+[2024-02-13 01:04:13] (createCUSTOMERContactType) Successfully created CUSTOMER contact type array
+[2024-02-13 01:04:13] (createCUSTOMERloyaltyProgram) Successfully created CUSTOMER loyalty program array
+[2024-02-13 01:04:13] (createSERVICESLibTender) Successfully processed SERVICES LibTender
+[2024-02-13 01:04:13] (createSERVICESlibserviceitems) Successfully processed SERVICES LibServiceItems
+[2024-02-13 01:04:13] (createReservationLibProperty) Successfully processed reservationLibProperty
+[2024-02-13 01:04:13] (createReservationLibSource) Successfully processed reservationLibSource
+[2024-02-13 01:04:13] (createReservationLibRoomClass) Successfully processed ReservationLibRoomClass
+[2024-02-13 01:04:13] (createReservationGroup) Successfully processed ReservationGroup
+[2024-02-13 01:04:13] (createReservationLibRoom) Successfully processed ReservationLibRoom
+[2024-02-13 01:04:13] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibContactType`
+[2024-02-13 01:04:13] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERcontact`
+[2024-02-13 01:04:13] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibLoyaltyProgram`
+[2024-02-13 01:04:13] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoom`
+[2024-02-13 01:04:13] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONLibRoomType`
+[2024-02-13 01:04:13] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoomClass`
+[2024-02-13 01:04:13] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibProperty`
+[2024-02-13 01:04:13] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONgroup`
+[2024-02-13 01:04:13] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibsource`
+[2024-02-13 01:04:13] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibstaystatus`
+[2024-02-13 01:04:13] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibTender`
+[2024-02-13 01:04:13] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibServiceItems`
+[2024-02-13 01:04:13] (createArrRESERVATIONstay) Successfully processed ARR RESERVATION stay data
+[2024-02-13 01:04:13] (createArrCUSTOMERrelationship) Successfully processed CUSTOMER relationship data
+[2024-02-13 01:04:18] (createArrCUSTOMERmembership) Successfully processed CUSTOMER membership data
+[2024-02-13 01:04:18] (createArrSERVICESpayment) Successfully processed SERVICES payment data
+[2024-02-13 01:04:19] (upsertCustomerRelationship) Unknown column 'isPrimaryGuest' in 'field list'
+[2024-02-13 01:04:19] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstay`
+[2024-02-13 01:04:19] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERrelationship`
+[2024-02-13 01:04:19] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERmembership`
+[2024-02-13 01:04:19] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESpayment`
+[2024-02-13 01:04:20] (createArrRESERVATIONstayStatusStay) Successfully processed RESERVATION stay status data
+[2024-02-13 01:04:45] (removeDuplicateRows) Successfully removed duplicate rows
+[2024-02-13 01:04:45] (createArrSERVICESfolioOrders) Successfully processed SERVICES folio orders
+[2024-02-13 01:04:45] (removeDuplicateOrders) Successfully removed duplicate folio orders
+[2024-02-13 01:04:54] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONroomDetails`
+[2024-02-13 01:04:54] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstayStatusStay`
+[2024-02-13 01:04:54] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
+[2024-02-13 16:28:21] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
+[2024-02-13 16:28:21] (fetchDataFromMySQLTable) Successfully fetched 0 records from hapi_raw_reservations
+[2024-02-13 16:28:21] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
+[2024-02-13 16:28:21] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc
+[2024-02-13 16:28:36] (getFirstNonNullImportCode) Successfully retrieved first non-null import_code from hapi_raw_reservations
+[2024-02-13 16:28:36] (fetchDataFromMySQLTable) Successfully fetched 415 records from hapi_raw_reservations
+[2024-02-13 16:28:37] (insertEtlTrackingInfo) Successfully inserted tracking info into PMSDATABASEmisc for source: fairmont_banff
+[2024-02-13 16:28:42] (createArrCUSTOMERcontact) Successfully processed CUSTOMER contacts
+[2024-02-13 16:28:42] (createCUSTOMERContactType) Successfully created CUSTOMER contact type array
+[2024-02-13 16:28:42] (createCUSTOMERloyaltyProgram) Successfully created CUSTOMER loyalty program array
+[2024-02-13 16:28:42] (createSERVICESLibTender) Successfully processed SERVICES LibTender
+[2024-02-13 16:28:42] (createSERVICESlibserviceitems) Successfully processed SERVICES LibServiceItems
+[2024-02-13 16:28:42] (createReservationLibProperty) Successfully processed reservationLibProperty
+[2024-02-13 16:28:42] (createReservationLibSource) Successfully processed reservationLibSource
+[2024-02-13 16:28:42] (createReservationLibRoomClass) Successfully processed ReservationLibRoomClass
+[2024-02-13 16:28:42] (createReservationGroup) Successfully processed ReservationGroup
+[2024-02-13 16:28:42] (createReservationLibRoom) Successfully processed ReservationLibRoom
+[2024-02-13 16:28:43] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibContactType`
+[2024-02-13 16:28:43] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERcontact`
+[2024-02-13 16:28:43] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERlibLoyaltyProgram`
+[2024-02-13 16:28:43] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoom`
+[2024-02-13 16:28:43] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONLibRoomType`
+[2024-02-13 16:28:43] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibRoomClass`
+[2024-02-13 16:28:43] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibProperty`
+[2024-02-13 16:28:43] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONgroup`
+[2024-02-13 16:28:43] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibsource`
+[2024-02-13 16:28:43] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONlibstaystatus`
+[2024-02-13 16:28:43] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibTender`
+[2024-02-13 16:28:43] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESlibServiceItems`
+[2024-02-13 16:28:43] (createArrRESERVATIONstay) Successfully processed ARR RESERVATION stay data
+[2024-02-13 16:28:43] (createArrCUSTOMERrelationship) Successfully processed CUSTOMER relationship data
+[2024-02-13 16:28:48] (createArrCUSTOMERmembership) Successfully processed CUSTOMER membership data
+[2024-02-13 16:28:48] (createArrSERVICESpayment) Successfully processed SERVICES payment data
+[2024-02-13 16:28:49] (upsertCustomerRelationship) Unknown column 'isPrimaryGuest' in 'field list'
+[2024-02-13 16:28:49] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstay`
+[2024-02-13 16:28:49] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERrelationship`
+[2024-02-13 16:28:49] (getTableAsAssociativeArray) Successfully fetched data from `CUSTOMERmembership`
+[2024-02-13 16:28:49] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESpayment`
+[2024-02-13 16:28:50] (createArrRESERVATIONstayStatusStay) Successfully processed RESERVATION stay status data
+[2024-02-13 16:29:16] (removeDuplicateRows) Successfully removed duplicate rows
+[2024-02-13 16:29:16] (createArrSERVICESfolioOrders) Successfully processed SERVICES folio orders
+[2024-02-13 16:29:16] (removeDuplicateOrders) Successfully removed duplicate folio orders
+[2024-02-13 16:29:24] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONroomDetails`
+[2024-02-13 16:29:24] (getTableAsAssociativeArray) Successfully fetched data from `RESERVATIONstayStatusStay`
+[2024-02-13 16:29:24] (getTableAsAssociativeArray) Successfully fetched data from `SERVICESfolioOrders`
+[2024-02-13 16:29:24] (updateEtlDuration) Successfully updated ETL duration in PMSDATABASEmisc

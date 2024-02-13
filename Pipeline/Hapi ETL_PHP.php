@@ -450,7 +450,7 @@ try {
 //
 //var_dump(array_slice($arrRESERVATIONroomDetails, 0, 10, true));
 //print_r($arrSERVICESfolioOrders);
-//print_r($arrRESERVATIONstay);
+//print_r($arrCUSTOMERcontact);
 //print_r($arrSERVICESfolioOrders);
 //
 //$output = var_export($normalizedData, true);

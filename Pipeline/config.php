@@ -2,7 +2,7 @@
 
 //Constants
     //schema aversion
-define('SCHEMA_VERSION', '1.43');
+define('SCHEMA_VERSION', '1.44');
 // Database Connections:
     //origin
 define('ORIGIN_TABLE_NAME', 'hapi_raw_reservations');

@@ -1292,7 +1292,7 @@ function upsertCustomerRelationship($data, $dbConnection, &$errorCount) {
     $actionLogFile = dirname(__FILE__) . '/action_log.txt';
 
     foreach ($data as $element) {
-        $isPrimaryGuest = isset($element['isPrimaryGuest']) ? (int)$element['isPrimaryGuest'] : null;
+//        $isPrimaryGuest = isset($element['isPrimaryGuest']) ? (int)$element['isPrimaryGuest'] : null;
         $dataSource = $element['dataSource'] ?? null;
         $contactTypeId = $element['contactTypeId'] ?? null;
         $contactId = $element['contactId'] ?? null;
@@ -1302,9 +1302,9 @@ function upsertCustomerRelationship($data, $dbConnection, &$errorCount) {
 
         try {
             // Check if a record with this combination already exists
-            $checkQuery = "SELECT 1 FROM `$tableName` WHERE `isPrimaryGuest` = ? AND `dataSource` = ? AND `contactTypeId` = ? AND `contactId` = ?";
+            $checkQuery = "SELECT 1 FROM `$tableName` WHERE  `dataSource` = ? AND `contactTypeId` = ? AND `contactId` = ?";
             $stmt = $dbConnection->prepare($checkQuery);
-            $stmt->bind_param("issi", $isPrimaryGuest, $dataSource, $contactTypeId, $contactId);
+            $stmt->bind_param("ssi",  $dataSource, $contactTypeId, $contactId);
             $stmt->execute();
             $result = $stmt->get_result();
             $existingRecord = $result->fetch_assoc();
@@ -1322,7 +1322,7 @@ function upsertCustomerRelationship($data, $dbConnection, &$errorCount) {
                 // Update
                 $updateQuery = "UPDATE `$tableName` SET `isPrimaryGuest` = ?, `dataSource` = ?, `contactTypeId` = ?, `contactId` = ? WHERE `id` = ?";
                 $updateStmt = $dbConnection->prepare($updateQuery);
-                $updateStmt->bind_param("issii", $isPrimaryGuest, $dataSource, $contactTypeId, $contactId, $existingRecord['id']);
+                $updateStmt->bind_param("ssii",  $dataSource, $contactTypeId, $contactId, $existingRecord['id']);
 
                 // Set action to update
                 $action = 'UPDATE';
@@ -1330,7 +1330,7 @@ function upsertCustomerRelationship($data, $dbConnection, &$errorCount) {
                 // Insert
                 $insertQuery = "INSERT INTO `$tableName` (`isPrimaryGuest`, `dataSource`, `contactTypeId`, `contactId`) VALUES (?, ?, ?, ?)";
                 $insertStmt = $dbConnection->prepare($insertQuery);
-                $insertStmt->bind_param("issi", $isPrimaryGuest, $dataSource, $contactTypeId, $contactId);
+                $insertStmt->bind_param("ssi",  $dataSource, $contactTypeId, $contactId);
 
                 // Set action to insert
                 $action = 'INSERT';
@@ -1344,7 +1344,7 @@ function upsertCustomerRelationship($data, $dbConnection, &$errorCount) {
                 }
 
                 // Save after state
-                $afterState = json_encode(['isPrimaryGuest' => $isPrimaryGuest, 'dataSource' => $dataSource, 'contactTypeId' => $contactTypeId, 'contactId' => $contactId]);
+                $afterState = json_encode(['dataSource' => $dataSource, 'contactTypeId' => $contactTypeId, 'contactId' => $contactId]);
             } else {
                 $insertStmt->execute();
                 if ($insertStmt->error) {
@@ -1352,7 +1352,7 @@ function upsertCustomerRelationship($data, $dbConnection, &$errorCount) {
                 }
 
                 // Save after state for insert
-                $afterState = json_encode(['isPrimaryGuest' => $isPrimaryGuest, 'dataSource' => $dataSource, 'contactTypeId' => $contactTypeId, 'contactId' => $contactId]);
+                $afterState = json_encode(['dataSource' => $dataSource, 'contactTypeId' => $contactTypeId, 'contactId' => $contactId]);
             }
 
             // Log the action with record identifier and rows affected
@@ -1992,6 +1992,7 @@ function upsertSERVICESfolioOrders($arrSERVICESfolioOrders, $dbConnection, &$err
 
     foreach ($arrSERVICESfolioOrders as $order) {
         // Extract the fields that will be used for matching existing records
+        $isPrimary = isset($order['isPrimary']) ? (int)$order['isPrimary'] : 0;
         $folioOrderType = $order['folioOrderType'];
         $unitCount = $order['unitCount'];
         $unitPrice = $order['unitPrice'];
@@ -2001,16 +2002,19 @@ function upsertSERVICESfolioOrders($arrSERVICESfolioOrders, $dbConnection, &$err
         $postingFrequency = $order['postingFrequency'];
         $startDate = $order['startDate'];
         $endDate = $order['endDate'];
+        $amount = $order['amount'];
         $fixedChargesQuantity = $order['fixedChargesQuantity'];
+        $ratePlanCode = $order['ratePlanCode'];
         $transferId = $order['transferId'];
         $transferDateTime = $order['transferDateTime'];
         $transferOnArrival = $order['transferOnArrival'];
         $isIncluded = $order['isIncluded'];
+        $metaData = $order['metaData'];
+        $dataSource = $order['dataSource'];
         $contactId = $order['contactId'];
         $stayId = $order['stayId'];
         $paymentId = $order['paymentId'];
         $libServiceItemsId = $order['libServiceItemsId'];
-        $metaData = $order['metaData'];
 
         $dbConnection->begin_transaction();
         try {
@@ -2025,27 +2029,31 @@ function upsertSERVICESfolioOrders($arrSERVICESfolioOrders, $dbConnection, &$err
             `postingFrequency` = ? AND
             `startDate` = ? AND
             `endDate` = ? AND
+            `amount` = ? AND
             `fixedChargesQuantity` = ? AND
+            `ratePlanCode` = ? AND
             `transferId` = ? AND
             `transferDateTime` = ? AND
             `transferOnArrival` = ? AND
+            `isPrimaryGuest` = ? AND
             `isIncluded` = ? AND
+            `metaData` = ? AND
+            `dataSource` = ? AND
             `contactId` = ? AND
             `stayId` = ? AND
             `paymentId` = ? AND
-            `libServiceItemsId` = ? AND
-            `metaData` = ?";
+            `libServiceItemsId` = ?";
             $stmt = $dbConnection->prepare($checkQuery);
             if (!$stmt) {
                 throw new Exception("(".__FUNCTION__.") Prepare failed: " . $dbConnection->error);
             }
 
-            $stmt->bind_param("siddddsssiisiiiiiis", $folioOrderType, $unitCount, $unitPrice, $fixedCost,
+            $stmt->bind_param("siddddsssdissssiissiiii", $folioOrderType, $unitCount, $unitPrice, $fixedCost,
                 $amountBeforeTax, $amountAfterTax, $postingFrequency,
-                $startDate, $endDate, $fixedChargesQuantity,
-                $transferId, $transferDateTime, $transferOnArrival,
-                $isIncluded, $contactId, $stayId, $paymentId,
-                $libServiceItemsId, $metaData);
+                $startDate, $endDate, $amount, $fixedChargesQuantity,
+                $ratePlanCode, $transferId, $transferDateTime, $transferOnArrival,
+                $isIncluded, $isPrimary, $metaData, $dataSource, $contactId, $stayId, $paymentId,
+                $libServiceItemsId);
             $stmt->execute();
             $result = $stmt->get_result();
             $existingRecord = $result->fetch_assoc();
@@ -2076,12 +2084,13 @@ function upsertSERVICESfolioOrders($arrSERVICESfolioOrders, $dbConnection, &$err
                     `transferDateTime` = ?,
                     `transferOnArrival` = ?,
                     `isIncluded` = ?,
+                    `isPrimary` = ?,
                     `dataSource` = ?,
                     `metaData` = ?
                 WHERE `contactId` = ? AND `stayId` = ? AND `paymentId` = ? AND `libServiceItemsId` = ?";
 
                 $updateStmt = $dbConnection->prepare($updateQuery);
-                $updateStmt->bind_param("siddsssdisssiissiiii",
+                $updateStmt->bind_param("siddddsssdissssiissiiii",
                     $order['folioOrderType'],
                     $order['unitCount'],
                     $order['unitPrice'],
@@ -2098,8 +2107,9 @@ function upsertSERVICESfolioOrders($arrSERVICESfolioOrders, $dbConnection, &$err
                     $order['transferDateTime'],
                     $order['transferOnArrival'],
                     $order['isIncluded'],
-                    $order['dataSource'],
+                    $order['isPrimary'],
                     $order['metaData'],
+                    $order['dataSource'],
                     // Where conditions
                     $contactId,
                     $stayId,
@@ -2132,19 +2142,19 @@ function upsertSERVICESfolioOrders($arrSERVICESfolioOrders, $dbConnection, &$err
                     'transferDateTime' => null,
                     'transferOnArrival' => null,
                     'isIncluded' => null,
+                    '$isPrimary' => null,
                     'dataSource' => null,
                     'metaData' => null,
                 ]);
 
                 // Insert new record
                 $insertQuery = "INSERT INTO `$tableName` (
-                    `contactId`,
-                    `stayId`,
-                    `paymentId`,
-                    `libServiceItemsId`,
-                    `unitCount`, 
-                    `unitPrice`, 
-                    `fixedCost`, 
+                    `folioOrderType`,
+                    `unitCount`,
+                    `unitPrice`,
+                    `fixedCost`,
+                    `amountBeforeTax`, 
+                    `amountAfterTax`, 
                     `postingFrequency`, 
                     `startDate`, 
                     `endDate`, 
@@ -2152,15 +2162,21 @@ function upsertSERVICESfolioOrders($arrSERVICESfolioOrders, $dbConnection, &$err
                     `fixedChargesQuantity`, 
                     `ratePlanCode`, 
                     `transferId`, 
-                    `transferDateTime`, 
+                    `transferDateTime`,  
                     `transferOnArrival`, 
                     `isIncluded`,
+                    `isPrimaryGuest`,
+                    `metaData`,
                     `dataSource`,
-                    `metaData`
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    `contactId`, 
+                    `stayId`,
+                    `paymentId`,
+                    `libServiceItemsId`
+
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?, ?)";
 
                 $insertStmt = $dbConnection->prepare($insertQuery);
-                $insertStmt->bind_param("iiiidddsssddssssiss", $contactId, $stayId, $paymentId, $libServiceItemsId,  $order['unitCount'], $order['unitPrice'], $order['fixedCost'], $order['postingFrequency'], $order['startDate'], $order['endDate'], $order['amount'], $order['fixedChargesQuantity'], $order['ratePlanCode'], $order['transferId'], $order['transferDateTime'], $order['transferOnArrival'], $order['isIncluded'], $order['dataSource'], $order['metaData']);
+                $insertStmt->bind_param("siddddsssdisssiiissiiii",  $order['folioOrderType'], $order['unitCount'], $order['unitPrice'], $order['fixedCost'], $order['amountBeforeTax'], $order['amountAfterTax'], $order['postingFrequency'], $order['startDate'], $order['endDate'], $order['amount'], $order['fixedChargesQuantity'], $order['ratePlanCode'], $order['transferId'], $order['transferDateTime'], $order['transferOnArrival'], $order['isIncluded'], $order['isPrimary'], $order['metaData'], $order['dataSource'], $contactId, $stayId, $paymentId, $libServiceItemsId);
                 $insertStmt->execute();
 
                 // Set action to insert
@@ -2191,6 +2207,7 @@ function upsertSERVICESfolioOrders($arrSERVICESfolioOrders, $dbConnection, &$err
                 'transferDateTime' => $order['transferDateTime'],
                 'transferOnArrival' => $order['transferOnArrival'],
                 'isIncluded' => $order['isIncluded'],
+                'isPrimary' => $order['isPrimary'],
                 'dataSource' => $order['dataSource'],
                 'metaData' => $order['metaData'],
             ]);
@@ -2210,7 +2227,7 @@ function upsertSERVICESfolioOrders($arrSERVICESfolioOrders, $dbConnection, &$err
 
             // Log the error
             $errorTimestamp = date('Y-m-d H:i:s');
-            $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Error: stayId:". $stayId . $e->getMessage() . PHP_EOL;
+            $errorLogMessage = "[{$errorTimestamp}] (".__FUNCTION__.") Error: stayId: ". $stayId . " contactId: " . $contactId . $e->getMessage() . PHP_EOL;
             error_log($errorLogMessage, 3, $errorLogFile);
 
             throw $e;  // Re-throw the exception
