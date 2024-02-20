@@ -1,7 +1,8 @@
 #Comparison View
+#Use to look at all data in the new database
 
 CREATE OR REPLACE VIEW vw_pms_data_all AS
-Select  s.createDateTime, s.modifyDateTime, s.startDate stayStartDate, s.endDate stayEndDate, s.createdBy, s.MetaData stayMetaData, s.extPMSConfNum, s.extGuestId, s.dataSource, rrc.className, rr.roomNumber, rrt.typeName, rrt.typeCode,
+Select  s.createDateTime, s.modifyDateTime, s.startDate stayStartDate, s.endDate stayEndDate, s.extPMSConfNum confirmation_number, s.createdBy, s.MetaData stayMetaData, s.extPMSConfNum, s.extGuestId, s.dataSource, rrc.className, rr.roomNumber, rrt.typeName, rrt.typeCode,
 rss.status, rss.statusName, rs.sourceName, rs.sourceType, rp.chainCode, rp.propertyCode, fo.amountBeforeTax, fo.amountAfterTax, fo.amount, fo.fixedChargesQuantity, fo.ratePlanCode folioOrderRatePlanCode, fo.isIncluded, 
 fo.startDate folioOrderStartDate, fo.endDate folioOrderEndDate, fo.folioOrderType, fo.unitCount, fo.unitPrice, fo.metaData folioOrderMetaData, p.paymentAmount,  p.currencyCode, t.paymentMethod,
 si.itemName, si.itemCode, si.ratePlanCode serviceItemRatePlanCode, c.firstName, c.lastName, c.title, c.email, c.birthDate, c.languageCode, c.languageFormat, c.extGuestId customerGuestId,

@@ -2,12 +2,14 @@
 //These are all of the functions having to do with the upsert of data into the
 //various tables of the end OLTP database
 
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 
+//Verbose Logging. Uncomment to turn on
+//error_reporting(E_ALL);
+//ini_set('display_errors', 1);
+//ini_set('display_startup_errors', 1);
+//error_reporting(E_ALL);
 
+//upserts $arrCUSTOMERcontact to the CUSTOMERcontactType table
 function upsertCustomerContactType($data, $dbConnection, &$errorCount) {
     // Define the error log file path and action log file path
     $errorLogFile = dirname(__FILE__) . '/error_log.txt';
@@ -109,7 +111,7 @@ function upsertCustomerContactType($data, $dbConnection, &$errorCount) {
 
 
 
-
+//upserts $arrRESERVATIONlibRoom to the RESERVATIONlibRoom table
 function upsertReservationLibRoom($data, $dbConnection, &$errorCount) {
     // Define the error log file path and action log file path
     $errorLogFile = dirname(__FILE__) . '/error_log.txt';
@@ -205,7 +207,7 @@ function upsertReservationLibRoom($data, $dbConnection, &$errorCount) {
 
 
 
-
+//upserts $arrRESERVATIONlibSource to the RESERVATIONlibSource table
 function upsertReservationLibSource($data, $dbConnection, &$errorCount) {
     // Define the error log file path and action log file path
     $errorLogFile = dirname(__FILE__) . '/error_log.txt';
@@ -307,7 +309,7 @@ function upsertReservationLibSource($data, $dbConnection, &$errorCount) {
 
 
 
-
+//upserts $arrRESERVATIONlibProperty to the RESERVATIONlibProperty table
 function upsertReservationLibProperty($data, $dbConnection, &$errorCount) {
     $tableName = 'RESERVATIONlibProperty';
     // Define the error log file path and action log file path
@@ -402,7 +404,7 @@ function upsertReservationLibProperty($data, $dbConnection, &$errorCount) {
 }
 
 
-
+//upserts $arrCUSTOMERlibLoyaltyProgram to the CUSTOMERlibLoyaltyProgram table
 function upsertCustomerLibLoyaltyProgram($data, $dbConnection, &$errorCount) {
     $tableName = 'CUSTOMERlibLoyaltyProgram';
     // Define the error log file path and action log file path
@@ -502,7 +504,7 @@ function upsertCustomerLibLoyaltyProgram($data, $dbConnection, &$errorCount) {
 }
 
 
-
+//upserts $arrSERVICESlibTender to the SERVICESlibTender table
 function upsertServicesLibTender($data, $dbConnection, &$errorCount) {
     $tableName = 'SERVICESlibTender';
     // Define the error log file path and action log file path
@@ -596,7 +598,7 @@ function upsertServicesLibTender($data, $dbConnection, &$errorCount) {
 }
 
 
-
+//upserts $arrSERVICESlibServiceItems into the SERVICESlibServiceItems table
 function upsertServicesLibServiceItems($data, $dbConnection, &$errorCount) {
     $tableName = 'SERVICESlibServiceItems';
     // Define the error log file path and action log file path
@@ -770,7 +772,7 @@ function upsertServicesLibServiceItems($data, $dbConnection, &$errorCount) {
 //    }
 //}
 
-
+//upserts $arrRESERVATIONGroup into the RESERVATIONgroup table
 function upsertReservationGroup($data, $dbConnection, &$errorCount) {
     $tableName = 'RESERVATIONgroup';
     // Define the error log file path and action log file path
@@ -874,7 +876,7 @@ function upsertReservationGroup($data, $dbConnection, &$errorCount) {
 
 
 
-
+//upserts $arrRESERVATIONlibStayStatus into the RESERVATIONlibStayStatus table
 function upsertReservationLibStayStatus($data, $dbConnection, &$errorCount) {
     $tableName = 'RESERVATIONlibStayStatus';
     // Define the error log file path and action log file path
@@ -975,7 +977,7 @@ function upsertReservationLibStayStatus($data, $dbConnection, &$errorCount) {
 }
 
 
-
+//upserts $arrRESERVATIONlibRoomType into the RESERVATIONlibRoomType table
 function upsertReservationLibRoomType($data, $dbConnection, &$errorCount) {
     $tableName = 'RESERVATIONlibRoomType';
     // Define the error log file path and action log file path
@@ -1077,7 +1079,7 @@ function upsertReservationLibRoomType($data, $dbConnection, &$errorCount) {
 }
 
 
-
+//upserts $arrRESERVATIONlibRoomClass into the RESERVATIONlibRoomClass table
 function upsertReservationLibRoomClass($data, $dbConnection, &$errorCount) {
     $tableName = 'RESERVATIONlibRoomClass';
     // Define the error log file path and action log file path
@@ -1178,7 +1180,7 @@ function upsertReservationLibRoomClass($data, $dbConnection, &$errorCount) {
 }
 
 
-
+//upserts $arrRESERVATIONstay into the RESERVATIONstay table
 function upsertReservationStay($data, $dbConnection, &$errorCount) {
     $tableName = 'RESERVATIONstay';
     // Define the error log file path and action log file path
@@ -1284,7 +1286,7 @@ function upsertReservationStay($data, $dbConnection, &$errorCount) {
 }
 
 
-
+//upserts $arrCUSTOMERrelationship into the CUSTOMERrelationship table
 function upsertCustomerRelationship($data, $dbConnection, &$errorCount) {
     $tableName = 'CUSTOMERrelationship';
     // Define the error log file path and action log file path
@@ -1320,17 +1322,17 @@ function upsertCustomerRelationship($data, $dbConnection, &$errorCount) {
                 $beforeState = json_encode($existingRecord);
 
                 // Update
-                $updateQuery = "UPDATE `$tableName` SET `isPrimaryGuest` = ?, `dataSource` = ?, `contactTypeId` = ?, `contactId` = ? WHERE `id` = ?";
+                $updateQuery = "UPDATE `$tableName` SET `dataSource` = ?, `contactTypeId` = ?, `contactId` = ? WHERE `id` = ?";
                 $updateStmt = $dbConnection->prepare($updateQuery);
-                $updateStmt->bind_param("ssii",  $dataSource, $contactTypeId, $contactId, $existingRecord['id']);
+                $updateStmt->bind_param("siii",  $dataSource, $contactTypeId, $contactId, $existingRecord['id']);
 
                 // Set action to update
                 $action = 'UPDATE';
             } else {
                 // Insert
-                $insertQuery = "INSERT INTO `$tableName` (`isPrimaryGuest`, `dataSource`, `contactTypeId`, `contactId`) VALUES (?, ?, ?, ?)";
+                $insertQuery = "INSERT INTO `$tableName` (`dataSource`, `contactTypeId`, `contactId`) VALUES (?, ?, ?)";
                 $insertStmt = $dbConnection->prepare($insertQuery);
-                $insertStmt->bind_param("ssi",  $dataSource, $contactTypeId, $contactId);
+                $insertStmt->bind_param("sii",  $dataSource, $contactTypeId, $contactId);
 
                 // Set action to insert
                 $action = 'INSERT';
@@ -1382,7 +1384,7 @@ function upsertCustomerRelationship($data, $dbConnection, &$errorCount) {
 
 
 
-
+//upserts $arrCUSTOMERmembership into the CUSTOMERmembership table
 function upsertCustomerMembership($data, $dbConnection, &$errorCount) {
     $tableName = 'CUSTOMERmembership';
     // Define the error log file path and action log file path
@@ -1479,7 +1481,7 @@ function upsertCustomerMembership($data, $dbConnection, &$errorCount) {
     }
 }
 
-
+//upserts $arrSERVICESpayment into the SERVICESpayment table
 function upsertSERVICESPayment($data, $dbConnection, &$errorCount) {
     $tableName = 'SERVICESpayment';
     // Define the error log file path and action log file path
@@ -1562,7 +1564,7 @@ function upsertSERVICESPayment($data, $dbConnection, &$errorCount) {
 }
 
 
-
+//upserts $arrCUSTOMERcontact into the CUSTOMERcontact table
 function upsertCustomerContact($data, $dbConnection, &$errorCount) {
     $tableName = 'CUSTOMERcontact';
     // Define the error log file path and action log file path
@@ -1691,7 +1693,7 @@ function upsertCustomerContact($data, $dbConnection, &$errorCount) {
 }
 
 
-
+//upserts $arrRESERVATIONstayStatusStay into the RESERVATIONstayStatusStay table
 function upsertReservationStayStatusStay($data, $dbConnection, &$errorCount) {
     $tableName = 'RESERVATIONstayStatusStay';
     // Define the error log file path and action log file path
@@ -1826,7 +1828,7 @@ function upsertReservationStayStatusStay($data, $dbConnection, &$errorCount) {
 
 
 
-
+//upserts $arrRESERVATIONroomDetails into the RESERVATIONroomDetails table
 function upsertReservationRoomDetails($arrRESERVATIONroomDetails, $dbConnection, &$errorCount) {
     $tableName = 'RESERVATIONroomDetails';
     // Define the error log file path and action log file path
@@ -1983,7 +1985,7 @@ function upsertReservationRoomDetails($arrRESERVATIONroomDetails, $dbConnection,
     }
 }
 
-
+//upserts $arrSERVICESfolioOrders into the SERVICESfolioOrders table
 function upsertSERVICESfolioOrders($arrSERVICESfolioOrders, $dbConnection, &$errorCount) {
     $tableName = 'SERVICESfolioOrders';
     // Define the error log file path and action log file path
@@ -2084,7 +2086,7 @@ function upsertSERVICESfolioOrders($arrSERVICESfolioOrders, $dbConnection, &$err
                     `transferDateTime` = ?,
                     `transferOnArrival` = ?,
                     `isIncluded` = ?,
-                    `isPrimary` = ?,
+                    `isPrimaryGuest` = ?,
                     `dataSource` = ?,
                     `metaData` = ?
                 WHERE `contactId` = ? AND `stayId` = ? AND `paymentId` = ? AND `libServiceItemsId` = ?";
@@ -2142,7 +2144,7 @@ function upsertSERVICESfolioOrders($arrSERVICESfolioOrders, $dbConnection, &$err
                     'transferDateTime' => null,
                     'transferOnArrival' => null,
                     'isIncluded' => null,
-                    '$isPrimary' => null,
+                    'isPrimaryGuest' => null,
                     'dataSource' => null,
                     'metaData' => null,
                 ]);
@@ -2207,7 +2209,7 @@ function upsertSERVICESfolioOrders($arrSERVICESfolioOrders, $dbConnection, &$err
                 'transferDateTime' => $order['transferDateTime'],
                 'transferOnArrival' => $order['transferOnArrival'],
                 'isIncluded' => $order['isIncluded'],
-                'isPrimary' => $order['isPrimary'],
+                'isPrimaryGuest' => $order['isPrimary'],
                 'dataSource' => $order['dataSource'],
                 'metaData' => $order['metaData'],
             ]);

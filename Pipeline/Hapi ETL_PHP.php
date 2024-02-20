@@ -19,6 +19,10 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+//increase memory size limits for logging files
+ini_set('memory_limit', '512M');
+
+
 
 //libraries and helpers
 require_once 'config.php';
@@ -46,8 +50,11 @@ $originDBConnection = new mysqli($originHost, $originUsername, $originPassword, 
 $daysToKeepLogs = DAYS_TO_KEEP_LOGS;
 
 
+//RESERVATIONlibProperty Table corpEntIds and VenueIds dictionaries for reference
 
+$chainCodeToCorpEntIdDict = CHAIN_CODE_TO_CORP_ENT_ID_DICT;
 
+$propertyCodeToVenueIdDict = PROPERTY_CODE_TO_VENUE_ID_DICT;
 
 
 
@@ -237,6 +244,14 @@ try {
    echo 'Error: ' . $e->getMessage();
 }
 
+//Update RESERVATIONlibProperty with corpEntId and venueId info found in config.php
+
+//update corpEntId field
+updateTableFromAssocArray($chainCodeToCorpEntIdDict, $destinationDBConnection, 'RESERVATIONlibProperty', 'chainCode', 'corpEntId', $errorCount);
+
+////update venueId field
+updateTableFromAssocArray($propertyCodeToVenueIdDict, $destinationDBConnection, 'RESERVATIONlibProperty', 'propertyCode', 'venueId', $errorCount);
+
 
 //Upsert into SERVICESlibTender table
 try {
@@ -330,7 +345,7 @@ $arrSERVICESlibServiceItems = getTableAsAssociativeArray($destinationDBConnectio
 // 1) RESERVATIONstay
 $arrRESERVATIONstay = createArrRESERVATIONstay($destinationDBConnection,$normalizedData, $arrRESERVATIONlibSource, $arrRESERVATIONlibProperty, $errorCount);
 // 2) CUSTOMERrelationship
-$arrCUSTOMERrelationship = createArrCUSTOMERrelationship($myDataSemiParsed, $arrCUSTOMERlibContactType, $arrCUSTOMERcontact, $errorCount);
+$arrCUSTOMERrelationship = createArrCUSTOMERrelationship($normalizedData, $arrCUSTOMERlibContactType, $arrCUSTOMERcontact, $errorCount);
 // 3) CUSTOMERmembership
 $arrCUSTOMERmembership = createArrCUSTOMERmembership($myDataSemiParsed, $arrCUSTOMERlibLoyaltyProgram, $arrCUSTOMERcontact, $errorCount);
 // 4) SERVICESpayment
@@ -438,10 +453,10 @@ try {
 //// 3) RESERVATIONgroupStay
 ////skipped since HAPI is not offering any group data
 // 4) SERVICESfolioOrders
-try {
-    $arrSERVICESfolioOrders = getTableAsAssociativeArray($destinationDBConnection, 'SERVICESfolioOrders', $errorCount);
-} catch (Exception $e) {
-}
+//try {
+//    $arrSERVICESfolioOrders = getTableAsAssociativeArray($destinationDBConnection, 'SERVICESfolioOrders', $errorCount);
+//} catch (Exception $e) {
+//}
 
 //Populate grandchild tables
 //var_dump(array_slice($arrroom, 0, 1000, true));
@@ -449,7 +464,7 @@ try {
 //var_dump(array_slice($arrSERVICESpayment, 0, 10, true));
 //
 //var_dump(array_slice($arrRESERVATIONroomDetails, 0, 10, true));
-//print_r($arrSERVICESfolioOrders);
+print_r($arrSERVICESfolioOrders);
 //print_r($arrCUSTOMERcontact);
 //print_r($arrSERVICESfolioOrders);
 //

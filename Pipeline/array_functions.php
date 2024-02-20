@@ -96,7 +96,7 @@ function fetchDataFromMySQLTable($tableName, $originDBConnection, $destinationDB
         // Fetch data and store it in an array
         $data = [];
         while ($row = $result->fetch_assoc()) {
-            if (is_null($row['confirmation_number']))
+            if (is_null($row['confirmation_number']) and is_null($row['guests']))
             {
                 continue;
             }
@@ -413,6 +413,55 @@ function createReservationLibProperty($reservations, &$errorCount) {
         throw $e;
     }
 }
+
+//Function to update ReservationlibProperty
+function updateTableFromAssocArray($data, $mysqli, $tableName, $field1, $field2, &$errorCount)
+{
+    $errorLogFile = dirname(__FILE__) . '/error_log.txt';
+    $actionLogFile = dirname(__FILE__) . '/action_log.txt';
+
+    // Disable autocommit to start the transaction
+    $mysqli->autocommit(FALSE);
+
+    foreach ($data as $index => $item) {
+        try {
+            // Correctly building the SQL statement
+            // Note: Directly injecting $item or $index into your SQL can be risky (SQL injection vulnerabilities),
+            // so parameter binding or escaping is strongly recommended.
+            $itemEscaped = $mysqli->real_escape_string($item);
+            $indexEscaped = $mysqli->real_escape_string($index);
+
+            $sql = "UPDATE `$tableName` SET `$field2` = '$itemEscaped' WHERE `$field1` = '$indexEscaped'";
+
+            // Execute the statement
+            if (!$mysqli->query($sql)) {
+                throw new Exception("(".__FUNCTION__.") Error: " . $mysqli->error);
+            }
+        } catch (Exception $e) {
+            // Increment error counter
+            $errorCount++;
+
+            // Log the error
+            $errorTimestamp = date('Y-m-d H:i:s');
+            $errorLogMessage = "[{$errorTimestamp}] (" . __FUNCTION__ . ") Error: " . $e->getMessage() . PHP_EOL;
+            error_log($errorLogMessage, 3, $errorLogFile);
+
+            // Rollback the transaction on error
+            $mysqli->rollback();
+            // Re-enable autocommit after rollback
+            $mysqli->autocommit(TRUE);
+
+            // Optionally re-throw the exception
+            throw $e;
+        }
+    }
+
+    // Commit the transaction if all operations were successful
+    $mysqli->commit();
+    // Re-enable autocommit after commit
+    $mysqli->autocommit(TRUE);
+}
+
 
 
 
@@ -1115,7 +1164,7 @@ function createArrCUSTOMERcontact($normalizedData, &$errorCount) {
 
         foreach ($normalizedData as $item) {
             if (isset($item['guests']) && !empty($item['guests'])) {
-                foreach ($item['guests'] as $guest) {
+//                foreach ($item['guests'] as $guest) {
                     foreach ($item['guests'] as $guest_ind) {
                         if (!isset($guest_ind['guest']) || !isset($guest_ind['guest']['names'][0])) {
                             continue;
@@ -1147,14 +1196,14 @@ function createArrCUSTOMERcontact($normalizedData, &$errorCount) {
 
 
                         $contact = [
-                            'firstName' => $nameData['givenName'] ?? null,
-                            'lastName' => $nameData['surname'] ?? null,
-                            'title' => $nameData['title'] ?? null,
+                            'firstName' => $nameData['givenName'] ?? '',
+                            'lastName' => $nameData['surname'] ?? '',
+                            'title' => $nameData['title'] ?? '',
                             'email' => $email ?? '', // Use the extracted email
                             'birthDate' => $guestData['dateOfBirth'] ?? null,
-                            'languageCode' => $guestData['primaryLanguage']['code'] ?? null,
-                            'languageFormat' => $guestData['primaryLanguage']['format'] ?? null,
-                            'extGuestId' => $item['extracted_guest_id'] ?? null,
+                            'languageCode' => $guestData['primaryLanguage']['code'] ?? '',
+                            'languageFormat' => $guestData['primaryLanguage']['format'] ?? '',
+                            'extGuestId' => $item['extracted_guest_id'] ?? '',
                             'isPrimary' => $guest['isPrimary'] ?? null,
                             'metaData' => $metaDataJson ?? null,
                             'dataSource' => 'HAPI'
@@ -1166,7 +1215,7 @@ function createArrCUSTOMERcontact($normalizedData, &$errorCount) {
                             $uniqueCheck[$uniqueId] = true;
                         }
                     }
-                }
+//                }
             }
         }
 
@@ -1499,7 +1548,7 @@ function getTableAsAssociativeArray($connection, $tableName) {
 
 
 //create the arrCUSTOMERrelationship array by parsing from $myDataSemiParsed
-function createArrCUSTOMERrelationship($myDataSemiParsed, $arrCUSTOMERlibContactType, $arrCUSTOMERcontact, &$errorCount) {
+function createArrCUSTOMERrelationship($normalizedData, $arrCUSTOMERlibContactType, $arrCUSTOMERcontact, &$errorCount) {
     // Define the error log file path
     $errorLogFile = dirname(__FILE__) . '/error_log.txt';
 
@@ -1512,6 +1561,9 @@ function createArrCUSTOMERrelationship($myDataSemiParsed, $arrCUSTOMERlibContact
             $contactTypeLookup[$type['type']] = $type['id'];
         }
 
+        // Get the default id for UNKNOWN contact type
+        $defaultLibContactId = $contactTypeLookup['UNKNOWN'] ?? null;
+
         // Create a lookup for contacts
         $contactLookup = [];
         foreach ($arrCUSTOMERcontact as $contact) {
@@ -1519,26 +1571,34 @@ function createArrCUSTOMERrelationship($myDataSemiParsed, $arrCUSTOMERlibContact
             $contactLookup[$key] = $contact['id'];
         }
 
-        foreach ($myDataSemiParsed as $entry) {
+        foreach ($normalizedData as $entry) {
+            $extGuestId = $entry['extracted_guest_id'] ?? ''; // Extracted guest ID for the entry
+            $guestsData = $entry['guests'] ?? []; // Guests data array
 
-
-            $guestsData = json_decode($entry['guests'], true) ?? [];
             foreach ($guestsData as $guestData) {
-                $guestInfo = $guestData['guest'] ?? null;
-                if ($guestInfo) {
-//                    $isPrimary = isset($guestData['isPrimary']) ? (int)$guestData['isPrimary'] : 0;
-                    $firstName = $guestInfo['names'][0]['givenName'] ?? null;
-                    $lastName = $guestInfo['names'][0]['surname'] ?? null;
-                    $extGuestId = $entry['extracted_guest_id'] ?? '';
+                $guestInfo = $guestData['guest'] ?? null; // Guest info
+                if (!$guestInfo) {
+                    continue; // Skip if no guest info
+                }
 
+                $names = $guestInfo['names'][0] ?? null; // Names array
+                if (!$names) {
+                    continue; // Skip if no names data
+                }
+
+                // Extract first name and last name
+                $firstName = $names['givenName'] ?? null;
+                $lastName = $names['surname'] ?? null;
+
+                if ($firstName && $lastName) {
+                    // Construct contact key
                     $contactKey = strtolower($firstName . $lastName . $extGuestId);
-
-                    $contactTypeId = $contactTypeLookup['GUEST'] ?? null;
+                    $contactTypeId = $contactTypeLookup['GUEST'] ?? $defaultLibContactId;
                     $contactId = $contactLookup[$contactKey] ?? null;
 
                     if ($contactTypeId !== null && $contactId !== null) {
+                        // Add to customer relationship array
                         $arrCUSTOMERrelationship[] = [
-//                            'isPrimary' => $isPrimary,
                             'contactTypeId' => $contactTypeId,
                             'type' => 'GUEST',
                             'contactId' => $contactId,
@@ -2168,6 +2228,8 @@ function createArrSERVICESfolioOrders($normalizedData, $arrCUSTOMERcontact, $arr
         $arrSERVICESfolioOrders = [];
 
         foreach ($normalizedData as $data) {
+            //initiate counter to track guest number
+            $guestCounter = 0;
             foreach ($data['guests'] as $guest) {
 
 
@@ -2177,8 +2239,10 @@ function createArrSERVICESfolioOrders($normalizedData, $arrCUSTOMERcontact, $arr
                 $extGuestId = $data['extracted_guest_id'] ?? 'UNKNOWN';
 
 
-//                $isPrimary = isset($guestData['isPrimary']) ? (int)$guestData['isPrimary'] : 0;
+
                 $isPrimary = $guest['isPrimary'] ?? 0;
+                // Check if it's the first element in the loop
+//                $isPrimary = ($guestCounter === 0) ? 1 : 0;
                 $createDateTime = strtotime($data['createdDateTime']) ?? null;
                 $modifyDateTime = strtotime($data['lastModifiedDateTime']) ?? null;
                 $startDate = $data['arrival'] ?? null; // Assuming these are already in the correct format
@@ -2426,6 +2490,8 @@ function createArrSERVICESfolioOrders($normalizedData, $arrCUSTOMERcontact, $arr
 //                // Add default/unknown values for all other fields
 //                $arrSERVICESfolioOrders[] = $unknownOrder;
 //            }
+                //increment the counter at the end of the iteration
+                $guestCounter++;
             }
         }
 //        populateLibFolioOrdersTypeId($arrSERVICESfolioOrders, $arrSERVICESlibFolioOrdersType, $errorCount);
